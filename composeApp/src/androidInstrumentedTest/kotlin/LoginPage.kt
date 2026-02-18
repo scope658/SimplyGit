@@ -1,10 +1,9 @@
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsSelectable
-import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTextInput
-import kotlin.math.log
 
 
 class LoginPage(composeTestRule: ComposeTestRule) {
@@ -22,11 +21,11 @@ class LoginPage(composeTestRule: ComposeTestRule) {
     }
 
     fun typePassword(password: String) {
-        loginTextField.performTextInput(text = password)
+        passwordTextField.performTextInput(text = password)
     }
 
     fun checkInputValues(loginField: String, passwordField: String) {
-        loginTextField.assertTextEquals(loginField)
-        passwordTextField.assertTextEquals(passwordField)
+        loginTextField.assert(hasText(loginField))
+        passwordTextField.assert(hasText(passwordField))
     }
 }

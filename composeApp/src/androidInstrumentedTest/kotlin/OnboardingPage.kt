@@ -7,8 +7,6 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import ktshwnumbertwo.composeapp.generated.resources.Res
-import ktshwnumbertwo.composeapp.generated.resources.compose_multiplatform
 
 
 class OnboardingPage(composeTestRule: ComposeTestRule) {
@@ -21,8 +19,8 @@ class OnboardingPage(composeTestRule: ComposeTestRule) {
         image.assertIsDisplayed()
             .assert(
                 matcher = SemanticsMatcher.expectValue(
-                    key = DrawableRes,
-                    expectedValue = Res.drawable.mock_onboarding_image,
+                    key = ImageUrl,
+                    expectedValue = FAKE_IMAGE_URL,
                 )
             )
         text.assertIsDisplayed()
@@ -44,5 +42,9 @@ class OnboardingPage(composeTestRule: ComposeTestRule) {
         image.assertIsNotDisplayed()
         text.assertIsNotDisplayed()
         button.assertIsNotDisplayed()
+    }
+
+    companion object {
+        private const val FAKE_IMAGE_URL = "fakeImageUrl"
     }
 }
