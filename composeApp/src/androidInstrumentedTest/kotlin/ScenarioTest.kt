@@ -1,6 +1,7 @@
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import junit.framework.TestCase.assertTrue
+import org.example.project.AppAssets
 import org.example.project.MainActivity
 import org.junit.Before
 import org.junit.Rule

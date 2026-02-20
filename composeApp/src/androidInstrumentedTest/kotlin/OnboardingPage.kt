@@ -7,6 +7,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import org.example.project.ImageUrl
 
 
 class OnboardingPage(composeTestRule: ComposeTestRule) {

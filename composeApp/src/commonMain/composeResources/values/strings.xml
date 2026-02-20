@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">KtsHwNumberTwo</string>
+    <string name="onboarding_description">Explore thousands of cat photos from around the world. Find your favorite feline friends!</string>
+    <string name="get_started">Get Started</string>
+</resources>
