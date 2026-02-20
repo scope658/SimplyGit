@@ -78,6 +78,6 @@ var SemanticsPropertyReceiver.ImageUrl by ImageUrl
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun OnboardingPreview() {
+private fun OnboardingPreview() {
     OnboardingScreen(onClick = {})
 }

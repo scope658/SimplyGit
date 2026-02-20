@@ -2,4 +2,7 @@
     <string name="app_name">KtsHwNumberTwo</string>
     <string name="onboarding_description">Explore thousands of cat photos from around the world. Find your favorite feline friends!</string>
     <string name="get_started">Get Started</string>
+    <string name="sign_in">Sign in</string>
+    <string name="login_label">Login</string>
+    <string name="password_label">Password</string>
 </resources>
