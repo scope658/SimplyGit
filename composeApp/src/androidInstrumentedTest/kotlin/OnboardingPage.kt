@@ -2,7 +2,6 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -40,9 +39,9 @@ class OnboardingPage(composeTestRule: ComposeTestRule) {
     }
 
     fun checkNotVisibleNow() {
-        image.assertIsNotDisplayed()
-        text.assertIsNotDisplayed()
-        button.assertIsNotDisplayed()
+        image.assertDoesNotExist()
+        text.assertDoesNotExist()
+        button.assertDoesNotExist()
     }
 
     companion object {

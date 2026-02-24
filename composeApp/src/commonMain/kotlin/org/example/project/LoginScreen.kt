@@ -54,7 +54,7 @@ fun LoginScreen() {
             modifier = Modifier.testTag("password_text_field")
         )
         Spacer(modifier = Modifier.height(10.dp))
-        Button(onClick = {}) {
+        Button(onClick = {}, modifier = Modifier.testTag("sign_in_button")) {
             Text(text = stringResource(Res.string.sign_in))
         }
     }
