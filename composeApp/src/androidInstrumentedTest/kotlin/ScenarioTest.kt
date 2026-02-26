@@ -1,48 +1,79 @@
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import junit.framework.TestCase.assertTrue
-import org.example.project.AppAssets
+import ktshwnumbertwo.composeapp.generated.resources.Res
 import org.example.project.MainActivity
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 
 @RunWith(value = AndroidJUnit4::class)
-class ScenarioTest {
+class ScenarioTest : AbstractTest() {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
-    @Before
-    fun setUp() {
-        AppAssets.imageUrl = "fakeImageUrl"
-        composeTestRule.activityRule.scenario.recreate()
-    }
 
     @Test
-    fun navigateToLoginScreen() {
+    fun fullOnboardingScreen() {
         val onboardingPage = OnboardingPage(composeTestRule)
 
-        onboardingPage.checkVisibleNow()
+        onboardingPage.checkVisibleNow(
+            imageRes = Res.drawable.first_onboarding_image,
+            onboardingTitle = "Search repositories",
+            onboardingText = "Find public GitHub repositories using search."
+        )
+        onboardingPage.clickContinueButton()
+
+        onboardingPage.checkVisibleNow(
+            imageRes = Res.drawable.second_onboarding_image,
+            "Add to favorites",
+            "Save repositories for quick access later."
+        )
+
+        onboardingPage.clickContinueButton()
+
+        composeTestRule.activityRule.assertAfterAndBeforeRecreate(
+            block = {
+                onboardingPage.checkVisibleNow(
+                    imageRes = Res.drawable.third_onboarding_image,
+                    "Simple navigation",
+                    "Repositories, favorites, and profile are available in the bottom menu."
+                )
+            }
+        )
+
         onboardingPage.clickContinueButton()
         onboardingPage.checkNotVisibleNow()
 
         val loginPage = LoginPage(composeTestRule)
-
         loginPage.checkVisibleNow()
-        loginPage.typeLogin(login = "userName")
-        loginPage.typePassword(password = "qwerty123")
+    }
 
-        composeTestRule.activityRule.scenario.recreate()
-        loginPage.checkInputValues(loginField = "userName", passwordField = "qwerty123")
+    @Test
+    fun skipOnboardingScreen() {
+        val onboardingPage = OnboardingPage(composeTestRule)
+        onboardingPage.checkVisibleNow(
+            imageRes = Res.drawable.first_onboarding_image,
+            onboardingTitle = "Search repositories",
+            onboardingText = "Find public GitHub repositories using search."
+        )
 
-        composeTestRule.activityRule.scenario.onActivity {
-            it.onBackPressedDispatcher.onBackPressed()
-        }
-        composeTestRule.activityRule.scenario.onActivity {
-            assertTrue(it.isFinishing)
-        }
+        onboardingPage.clickSkipButton()
+        onboardingPage.checkNotVisibleNow()
+
+        val loginPage = LoginPage(composeTestRule)
+        loginPage.checkVisibleNow()
+    }
+}
+
+abstract class AbstractTest {
+    protected fun ActivityScenarioRule<*>.assertAfterAndBeforeRecreate(
+        block: () -> Unit,
+    ) {
+        block()
+        this.scenario.recreate()
+        block()
     }
 }

@@ -6,45 +6,66 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import org.example.project.ImageUrl
+import org.example.project.DrawableRes
+import org.jetbrains.compose.resources.DrawableResource
 
 
 class OnboardingPage(composeTestRule: ComposeTestRule) {
 
     private val image = composeTestRule.onNodeWithTag("onboarding_image")
-    private val text = composeTestRule.onNodeWithTag("onboarding_text")
-    private val button = composeTestRule.onNodeWithTag("onboarding_button")
+    private val onboardingText = composeTestRule.onNodeWithTag("onboarding_text")
+    private val onboardingTitle = composeTestRule.onNodeWithTag("onboarding_title")
+    private val continueButton = composeTestRule.onNodeWithTag("onboarding_button")
+    private val skipButton = composeTestRule.onNodeWithTag("skip_onboarding_button")
 
-    fun checkVisibleNow() {
+    fun checkVisibleNow(
+        imageRes: DrawableResource,
+        onboardingTitle: String,
+        onboardingText: String
+    ) {
+
         image.assertIsDisplayed()
             .assert(
                 matcher = SemanticsMatcher.expectValue(
-                    key = ImageUrl,
-                    expectedValue = FAKE_IMAGE_URL,
+                    key = DrawableRes,
+                    expectedValue = imageRes,
                 )
             )
-        text.assertIsDisplayed()
+
+        this.onboardingTitle
+            .assertIsDisplayed()
+            .assertTextEquals(onboardingTitle)
+
+        this.onboardingText
+            .assertIsDisplayed()
             .assertTextEquals(
-                "Explore thousands of cat photos from around the world. " +
-                        "Find your favorite feline friends!"
+                onboardingText
             )
 
-        button.assertIsDisplayed()
+        continueButton
+            .assertIsDisplayed()
             .assertHasClickAction()
-            .assertTextEquals("Get Started")
+            .assertTextEquals("Next")
+
+        skipButton
+            .assertIsDisplayed()
+            .assertHasClickAction()
+            .assertTextEquals("Skip")
     }
 
     fun clickContinueButton() {
-        button.performClick()
+        continueButton.performClick()
+    }
+
+    fun clickSkipButton() {
+        skipButton.performClick()
     }
 
     fun checkNotVisibleNow() {
         image.assertDoesNotExist()
-        text.assertDoesNotExist()
-        button.assertDoesNotExist()
-    }
-
-    companion object {
-        private const val FAKE_IMAGE_URL = "fakeImageUrl"
+        onboardingTitle.assertDoesNotExist()
+        onboardingText.assertDoesNotExist()
+        continueButton.assertDoesNotExist()
+        skipButton.assertDoesNotExist()
     }
 }
