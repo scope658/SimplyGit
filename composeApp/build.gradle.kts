@@ -36,6 +36,8 @@ kotlin {
             implementation(libs.androidx.activity.compose)
 
             implementation(libs.coil.network.okhttp)
+
+            implementation(libs.koin.android)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -52,6 +54,10 @@ kotlin {
             implementation(libs.navigation.compose)
 
             implementation(libs.kotlinx.serialization.json)
+
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
