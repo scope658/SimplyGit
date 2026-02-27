@@ -6,11 +6,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import ktshwnumbertwo.composeapp.generated.resources.Res
+import ktshwnumbertwo.composeapp.generated.resources.mock_onboarding_image
+import org.example.project.core.RunAsync
+import org.example.project.onboarding.domain.OnboardingRepository
+import org.example.project.onboarding.presentation.OnboardingEvent
+import org.example.project.onboarding.presentation.OnboardingPage
+import org.example.project.onboarding.presentation.OnboardingStepState
+import org.example.project.onboarding.presentation.OnboardingViewModel
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -69,12 +77,7 @@ class OnboardingViewModelTest {
 
     @Test
     fun `finishing onboarding after third page`() = runBlocking {
-        onboardingViewModel = OnboardingViewModel(
-            savedStateHandle = savedStateHandle,
-            onboardingRepository = fakeOnboardingRepository,
-            runAsync = fakeOnboardingRunAsync,
-            onboardingStepState = FakeOnboardingStepState.FakeThirdPage
-        )
+        savedStateHandle["ONBOARDING_STEP_KEY"] = FakeOnboardingStepState.FakeThirdPage
 
         val stepState: StateFlow<OnboardingStepState> = onboardingViewModel.onboardingStepStateFlow
         val pageState: StateFlow<OnboardingPage> = onboardingViewModel.onboardingPageFlow
@@ -137,8 +140,8 @@ class OnboardingViewModelTest {
 
 private interface FakeOnboardingStepState : OnboardingStepState {
 
-
-    object FakeFirstPage : FakeOnboardingStepState {
+    @CommonParcelize
+    object FakeFirstPage : FakeOnboardingStepState, CommonParcelable {
 
         override val nextPage: FakeOnboardingStepState? = FakeSecondPage
 
@@ -148,7 +151,8 @@ private interface FakeOnboardingStepState : OnboardingStepState {
         }
     }
 
-    object FakeSecondPage : FakeOnboardingStepState {
+    @CommonParcelize
+    object FakeSecondPage : FakeOnboardingStepState, CommonParcelable {
 
         override val nextPage: FakeOnboardingStepState? = FakeThirdPage
 
@@ -158,7 +162,8 @@ private interface FakeOnboardingStepState : OnboardingStepState {
         }
     }
 
-    object FakeThirdPage : FakeOnboardingStepState {
+    @CommonParcelize
+    object FakeThirdPage : FakeOnboardingStepState, CommonParcelable {
 
         override val nextPage: FakeOnboardingStepState? = null
 
