@@ -68,6 +68,60 @@ class ScenarioTest : AbstractTest() {
         val loginPage = LoginPage(composeTestRule)
         loginPage.checkVisibleNow()
     }
+
+    @Test
+    fun emptyFieldsThenInvalidInputs() {
+        val onboardingPage = OnboardingPage(composeTestRule)
+        onboardingPage.clickSkipButton()
+
+        val loginPage = LoginPage(composeTestRule)
+
+        loginPage.checkVisibleNow()
+        loginPage.typeLogin(" ")
+        loginPage.typePassword(" ")
+
+        loginPage.checkInputValues(loginField = "", passwordField = "")
+
+        loginPage.checkButtonIsNotActive()
+
+        loginPage.typePassword("1")
+        loginPage.checkInputValues(loginField = "", passwordField = "1")
+
+        loginPage.checkButtonIsNotActive()
+
+        loginPage.typeLogin("a")
+        loginPage.checkInputValues("a", "1")
+
+        loginPage.checkButtonIsActive()
+        loginPage.clickSignInButton()
+
+        loginPage.checkInputsIsNotValid()
+    }
+
+    @Test
+    fun validLoginInputs() {
+        val onboardingPage = OnboardingPage(composeTestRule)
+        onboardingPage.clickSkipButton()
+
+        val loginPage = LoginPage(composeTestRule)
+
+        loginPage.typeLogin("admin")
+        loginPage.typePassword("admin1234")
+
+        composeTestRule.activityRule.assertAfterAndBeforeRecreate(
+            block = {
+                loginPage.checkInputValues(
+                    loginField = "admin",
+                    passwordField = "admin1234"
+                )
+            }
+        )
+        loginPage.checkButtonIsActive()
+
+        loginPage.clickSignInButton()
+        //TODO add ListPage check visible
+    }
+
 }
 
 abstract class AbstractTest {

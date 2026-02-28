@@ -9,6 +9,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 
 
@@ -56,18 +57,26 @@ class LoginPage(composeTestRule: ComposeTestRule) {
         passwordTextField.performTextInput(text = password)
     }
 
-    fun checkInputsIsValid(loginField: String, passwordField: String) {
+    fun clickSignInButton() {
+        signInButton
+            .performClick()
+    }
+
+    fun checkInputValues(loginField: String, passwordField: String) {
         loginTextField
             .assert(hasText(loginField))
         passwordTextField
             .assert(hasText(passwordField))
+    }
 
-        passwordSuppText
-            .assertIsNotDisplayed()
-
+    fun checkButtonIsActive() {
         signInButton
             .assertIsEnabled()
+    }
 
+    fun checkButtonIsNotActive() {
+        signInButton
+            .assertIsNotEnabled()
     }
 
     fun checkInputsIsNotValid() {
@@ -75,5 +84,4 @@ class LoginPage(composeTestRule: ComposeTestRule) {
             .assertIsDisplayed()
             .assertTextEquals("Invalid login or password")
     }
-
 }
