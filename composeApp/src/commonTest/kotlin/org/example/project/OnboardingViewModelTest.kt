@@ -13,6 +13,10 @@ import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import ktshwnumbertwo.composeapp.generated.resources.Res
 import ktshwnumbertwo.composeapp.generated.resources.mock_onboarding_image
+import ktshwnumbertwo.composeapp.generated.resources.onboarding_first_desc
+import ktshwnumbertwo.composeapp.generated.resources.onboarding_first_title
+import ktshwnumbertwo.composeapp.generated.resources.onboarding_second_title
+import ktshwnumbertwo.composeapp.generated.resources.onboarding_third_title
 import org.example.project.core.RunAsync
 import org.example.project.onboarding.domain.OnboardingRepository
 import org.example.project.onboarding.presentation.OnboardingEvent
@@ -175,17 +179,15 @@ private interface FakeOnboardingStepState : OnboardingStepState {
 }
 
 private val expectedFirstPage = OnboardingPage(
-    title = "1",
-    description = "1",
+    title = Res.string.onboarding_first_title,
+    description = Res.string.onboarding_first_desc,
     image = Res.drawable.mock_onboarding_image,
 )
 private val expectedSecondPage = expectedFirstPage.copy(
-    title = "2",
-    description = "2",
+    title = Res.string.onboarding_second_title,
 )
 private val expectedThirdPage = expectedFirstPage.copy(
-    title = "3",
-    description = "3",
+    title = Res.string.onboarding_third_title,
 )
 
 private class FakeOnboardingRunAsync : RunAsync {

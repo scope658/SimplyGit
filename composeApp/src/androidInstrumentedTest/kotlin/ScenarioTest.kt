@@ -2,6 +2,9 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ktshwnumbertwo.composeapp.generated.resources.Res
+import ktshwnumbertwo.composeapp.generated.resources.first_onboarding_image
+import ktshwnumbertwo.composeapp.generated.resources.second_onboarding_image
+import ktshwnumbertwo.composeapp.generated.resources.third_onboarding_image
 import org.example.project.MainActivity
 import org.junit.Rule
 import org.junit.Test
@@ -13,7 +16,6 @@ class ScenarioTest : AbstractTest() {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
-
 
     @Test
     fun fullOnboardingScreen() {
