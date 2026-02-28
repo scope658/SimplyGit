@@ -1,13 +1,9 @@
 package org.example.project
 
 import androidx.lifecycle.SavedStateHandle
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
@@ -17,7 +13,7 @@ import ktshwnumbertwo.composeapp.generated.resources.onboarding_first_desc
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_first_title
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_second_title
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_third_title
-import org.example.project.core.RunAsync
+import org.example.project.core.FakeRunAsync
 import org.example.project.onboarding.domain.OnboardingRepository
 import org.example.project.onboarding.presentation.OnboardingEvent
 import org.example.project.onboarding.presentation.OnboardingPage
@@ -32,13 +28,13 @@ class OnboardingViewModelTest {
 
     private lateinit var onboardingViewModel: OnboardingViewModel
     private lateinit var fakeOnboardingRepository: FakeOnboardingRepository
-    private lateinit var fakeOnboardingRunAsync: FakeOnboardingRunAsync
+    private lateinit var fakeOnboardingRunAsync: FakeRunAsync
     private lateinit var savedStateHandle: SavedStateHandle
 
     @BeforeTest
     fun setUp() {
         fakeOnboardingRepository = FakeOnboardingRepository()
-        fakeOnboardingRunAsync = FakeOnboardingRunAsync()
+        fakeOnboardingRunAsync = FakeRunAsync()
         savedStateHandle = SavedStateHandle()
         onboardingViewModel = OnboardingViewModel(
             savedStateHandle = savedStateHandle,
@@ -190,39 +186,7 @@ private val expectedThirdPage = expectedFirstPage.copy(
     title = Res.string.onboarding_third_title,
 )
 
-private class FakeOnboardingRunAsync : RunAsync {
 
-    override fun runSharedFlow(
-        scope: CoroutineScope,
-        action: suspend () -> Unit,
-    ) {
-        scope.launch(Dispatchers.Unconfined) {
-            action.invoke()
-        }
-    }
-    override fun <T : Any> runAsync(
-        scope: CoroutineScope,
-        background: suspend () -> T,
-        ui: (T) -> Unit,
-    ) {
-        runBlocking {
-            background.invoke()
-        }
-    }
-
-    override fun <T : Any> runFlow(
-        scope: CoroutineScope,
-        flow: Flow<T>,
-        onEach: (T) -> Unit,
-    ) {
-
-        scope.launch(Dispatchers.Unconfined) {
-            flow.collect {
-                onEach.invoke(it)
-            }
-        }
-    }
-}
 
 private class FakeOnboardingRepository : OnboardingRepository {
 
