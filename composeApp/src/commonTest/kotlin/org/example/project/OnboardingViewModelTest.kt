@@ -190,6 +190,14 @@ private val expectedThirdPage = expectedFirstPage.copy(
 
 private class FakeOnboardingRunAsync : RunAsync {
 
+    override fun runSharedFlow(
+        scope: CoroutineScope,
+        action: suspend () -> Unit,
+    ) {
+        scope.launch(Dispatchers.Unconfined) {
+            action.invoke()
+        }
+    }
     override fun <T : Any> runAsync(
         scope: CoroutineScope,
         background: suspend () -> T,

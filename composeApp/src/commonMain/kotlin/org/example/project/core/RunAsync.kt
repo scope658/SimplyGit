@@ -21,6 +21,10 @@ interface RunAsync {
         flow: Flow<T>,
         onEach: (T) -> Unit,
     )
+    fun runSharedFlow(
+        scope: CoroutineScope,
+        action: suspend () -> Unit,
+    )
     class Base : RunAsync {
         override fun <T : Any> runAsync(
             scope: CoroutineScope,
@@ -41,6 +45,15 @@ interface RunAsync {
             onEach: (T) -> Unit
         ) {
             flow.onEach(onEach).launchIn(scope)
+        }
+
+        override fun runSharedFlow(
+            scope: CoroutineScope,
+            action: suspend () -> Unit
+        ) {
+            scope.launch {
+                action()
+            }
         }
     }
 }

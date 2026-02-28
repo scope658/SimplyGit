@@ -18,6 +18,7 @@ class OnboardingViewModel(
     private val runAsync: RunAsync,
     onboardingStepState: OnboardingStepState,
 ) : ViewModel(), OnboardingActions {
+
     private val _onboardingStepStateFlow: MutableStateFlow<OnboardingStepState> =
         savedStateHandle.getMutableStateFlow(ONBOARDING_STEP_KEY, onboardingStepState)
     val onboardingStepStateFlow = _onboardingStepStateFlow.asStateFlow()
@@ -50,11 +51,12 @@ class OnboardingViewModel(
     }
 
     override fun skipOnboarding() {
-        runAsync.runAsync(
-            scope = viewModelScope,
-            background = { _onboardingEvent.emit(OnboardingEvent.Finished) },
-            { },
+
+        runAsync.runSharedFlow(
+            viewModelScope,
+            action = { _onboardingEvent.emit(OnboardingEvent.Finished) }
         )
+
     }
 
     override fun finishOnboarding() {
