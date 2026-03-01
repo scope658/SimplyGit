@@ -3,10 +3,8 @@ package org.example.project.login.presentation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.flow.collectLatest
 import org.example.project.Routes
 import org.koin.compose.viewmodel.koinViewModel
@@ -34,11 +32,4 @@ fun LoginScreen(
         loginViewModel,
     )
 
-}
-
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-private fun LoginScreenPreview() {
-    LoginScreen(navController = rememberNavController())
 }
