@@ -6,6 +6,7 @@ import ktshwnumbertwo.composeapp.generated.resources.first_onboarding_image
 import ktshwnumbertwo.composeapp.generated.resources.second_onboarding_image
 import ktshwnumbertwo.composeapp.generated.resources.third_onboarding_image
 import org.example.project.MainActivity
+import org.example.project.MockData
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -99,7 +100,7 @@ class ScenarioTest : AbstractTest() {
     }
 
     @Test
-    fun validLoginInputs() {
+    fun validLoginThenToMainScreen() {
         val onboardingPage = OnboardingPage(composeTestRule)
         onboardingPage.clickSkipButton()
 
@@ -119,10 +120,16 @@ class ScenarioTest : AbstractTest() {
         loginPage.checkButtonIsActive()
 
         loginPage.clickSignInButton()
-        //TODO add ListPage check visible
+
+        val mainPage = MainPage(composeTestRule)
+
+        mainPage.checkUserRepositories(
+            userRepositories = MockData.mockedUserRepositoriesUi,
+        )
     }
 
 }
+
 
 abstract class AbstractTest {
     protected fun ActivityScenarioRule<*>.assertAfterAndBeforeRecreate(
@@ -133,3 +140,5 @@ abstract class AbstractTest {
         block()
     }
 }
+
+
