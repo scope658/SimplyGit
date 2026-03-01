@@ -8,11 +8,11 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import org.example.project.core.FakeRunAsync
-import org.example.project.login.ErrorState
-import org.example.project.login.LoginUiEvent
-import org.example.project.login.LoginUiState
-import org.example.project.login.LoginViewModel
 import org.example.project.login.domain.LoginRepository
+import org.example.project.login.presentation.ErrorState
+import org.example.project.login.presentation.LoginUiEvent
+import org.example.project.login.presentation.LoginUiState
+import org.example.project.login.presentation.LoginViewModel
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -158,7 +158,7 @@ private class FakeLoginRepository : LoginRepository {
 
     private var fakeResult: Result<Unit> = Result.success(Unit)
 
-    override fun login(username: String, password: String): Result<Unit> {
+    override fun login(login: String, password: String): Result<Unit> {
         return fakeResult
     }
 
