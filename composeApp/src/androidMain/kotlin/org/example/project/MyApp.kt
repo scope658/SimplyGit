@@ -2,6 +2,7 @@ package org.example.project
 
 import android.app.Application
 import org.example.project.login.di.loginModule
+import org.example.project.main.di.mainModule
 import org.example.project.onboarding.di.onboardingModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
@@ -12,7 +13,7 @@ class MyApp : Application() {
         super.onCreate()
         startKoin {
             androidContext(this@MyApp)
-            modules(onboardingModule, loginModule)
+            modules(onboardingModule, loginModule, mainModule)
         }
     }
 }
