@@ -17,4 +17,6 @@
 
     <string name="onboarding_next">Next</string>
     <string name="onboarding_skip">Skip</string>
+
+    <string name="invalid_login_or_password">Invalid login or password</string>
 </resources>

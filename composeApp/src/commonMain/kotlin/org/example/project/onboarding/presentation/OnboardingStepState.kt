@@ -14,13 +14,13 @@ import org.example.project.CommonParcelable
 import org.example.project.CommonParcelize
 
 
-interface OnboardingStepState {
+interface OnboardingStepState : CommonParcelable {
 
     val nextPage: OnboardingStepState?
     fun currentState(): OnboardingPage
 
     @CommonParcelize
-    object FirstPage : OnboardingStepState, CommonParcelable {
+    object FirstPage : OnboardingStepState {
 
         override val nextPage: OnboardingStepState? = SecondPage
 
@@ -35,7 +35,7 @@ interface OnboardingStepState {
     }
 
     @CommonParcelize
-    object SecondPage : OnboardingStepState, CommonParcelable {
+    object SecondPage : OnboardingStepState {
 
         override val nextPage: OnboardingStepState? = ThirdPage
 
@@ -50,7 +50,7 @@ interface OnboardingStepState {
     }
 
     @CommonParcelize
-    object ThirdPage : OnboardingStepState, CommonParcelable {
+    object ThirdPage : OnboardingStepState {
 
         override val nextPage: OnboardingStepState? = null
 
