@@ -95,7 +95,7 @@ fun RepositoryCard(userRepositoryUi: UserRepositoryUi) {
 
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
-fun MainUiPreview() {
+private fun MainUiPreview() {
     Scaffold {
         Box(modifier = Modifier.padding(it)) {
             MainUi(
