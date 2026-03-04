@@ -128,6 +128,27 @@ class ScenarioTest : AbstractTest() {
         )
     }
 
+
+    @Test
+    fun hideAndShowPasswordButtons() {
+        val onboardingPage = OnboardingPage(composeTestRule)
+        onboardingPage.clickSkipButton()
+
+        val loginPage = LoginPage(composeTestRule)
+
+        loginPage.typePassword("admin1234")
+
+        loginPage.clickAuthIconButton()
+        loginPage.checkHidePasswordIconVisible()
+
+        composeTestRule.activityRule.assertAfterAndBeforeRecreate {
+            loginPage.checkHidePasswordIconVisible()
+        }
+
+        loginPage.clickAuthIconButton()
+        loginPage.checkShowPasswordIconVisible()
+
+    }
 }
 
 

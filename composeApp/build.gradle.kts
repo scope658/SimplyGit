@@ -61,6 +61,9 @@ kotlin {
 
             implementation(libs.material.icons.extended.v173)
         }
+        iosMain.dependencies {
+            implementation(libs.coil.network.ktor)
+        }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }

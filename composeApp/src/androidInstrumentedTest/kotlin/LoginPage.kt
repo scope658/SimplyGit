@@ -23,6 +23,11 @@ class LoginPage(composeTestRule: ComposeTestRule) {
     private val passwordSuppText =
         composeTestRule.onNodeWithTag("password_supp_text", useUnmergedTree = true)
     private val signInButton = composeTestRule.onNodeWithTag("sign_in_button")
+    private val authIconButton = composeTestRule.onNodeWithTag("auth_icon_button")
+    private val hidePasswordIcon =
+        composeTestRule.onNodeWithTag("hide_password", useUnmergedTree = true)
+    private val showPasswordIcon =
+        composeTestRule.onNodeWithTag("show_password", useUnmergedTree = true)
 
     fun checkVisibleNow() {
         loginTextField
@@ -47,6 +52,15 @@ class LoginPage(composeTestRule: ComposeTestRule) {
             .assertTextContains("Sign in")
             .assertHasClickAction()
             .assertIsNotEnabled()
+
+        authIconButton
+            .assertIsDisplayed()
+
+        showPasswordIcon
+            .assertIsDisplayed()
+
+        hidePasswordIcon
+            .assertDoesNotExist()
     }
 
     fun typeLogin(login: String) {
@@ -83,5 +97,26 @@ class LoginPage(composeTestRule: ComposeTestRule) {
         passwordSuppText
             .assertIsDisplayed()
             .assertTextEquals("Invalid login or password")
+    }
+
+    fun checkHidePasswordIconVisible() {
+        hidePasswordIcon
+            .assertIsDisplayed()
+
+        showPasswordIcon
+            .assertDoesNotExist()
+    }
+
+    fun checkShowPasswordIconVisible() {
+        showPasswordIcon
+            .assertIsDisplayed()
+
+        hidePasswordIcon
+            .assertDoesNotExist()
+    }
+
+    fun clickAuthIconButton() {
+        authIconButton
+            .performClick()
     }
 }

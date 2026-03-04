@@ -18,18 +18,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ktshwnumbertwo.composeapp.generated.resources.Res
+import ktshwnumbertwo.composeapp.generated.resources.onboarding_button_test_tag
+import ktshwnumbertwo.composeapp.generated.resources.onboarding_image_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_next
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_skip
+import ktshwnumbertwo.composeapp.generated.resources.onboarding_skip_button_test_tag
+import ktshwnumbertwo.composeapp.generated.resources.onboarding_text_test_tag
+import ktshwnumbertwo.composeapp.generated.resources.onboarding_title_test_tag
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import theme.fontSizeS
+import theme.fontSizeXXL
+import theme.spacingHuge
+import theme.spacingL
+import theme.spacingM
+import theme.spacingXL
+import theme.spacingXXL
 
 @Composable
 fun OnboardingUi(onboardingPage: OnboardingPage, onboardingActions: OnboardingActions) {
@@ -44,42 +54,43 @@ fun OnboardingUi(onboardingPage: OnboardingPage, onboardingActions: OnboardingAc
         Image(
             painter = painterResource(onboardingPage.image),
             contentDescription = null,
-            modifier = Modifier.padding(10.dp).testTag("onboarding_image")
-                .semantics {
+            modifier = Modifier.padding(spacingM)
+                .testTag(stringResource(Res.string.onboarding_image_test_tag))
+                .clearAndSetSemantics {
                     this.DrawableRes = onboardingPage.image
                 }
         )
 
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(spacingHuge))
         Text(
             text = stringResource(onboardingPage.title),
-            fontSize = 25.sp,
+            fontSize = fontSizeXXL,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.testTag("onboarding_title")
+            modifier = Modifier.testTag(stringResource(Res.string.onboarding_title_test_tag))
         )
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(spacingXL))
         Text(
             text = stringResource(onboardingPage.description),
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.W400,
-            fontSize = 15.sp,
+            fontSize = fontSizeS,
             modifier = Modifier.testTag(
-                "onboarding_text"
+                stringResource(Res.string.onboarding_text_test_tag)
             ),
         )
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(spacingXXL))
         FilledTonalButton(
             onClick = onboardingActions::nextPage,
-            modifier = Modifier.testTag("onboarding_button")
+            modifier = Modifier.testTag(stringResource(Res.string.onboarding_button_test_tag))
         ) {
             Text(
                 text = stringResource(Res.string.onboarding_next),
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(spacingL)
             )
         }
         TextButton(
             onClick = onboardingActions::skipOnboarding,
-            modifier = Modifier.testTag("skip_onboarding_button")
+            modifier = Modifier.testTag(stringResource(Res.string.onboarding_skip_button_test_tag))
         ) {
             Text(text = stringResource(Res.string.onboarding_skip))
         }

@@ -19,4 +19,6 @@
     <string name="onboarding_skip">Skip</string>
 
     <string name="invalid_login_or_password">Invalid login or password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="show_password">Show password</string>
 </resources>

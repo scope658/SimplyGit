@@ -12,6 +12,10 @@ import org.example.project.CommonParcelable
 import org.example.project.CommonParcelize
 import org.example.project.core.RunAsync
 import org.example.project.login.domain.LoginRepository
+import org.example.project.login.presentation.components.ErrorState
+import org.example.project.login.presentation.components.TrailingIconState
+import org.example.project.login.presentation.components.VisibilityIconState
+import org.example.project.login.presentation.components.VisualTransformationState
 
 class LoginViewModel(
     savedStateHandle: SavedStateHandle,
@@ -66,6 +70,25 @@ class LoginViewModel(
             }
     }
 
+    override fun changePasswordVisibility() {
+        val currentState = _loginUiState.value
+        if (currentState.visualTransformationState is VisualTransformationState.Hide) {
+            _loginUiState.update {
+                it.copy(
+                    visualTransformationState = VisualTransformationState.Show,
+                    trailingIconState = TrailingIconState.Password(visibilityIconState = VisibilityIconState.Hide)
+                )
+            }
+        } else {
+            _loginUiState.update {
+                it.copy(
+                    visualTransformationState = VisualTransformationState.Hide,
+                    trailingIconState = TrailingIconState.Password(visibilityIconState = VisibilityIconState.Show)
+                )
+            }
+        }
+    }
+
     companion object {
         private const val LOGIN_UI_STATE_KEY = "LOGIN_UI_STATE_KEY"
     }
@@ -81,8 +104,17 @@ data class LoginUiState(
     val password: String,
     val isLoginButtonActive: Boolean,
     val error: ErrorState,
+    val trailingIconState: TrailingIconState,
+    val visualTransformationState: VisualTransformationState,
 ) : CommonParcelable {
     companion object {
-        val INITIAL = LoginUiState(login = "", "", false, ErrorState.Empty)
+        val INITIAL = LoginUiState(
+            login = "",
+            "",
+            false,
+            ErrorState.Empty,
+            trailingIconState = TrailingIconState.Password(visibilityIconState = VisibilityIconState.Show),
+            visualTransformationState = VisualTransformationState.Hide,
+        )
     }
 }

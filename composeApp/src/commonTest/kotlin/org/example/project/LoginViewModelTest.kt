@@ -9,10 +9,13 @@ import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import org.example.project.core.FakeRunAsync
 import org.example.project.login.domain.LoginRepository
-import org.example.project.login.presentation.ErrorState
 import org.example.project.login.presentation.LoginUiEvent
 import org.example.project.login.presentation.LoginUiState
 import org.example.project.login.presentation.LoginViewModel
+import org.example.project.login.presentation.components.ErrorState
+import org.example.project.login.presentation.components.TrailingIconState
+import org.example.project.login.presentation.components.VisibilityIconState
+import org.example.project.login.presentation.components.VisualTransformationState
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -130,6 +133,37 @@ class LoginViewModelTest {
         val expectedEvent = LoginUiEvent.LoginSuccessEvent
         assertEquals(expectedEvent, actualFinalEvent)
     }
+
+    @Test
+    fun `change password visibility`() {
+
+        val loginUiState: StateFlow<LoginUiState> = loginViewModel.loginUiState
+
+        assertEquals(initialLoginUiState, loginUiState.value)
+        loginViewModel.changePasswordVisibility()
+
+        assertEquals(
+            initialLoginUiState.copy(
+                trailingIconState = TrailingIconState.Password(
+                    visibilityIconState = VisibilityIconState.Hide
+                ),
+                visualTransformationState = VisualTransformationState.Show,
+            ),
+            loginUiState.value
+        )
+
+        loginViewModel.changePasswordVisibility()
+
+        assertEquals(
+            initialLoginUiState.copy(
+                trailingIconState = TrailingIconState.Password(
+                    visibilityIconState = VisibilityIconState.Show
+                ),
+                visualTransformationState = VisualTransformationState.Hide
+            ),
+            loginUiState.value
+        )
+    }
 }
 
 private val failureLoginUiState = LoginUiState(
@@ -137,6 +171,8 @@ private val failureLoginUiState = LoginUiState(
     password = "1",
     isLoginButtonActive = true,
     error = ErrorState.Error,
+    trailingIconState = TrailingIconState.Password(visibilityIconState = VisibilityIconState.Show),
+    visualTransformationState = VisualTransformationState.Hide,
 )
 
 
@@ -145,13 +181,16 @@ private val successLoginUiState = LoginUiState(
     password = "admin1234",
     isLoginButtonActive = true,
     error = ErrorState.Empty,
-
-    )
+    trailingIconState = TrailingIconState.Password(visibilityIconState = VisibilityIconState.Show),
+    visualTransformationState = VisualTransformationState.Hide,
+)
 private val initialLoginUiState = LoginUiState(
     login = "",
     password = "",
     isLoginButtonActive = false,
     error = ErrorState.Empty,
+    trailingIconState = TrailingIconState.Password(visibilityIconState = VisibilityIconState.Show),
+    visualTransformationState = VisualTransformationState.Hide,
 )
 
 private class FakeLoginRepository : LoginRepository {

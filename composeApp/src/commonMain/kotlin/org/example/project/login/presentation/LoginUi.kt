@@ -4,30 +4,30 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import ktshwnumbertwo.composeapp.generated.resources.Res
-import ktshwnumbertwo.composeapp.generated.resources.invalid_login_or_password
 import ktshwnumbertwo.composeapp.generated.resources.login_label
+import ktshwnumbertwo.composeapp.generated.resources.login_label_test_tag
+import ktshwnumbertwo.composeapp.generated.resources.login_text_field_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.password_label
+import ktshwnumbertwo.composeapp.generated.resources.password_label_test_tag
+import ktshwnumbertwo.composeapp.generated.resources.password_text_field_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.sign_in
-import org.example.project.CommonParcelable
-import org.example.project.CommonParcelize
+import ktshwnumbertwo.composeapp.generated.resources.sign_in_button_test_tag
+import org.example.project.login.presentation.components.AuthTextField
+import org.example.project.login.presentation.components.ErrorState
+import org.example.project.login.presentation.components.TrailingIconState
 import org.jetbrains.compose.resources.stringResource
+import theme.spacingM
 
 
 @Composable
@@ -45,77 +45,33 @@ fun LoginUi(loginUiState: LoginUiState, loginActions: LoginActions) {
             value = loginUiState.login,
             onValueChange = loginActions::onUsernameChanged,
             isError = isError,
-            textFieldModifier = Modifier.testTag("login_text_field"),
-            labelModifier = Modifier.testTag("login_label"),
+            textFieldModifier = Modifier.testTag(stringResource(Res.string.login_text_field_test_tag)),
+            labelModifier = Modifier.testTag(stringResource(Res.string.login_label_test_tag)),
+            trailingIconState = TrailingIconState.Login,
+            onTrailingIconClick = {},
         )
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(spacingM))
         AuthTextField(
             labelText = stringResource(Res.string.password_label),
             value = loginUiState.password,
             onValueChange = loginActions::onPasswordChanged,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            visualTransformation = PasswordVisualTransformation(),
             isError = isError,
             errorText = loginUiState.error,
-            textFieldModifier = Modifier.testTag("password_text_field"),
-            labelModifier = Modifier.testTag("password_label"),
+            textFieldModifier = Modifier.testTag(stringResource(Res.string.password_text_field_test_tag)),
+            labelModifier = Modifier.testTag(stringResource(Res.string.password_label_test_tag)),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            visualTransformationState = loginUiState.visualTransformationState,
+            trailingIconState = loginUiState.trailingIconState,
+            onTrailingIconClick = loginActions::changePasswordVisibility,
+
         )
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(spacingM))
         Button(
+            enabled = loginUiState.isLoginButtonActive,
             onClick = loginActions::login,
-            modifier = Modifier.testTag("sign_in_button"),
-            enabled = loginUiState.isLoginButtonActive
+            modifier = Modifier.testTag(stringResource(Res.string.sign_in_button_test_tag)),
         ) {
             Text(text = stringResource(Res.string.sign_in))
-        }
-    }
-}
-
-@Composable
-fun AuthTextField(
-    labelText: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    errorText: ErrorState = ErrorState.Empty,
-    isError: Boolean,
-    textFieldModifier: Modifier = Modifier,
-    labelModifier: Modifier = Modifier,
-) {
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = textFieldModifier.fillMaxWidth().padding(horizontal = 40.dp),
-        label = { Text(text = labelText, modifier = labelModifier) },
-        singleLine = true,
-        keyboardOptions = keyboardOptions,
-        visualTransformation = visualTransformation,
-        isError = isError,
-        supportingText = { errorText.Show() }
-    )
-}
-
-
-interface ErrorState : CommonParcelable {
-    @Composable
-    fun Show()
-
-    @CommonParcelize
-    object Empty : ErrorState {
-        @Composable
-        override fun Show() = Unit
-    }
-
-    @CommonParcelize
-    object Error : ErrorState {
-        @Composable
-        override fun Show() {
-            Text(
-                stringResource(Res.string.invalid_login_or_password),
-                modifier = Modifier.testTag("password_supp_text")
-            )
         }
     }
 }
@@ -134,7 +90,7 @@ private fun LoginUiPreview() {
 private fun LoginErrorPreview() {
     LoginUi(
         loginUiState = previewLoginUiState.copy(
-            isLoginButtonActive = false,
+            isLoginButtonActive = true,
             error = ErrorState.Error
         ),
         loginActions = loginPreviewActions
@@ -142,15 +98,17 @@ private fun LoginErrorPreview() {
 }
 
 private val loginPreviewActions = object : LoginActions {
+
     override fun onUsernameChanged(userName: String) = Unit
 
     override fun onPasswordChanged(password: String) = Unit
 
     override fun login() = Unit
+
+    override fun changePasswordVisibility() = Unit
 }
 
-private val previewLoginUiState = LoginUiState(
-    login = "admin", password = "admin1234", isLoginButtonActive = true, error = ErrorState.Empty
-)
+private val previewLoginUiState = LoginUiState.INITIAL.copy(login = "admin", password = "admin1234")
+
 
 
