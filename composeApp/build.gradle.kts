@@ -51,10 +51,16 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+
+        iosMain.dependencies {
+            implementation(libs.coil.network.ktor)
+        }
+
         androidInstrumentedTest.dependencies {
             implementation(libs.androidx.testExt.junit)
             implementation(libs.androidx.espresso.core)
             implementation(libs.compose.ui.test.junit4)
+
         }
     }
 }

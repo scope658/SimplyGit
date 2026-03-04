@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Text
@@ -17,21 +16,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.SemanticsPropertyKey
-import androidx.compose.ui.semantics.SemanticsPropertyReceiver
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import ktshwnumbertwo.composeapp.generated.resources.Res
 import ktshwnumbertwo.composeapp.generated.resources.get_started
 import ktshwnumbertwo.composeapp.generated.resources.mock_onboarding_image
+import ktshwnumbertwo.composeapp.generated.resources.onboarding_button_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_description
+import ktshwnumbertwo.composeapp.generated.resources.onboarding_text_test_tag
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import theme.onboardingImageShape
+import theme.paddingMedium
+import theme.spacingExtraLarge
 
 @Composable
 fun OnboardingScreen(onClick: () -> Unit) {
@@ -47,35 +47,36 @@ fun OnboardingScreen(onClick: () -> Unit) {
         AsyncImage(
             model = AppAssets.imageUrl,
             contentDescription = null,
-            modifier = Modifier.clip(shape = RoundedCornerShape(15.dp))
-                .semantics { this.ImageUrl = AppAssets.imageUrl }
-                .testTag("onboarding_image"),
+            modifier = Modifier.clip(shape = onboardingImageShape)
+                .testTag(AppAssets.imageUrl),
             placeholder = painterResource(resource = mockOnboardingImageRes),
-            contentScale = ContentScale.FillHeight,
+            contentScale = ContentScale.Crop,
             error = painterResource(mockOnboardingImageRes)
         )
-        Spacer(modifier = Modifier.height(60.dp))
+        Spacer(modifier = Modifier.height(spacingExtraLarge))
         Text(
             text = stringResource(Res.string.onboarding_description),
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.W300,
             fontSize = 25.sp,
             modifier = Modifier.testTag(
-                "onboarding_text"
+                stringResource(Res.string.onboarding_text_test_tag)
             )
         )
-        Spacer(modifier = Modifier.height(60.dp))
+        Spacer(modifier = Modifier.height(spacingExtraLarge))
         FilledTonalButton(
             onClick = { onClick() },
-            modifier = Modifier.testTag("onboarding_button")
+            modifier = Modifier.testTag(stringResource(Res.string.onboarding_button_test_tag))
         ) {
-            Text(text = stringResource(Res.string.get_started), modifier = Modifier.padding(16.dp))
+            Text(
+                text = stringResource(Res.string.get_started), modifier = Modifier.padding(
+                    paddingMedium
+                )
+            )
         }
     }
 }
 
-val ImageUrl = SemanticsPropertyKey<String>(name = "imageUrl")
-var SemanticsPropertyReceiver.ImageUrl by ImageUrl
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable

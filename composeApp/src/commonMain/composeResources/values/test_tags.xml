@@ -1,0 +1,9 @@
+<resources>
+    <string name="onboarding_text_test_tag">onboarding_text</string>
+    <string name="onboarding_button_test_tag">onboarding_button</string>
+
+    <string name="login_text_field_test_tag">login_text_field</string>
+    <string name="password_text_field_test_tag">password_text_field</string>
+    <string name="sign_in_button_test_tag">sign_in_button</string>
+
+</resources>

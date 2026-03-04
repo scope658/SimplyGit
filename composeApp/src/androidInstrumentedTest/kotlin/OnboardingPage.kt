@@ -1,28 +1,21 @@
-import androidx.compose.ui.test.SemanticsMatcher
-import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import org.example.project.ImageUrl
 
 
 class OnboardingPage(composeTestRule: ComposeTestRule) {
 
-    private val image = composeTestRule.onNodeWithTag("onboarding_image")
+    private val image = composeTestRule.onNodeWithTag(FAKE_IMAGE_URL)
     private val text = composeTestRule.onNodeWithTag("onboarding_text")
     private val button = composeTestRule.onNodeWithTag("onboarding_button")
 
     fun checkVisibleNow() {
-        image.assertIsDisplayed()
-            .assert(
-                matcher = SemanticsMatcher.expectValue(
-                    key = ImageUrl,
-                    expectedValue = FAKE_IMAGE_URL,
-                )
-            )
+        image
+            .assertIsDisplayed()
+
         text.assertIsDisplayed()
             .assertTextEquals(
                 "Explore thousands of cat photos from around the world. " +

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,20 +18,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import ktshwnumbertwo.composeapp.generated.resources.Res
 import ktshwnumbertwo.composeapp.generated.resources.login_label
+import ktshwnumbertwo.composeapp.generated.resources.login_text_field_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.password_label
+import ktshwnumbertwo.composeapp.generated.resources.password_text_field_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.sign_in
+import ktshwnumbertwo.composeapp.generated.resources.sign_in_button_test_tag
+import org.example.project.components.AuthTextField
 import org.jetbrains.compose.resources.stringResource
+import theme.spacingStandard
 
 
 @Composable
 fun LoginScreen() {
+
     var loginField by rememberSaveable { mutableStateOf("") }
     var passwordField by rememberSaveable { mutableStateOf("") }
+
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -42,42 +46,25 @@ fun LoginScreen() {
             labelText = stringResource(Res.string.login_label),
             value = loginField,
             onValueChange = { loginField = it },
-            modifier = Modifier.testTag("login_text_field"),
+            modifier = Modifier.testTag(stringResource(Res.string.login_text_field_test_tag)),
         )
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(spacingStandard))
         AuthTextField(
             labelText = stringResource(Res.string.password_label),
             value = passwordField,
             onValueChange = { passwordField = it },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.testTag("password_text_field")
+            modifier = Modifier.testTag(stringResource(Res.string.password_text_field_test_tag))
         )
-        Spacer(modifier = Modifier.height(10.dp))
-        Button(onClick = {}, modifier = Modifier.testTag("sign_in_button")) {
+        Spacer(modifier = Modifier.height(spacingStandard))
+        Button(
+            onClick = {},
+            modifier = Modifier.testTag(stringResource(Res.string.sign_in_button_test_tag))
+        ) {
             Text(text = stringResource(Res.string.sign_in))
         }
     }
-}
-
-@Composable
-fun AuthTextField(
-    labelText: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    modifier: Modifier = Modifier,
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier,
-        label = { Text(text = labelText) },
-        singleLine = true,
-        keyboardOptions = keyboardOptions,
-        visualTransformation = visualTransformation,
-    )
 }
 
 @Preview(showBackground = true, showSystemUi = true)
