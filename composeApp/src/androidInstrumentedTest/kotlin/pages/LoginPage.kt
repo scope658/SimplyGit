@@ -1,16 +1,18 @@
 package pages
 
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 
 
-class LoginPage(composeTestRule: ComposeTestRule) {
+class LoginPage(private val composeTestRule: ComposeTestRule) {
 
     private val loginPoster = composeTestRule.onNodeWithTag("login_poster")
     private val signInButton = composeTestRule.onNodeWithTag("sign_in_button")
@@ -42,7 +44,13 @@ class LoginPage(composeTestRule: ComposeTestRule) {
             .performClick()
     }
 
+    @OptIn(ExperimentalTestApi::class)
     fun checkErrorMessageIsVisible(errorMessage: String) {
+        composeTestRule.waitUntilExactlyOneExists(
+            matcher = hasText(errorMessage),
+            timeoutMillis = 5000
+        )
+
         this.errorMessage
             .assertIsDisplayed()
             .assertTextEquals(errorMessage)

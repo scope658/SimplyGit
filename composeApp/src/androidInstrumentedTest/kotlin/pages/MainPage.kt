@@ -1,8 +1,10 @@
 package pages
 
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performScrollToNode
@@ -19,7 +21,12 @@ class MainPage(private val composeTestRule: ComposeTestRule) {
             .assertIsDisplayed()
     }
 
+    @OptIn(ExperimentalTestApi::class)
     fun checkUserRepositories(userRepositories: List<UserRepositoryUi>) {
+        composeTestRule.waitUntilExactlyOneExists(
+            matcher = hasText("scope658"),
+            timeoutMillis = 5000
+        )
         userRepositories.forEach {
             assertRepositories(it)
         }
