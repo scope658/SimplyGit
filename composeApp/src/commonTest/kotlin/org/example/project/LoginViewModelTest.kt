@@ -1,6 +1,7 @@
 package org.example.project
 
 import androidx.lifecycle.SavedStateHandle
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -8,14 +9,12 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import org.example.project.core.FakeRunAsync
+import org.example.project.core.RunAsync
 import org.example.project.login.domain.LoginRepository
+import org.example.project.login.presentation.ErrorState
 import org.example.project.login.presentation.LoginUiEvent
 import org.example.project.login.presentation.LoginUiState
 import org.example.project.login.presentation.LoginViewModel
-import org.example.project.login.presentation.components.ErrorState
-import org.example.project.login.presentation.components.TrailingIconState
-import org.example.project.login.presentation.components.VisibilityIconState
-import org.example.project.login.presentation.components.VisualTransformationState
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -27,11 +26,11 @@ class LoginViewModelTest {
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var loginRepository: FakeLoginRepository
     private lateinit var savedStateHandle: SavedStateHandle
-    private lateinit var fakeLoginRunAsync: FakeRunAsync
+    private lateinit var fakeLoginRunAsync: FakeLoginRunAsync
 
     @BeforeTest
     fun setUp() {
-        fakeLoginRunAsync = FakeRunAsync()
+        fakeLoginRunAsync = FakeLoginRunAsync()
         savedStateHandle = SavedStateHandle()
         loginRepository = FakeLoginRepository()
         loginViewModel = LoginViewModel(
@@ -42,75 +41,18 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `login is valid`() = runBlocking {
-        loginRepository.mockResult(Result.success(Unit))
+    fun `failure login then success`() = runBlocking {
+        loginRepository.isFailure(true)
         val loginUiState: StateFlow<LoginUiState> = loginViewModel.loginUiState
 
-        assertEquals(initialLoginUiState, loginUiState.value)
+        assertEquals(initialUiState, loginUiState.value)
 
+        loginViewModel.loginIn()
 
-        loginViewModel.onUsernameChanged(userName = "admin")
-        loginViewModel.onPasswordChanged(password = "admin1234")
+        assertEquals(loadingUiState, loginUiState.value)
+        fakeLoginRunAsync.invokeBackground()
 
-        assertEquals(successLoginUiState, loginUiState.value)
-        loginViewModel.login()
-
-        val loginEventSharedFlow: SharedFlow<LoginUiEvent> = loginViewModel.loginUiEvent
-
-        val actualEvent = withTimeout(1000) {
-            loginEventSharedFlow.first()
-        }
-
-        val expectedEvent = LoginUiEvent.LoginSuccessEvent
-        assertEquals(expectedEvent, actualEvent)
-    }
-
-    @Test
-    fun `login is empty`() {
-        val loginUiState: StateFlow<LoginUiState> = loginViewModel.loginUiState
-
-        loginViewModel.onUsernameChanged(userName = " ")
-        loginViewModel.onPasswordChanged(password = " ")
-
-        assertEquals(initialLoginUiState, loginUiState.value)
-    }
-
-    @Test
-    fun `login is not valid then valid`() = runBlocking {
-        loginRepository.mockResult(Result.failure(IllegalStateException()))
-
-        val loginEventSharedFlow: SharedFlow<LoginUiEvent> = loginViewModel.loginUiEvent
-        val loginUiState: StateFlow<LoginUiState> = loginViewModel.loginUiState
-
-        loginViewModel.onUsernameChanged(userName = "a")
-
-        assertEquals(
-            failureLoginUiState.copy(
-                password = "",
-                error = ErrorState.Empty,
-                isLoginButtonActive = false
-            ),
-            loginUiState.value
-        )
-
-        loginViewModel.onPasswordChanged("1")
-        assertEquals(failureLoginUiState.copy(error = ErrorState.Empty), loginUiState.value)
-
-        val actualEvent = withTimeoutOrNull(300) {
-            loginEventSharedFlow.first()
-        }
-        assertNull(actualEvent)
-
-        loginViewModel.login()
-
-        assertEquals(failureLoginUiState, loginUiState.value)
-
-        loginRepository.mockResult(Result.success(Unit))
-
-        loginViewModel.onUsernameChanged(userName = "admin")
-        loginViewModel.onPasswordChanged(password = "admin1234")
-
-        assertEquals(successLoginUiState.copy(error = ErrorState.Error), loginUiState.value)
+        assertEquals(errorUiState, loginUiState.value)
 
         //process death
         loginViewModel = LoginViewModel(
@@ -119,90 +61,83 @@ class LoginViewModelTest {
             runAsync = fakeLoginRunAsync
         )
 
-        val newLoginUiState: StateFlow<LoginUiState> = loginViewModel.loginUiState
+        val newState = loginViewModel.loginUiState.value
+        assertEquals(errorUiState, newState)
 
-        assertEquals(successLoginUiState.copy(error = ErrorState.Error), newLoginUiState.value)
-
-        loginViewModel.login()
-
-        val newLoginEventSharedFlow: SharedFlow<LoginUiEvent> = loginViewModel.loginUiEvent
-        val actualFinalEvent = withTimeout(300) {
-            newLoginEventSharedFlow.first()
+        val sharedFlow: SharedFlow<LoginUiEvent> = loginViewModel.loginUiEvent
+        val actualEvent = withTimeoutOrNull(300) {
+            sharedFlow.first()
         }
+        assertNull(actualEvent)
 
-        val expectedEvent = LoginUiEvent.LoginSuccessEvent
-        assertEquals(expectedEvent, actualFinalEvent)
+        loginRepository.isFailure(false)
+
+        loginViewModel.loginIn()
+
+        assertEquals(loadingUiState, loginUiState.value)
+        fakeLoginRunAsync.invokeBackground()
+        loginRepository.checkSavedToken("fakeToken")
+        assertEquals(loadingUiState, loginUiState.value)
+
+        val newSharedFlow: SharedFlow<LoginUiEvent> = loginViewModel.loginUiEvent
+        val actualNewEvent = withTimeout(300) {
+            newSharedFlow.first()
+        }
+        assertEquals(LoginUiEvent.LoginSuccessEvent, actualNewEvent)
     }
 
-    @Test
-    fun `change password visibility`() {
-
-        val loginUiState: StateFlow<LoginUiState> = loginViewModel.loginUiState
-
-        assertEquals(initialLoginUiState, loginUiState.value)
-        loginViewModel.changePasswordVisibility()
-
-        assertEquals(
-            initialLoginUiState.copy(
-                trailingIconState = TrailingIconState.Password(
-                    visibilityIconState = VisibilityIconState.Hide
-                ),
-                visualTransformationState = VisualTransformationState.Show,
-            ),
-            loginUiState.value
-        )
-
-        loginViewModel.changePasswordVisibility()
-
-        assertEquals(
-            initialLoginUiState.copy(
-                trailingIconState = TrailingIconState.Password(
-                    visibilityIconState = VisibilityIconState.Show
-                ),
-                visualTransformationState = VisualTransformationState.Hide
-            ),
-            loginUiState.value
-        )
-    }
 }
 
-private val failureLoginUiState = LoginUiState(
-    login = "a",
-    password = "1",
-    isLoginButtonActive = true,
-    error = ErrorState.Error,
-    trailingIconState = TrailingIconState.Password(visibilityIconState = VisibilityIconState.Show),
-    visualTransformationState = VisualTransformationState.Hide,
-)
+private val loadingUiState = LoginUiState.Loading
+private val initialUiState = LoginUiState.Initial(errorState = ErrorState.Empty)
+private val errorUiState =
+    LoginUiState.Initial(errorState = ErrorState.Error(message = "auth failed"))
 
 
-private val successLoginUiState = LoginUiState(
-    login = "admin",
-    password = "admin1234",
-    isLoginButtonActive = true,
-    error = ErrorState.Empty,
-    trailingIconState = TrailingIconState.Password(visibilityIconState = VisibilityIconState.Show),
-    visualTransformationState = VisualTransformationState.Hide,
-)
-private val initialLoginUiState = LoginUiState(
-    login = "",
-    password = "",
-    isLoginButtonActive = false,
-    error = ErrorState.Empty,
-    trailingIconState = TrailingIconState.Password(visibilityIconState = VisibilityIconState.Show),
-    visualTransformationState = VisualTransformationState.Hide,
-)
+private class FakeLoginRunAsync(
+    private val base: FakeRunAsync = FakeRunAsync()
+) : RunAsync by base {
+
+    private lateinit var cachedBackground: suspend () -> Any
+
+    override fun <T : Any> runAsync(
+        scope: CoroutineScope,
+        background: suspend () -> T,
+        ui: (T) -> Unit
+    ) {
+        cachedBackground = background
+    }
+
+    fun invokeBackground() = runBlocking {
+        cachedBackground.invoke()
+    }
+
+}
 
 private class FakeLoginRepository : LoginRepository {
 
-    private var fakeResult: Result<Unit> = Result.success(Unit)
+    private var mockedResult = Result.success("fakeToken")
+    private var failureFlag = false
+    private lateinit var savedToken: String
+    override suspend fun userToken(): Result<String> {
 
-    override fun login(login: String, password: String): Result<Unit> {
-        return fakeResult
+        return if (failureFlag) {
+            Result.failure(IllegalStateException("auth failed"))
+        } else {
+            mockedResult
+        }
+
     }
 
-    fun mockResult(result: Result<Unit>) {
-        fakeResult = result
+    override suspend fun saveUserToken(token: String) {
+        savedToken = token
     }
 
+    fun isFailure(flag: Boolean) {
+        failureFlag = flag
+    }
+
+    fun checkSavedToken(expectedSavedToken: String) {
+        assertEquals(savedToken, expectedSavedToken)
+    }
 }
