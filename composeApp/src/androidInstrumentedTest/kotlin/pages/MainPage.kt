@@ -1,3 +1,5 @@
+package pages
+
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
@@ -10,6 +12,12 @@ import org.example.project.main.presentation.UserRepositoryUi
 class MainPage(private val composeTestRule: ComposeTestRule) {
 
     val userRepositoryLazyColum = composeTestRule.onNodeWithTag("main_lazy_column")
+    val searchTextField = composeTestRule.onNodeWithTag("search_text_field")
+
+    fun checkVisibleNow() {
+        searchTextField
+            .assertIsDisplayed()
+    }
 
     fun checkUserRepositories(userRepositories: List<UserRepositoryUi>) {
         userRepositories.forEach {

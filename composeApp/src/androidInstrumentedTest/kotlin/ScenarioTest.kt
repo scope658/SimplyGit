@@ -10,6 +10,8 @@ import org.example.project.MockData
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import pages.LoginPage
+import pages.MainPage
 
 
 @RunWith(value = AndroidJUnit4::class)
@@ -71,83 +73,29 @@ class ScenarioTest : AbstractTest() {
     }
 
     @Test
-    fun emptyFieldsThenInvalidInputs() {
+    fun successLoginIn() {
+        //TODO ADD MOCK SUCCESS IN LOGIN REPO
         val onboardingPage = OnboardingPage(composeTestRule)
         onboardingPage.clickSkipButton()
 
         val loginPage = LoginPage(composeTestRule)
-
         loginPage.checkVisibleNow()
-        loginPage.typeLogin(" ")
-        loginPage.typePassword(" ")
-
-        loginPage.checkInputValues(loginField = "", passwordField = "")
-
-        loginPage.checkButtonIsNotActive()
-
-        loginPage.typePassword("1")
-        loginPage.checkInputValues(loginField = "", passwordField = "1")
-
-        loginPage.checkButtonIsNotActive()
-
-        loginPage.typeLogin("a")
-        loginPage.checkInputValues("a", "1")
-
-        loginPage.checkButtonIsActive()
-        loginPage.clickSignInButton()
-
-        loginPage.checkInputsIsNotValid()
-    }
-
-    @Test
-    fun validLoginThenToMainScreen() {
-        val onboardingPage = OnboardingPage(composeTestRule)
-        onboardingPage.clickSkipButton()
-
-        val loginPage = LoginPage(composeTestRule)
-
-        loginPage.typeLogin("admin")
-        loginPage.typePassword("admin1234")
-
-        composeTestRule.activityRule.assertAfterAndBeforeRecreate(
-            block = {
-                loginPage.checkInputValues(
-                    loginField = "admin",
-                    passwordField = "admin1234"
-                )
-            }
-        )
-        loginPage.checkButtonIsActive()
-
-        loginPage.clickSignInButton()
 
         val mainPage = MainPage(composeTestRule)
-
-        mainPage.checkUserRepositories(
-            userRepositories = MockData.mockedUserRepositoriesUi,
-        )
+        mainPage.checkVisibleNow()
+        mainPage.checkUserRepositories(userRepositories = MockData.mockedUserRepositoriesUi)
     }
 
-
     @Test
-    fun hideAndShowPasswordButtons() {
+    fun failureLoginIn() {
+        //TODO ADD MOCK FAILURE IN LOGIN REPO
         val onboardingPage = OnboardingPage(composeTestRule)
         onboardingPage.clickSkipButton()
 
         val loginPage = LoginPage(composeTestRule)
 
-        loginPage.typePassword("admin1234")
-
-        loginPage.clickAuthIconButton()
-        loginPage.checkHidePasswordIconVisible()
-
-        composeTestRule.activityRule.assertAfterAndBeforeRecreate {
-            loginPage.checkHidePasswordIconVisible()
-        }
-
-        loginPage.clickAuthIconButton()
-        loginPage.checkShowPasswordIconVisible()
-
+        loginPage.clickSignInButton()
+        loginPage.checkErrorMessageIsVisible("User cancelled")
     }
 }
 
