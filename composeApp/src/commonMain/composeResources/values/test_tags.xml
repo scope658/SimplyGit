@@ -1,11 +1,5 @@
 <resources>
 
-    <string name="login_text_field_test_tag">login_text_field</string>
-    <string name="password_text_field_test_tag">password_text_field</string>
-    <string name="sign_in_button_test_tag">sign_in_button</string>
-    <string name="login_label_test_tag">login_label</string>
-    <string name="password_label_test_tag">password_label</string>
-    <string name="password_supp_text_test_tag">password_supp_text</string>
 
     <string name="main_lazy_column_test_tag">main_lazy_column</string>
     <string name="user_repo_card_tag_prefix">user_repo_card_</string>
@@ -22,8 +16,9 @@
     <string name="onboarding_button_test_tag">onboarding_button</string>
     <string name="onboarding_skip_button_test_tag">skip_onboarding_button</string>
 
+    <string name="login_poster_test_tag">login_poster</string>
+    <string name="app_name_test_tag">app_name</string>
+    <string name="sign_in_button_test_tag">sign_in_button</string>
+    <string name="login_error_message_test_tag">error_message</string>
 
-    <string name="auth_icon_button_test_tag">auth_icon_button</string>
-    <string name="hide_password_icon_test_tag">hide_password</string>
-    <string name="show_password_icon_test_tag">show_password</string>
 </resources>

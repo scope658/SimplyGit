@@ -36,7 +36,10 @@ class LoginViewModel(
                 loginRepository.userToken()
                     .onSuccess { userToken ->
                         loginRepository.saveUserToken(token = userToken)
-                        _loginUiEvent.emit(LoginUiEvent.LoginSuccessEvent)
+                        runAsync.runSharedFlow(viewModelScope, action = {
+                            _loginUiEvent.emit(LoginUiEvent.LoginSuccessEvent)
+                        })
+
                     }
                     .onFailure {
                         _loginUiState.value =

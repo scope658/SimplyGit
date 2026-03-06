@@ -18,6 +18,9 @@ val indicatorSize = 10.dp
 val iconSizeSmall = 24.dp
 val avatarSizeMedium = 30.dp
 
+val loginLogoSize = 160.dp
+val buttonHeightLarge = 50.dp
+val progressIndicatorLarge = 64.dp
 
 val fontSizeS = 16.sp
 val fontSizeXXL = 25.sp

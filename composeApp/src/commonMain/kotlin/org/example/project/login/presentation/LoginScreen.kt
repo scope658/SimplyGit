@@ -27,9 +27,5 @@ fun LoginScreen(
             }
         }
     }
-    LoginUi(
-        loginUiState,
-        loginViewModel,
-    )
-
+    loginUiState.Show(loginViewModel)
 }
