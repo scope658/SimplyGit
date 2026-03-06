@@ -1,6 +1,8 @@
 package org.example.project
 
 import android.app.Application
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
 import org.example.project.login.di.loginModule
 import org.example.project.main.di.mainModule
 import org.example.project.onboarding.di.onboardingModule
@@ -11,9 +13,10 @@ class MyApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        Napier.base(DebugAntilog())
         startKoin {
             androidContext(this@MyApp)
-            modules(onboardingModule, loginModule, mainModule)
+            modules(onboardingModule, loginModule, mainModule, androidModule)
         }
     }
 }

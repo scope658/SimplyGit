@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -87,6 +88,10 @@ android {
     namespace = "org.example.project"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
+    buildFeatures {
+        buildConfig = true
+    }
+    
     defaultConfig {
         manifestPlaceholders["appAuthRedirectScheme"] = "simplygit"
         applicationId = "org.example.project"
@@ -95,6 +100,13 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use { localProperties.load(it) }
+        }
+        val secret = localProperties.getProperty("CLIENT_SECRET") ?: ""
+        buildConfigField("String", "CLIENT_SECRET", "\"$secret\"")
     }
     packaging {
         resources {
@@ -104,6 +116,12 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            val localProperties = Properties()
+            buildConfigField(
+                "String",
+                "CLIENT_SECRET",
+                "\"${localProperties.getProperty("CLIENT_SECRET")}\""
+            )
         }
     }
     compileOptions {
