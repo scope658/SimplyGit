@@ -3,7 +3,7 @@ package pages
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
@@ -28,7 +28,7 @@ class LoginPage(private val composeTestRule: ComposeTestRule) {
             .assertIsDisplayed()
             .assertTextContains("Sign in with GitHub")
             .assertHasClickAction()
-            .assertIsNotEnabled()
+            .assertIsEnabled()
 
         appName
             .assertIsDisplayed()

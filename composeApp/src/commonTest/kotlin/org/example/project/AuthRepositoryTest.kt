@@ -24,11 +24,11 @@ class AuthRepositoryTest {
         val expectedResult = Result.success("fakeToken")
         assertEquals(expectedResult, actualResult)
 
-        val currentToken = UserToken.token
+        val currentToken = TokenStorage.token
         assertEquals("", currentToken)
 
         authRepository.saveUserToken("fakeToken")
-        val actualSavedToken = UserToken.token
+        val actualSavedToken = TokenStorage.token
         assertEquals("fakeToken", actualSavedToken)
     }
 
@@ -43,22 +43,5 @@ class AuthRepositoryTest {
         assertEquals(expectedException.message, error.message)
     }
 
-}
-
-private class FakeAuthWrapper : AuthWrapper {
-
-    private var exception: Exception? = null
-
-    override suspend fun userToken(): String {
-        exception?.let {
-            throw it
-        }
-        return "fakeToken"
-
-    }
-
-    fun setException(expectedException: Exception) {
-        exception = expectedException
-    }
 }
 

@@ -4,7 +4,6 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
-import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performScrollToNode
@@ -24,7 +23,7 @@ class MainPage(private val composeTestRule: ComposeTestRule) {
     @OptIn(ExperimentalTestApi::class)
     fun checkUserRepositories(userRepositories: List<UserRepositoryUi>) {
         composeTestRule.waitUntilExactlyOneExists(
-            matcher = hasText("scope658"),
+            matcher = hasTestTag("main_lazy_column"),
             timeoutMillis = 5000
         )
         userRepositories.forEach {
