@@ -99,7 +99,7 @@ android {
     buildFeatures {
         buildConfig = true
     }
-    
+
     defaultConfig {
         manifestPlaceholders["appAuthRedirectScheme"] = "simplygit"
         applicationId = "org.example.project"
