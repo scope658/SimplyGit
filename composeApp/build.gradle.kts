@@ -38,6 +38,9 @@ kotlin {
             implementation(libs.coil.network.okhttp)
 
             implementation(libs.koin.android)
+
+            implementation(libs.appauth)
+
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -60,6 +63,8 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
 
             implementation(libs.material.icons.extended.v173)
+
+            implementation(libs.napier)
         }
         iosMain.dependencies {
             implementation(libs.coil.network.ktor)
@@ -67,16 +72,13 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
-
-        iosMain.dependencies {
-            implementation(libs.coil.network.ktor)
-        }
-
         androidInstrumentedTest.dependencies {
             implementation(libs.androidx.testExt.junit)
             implementation(libs.androidx.espresso.core)
             implementation(libs.compose.ui.test.junit4)
 
+            implementation(libs.koin.test)
+            implementation(libs.koin.test.junit4)
         }
     }
 }
@@ -86,6 +88,7 @@ android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
+        manifestPlaceholders["appAuthRedirectScheme"] = "simplygit"
         applicationId = "org.example.project"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()

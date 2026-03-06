@@ -1,24 +1,54 @@
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ktshwnumbertwo.composeapp.generated.resources.Res
 import ktshwnumbertwo.composeapp.generated.resources.first_onboarding_image
 import ktshwnumbertwo.composeapp.generated.resources.second_onboarding_image
 import ktshwnumbertwo.composeapp.generated.resources.third_onboarding_image
+import org.example.project.AuthWrapper
+import org.example.project.FakeAuthWrapper
 import org.example.project.MainActivity
 import org.example.project.MockData
+import org.example.project.login.di.loginModule
+import org.example.project.main.di.mainModule
+import org.example.project.onboarding.di.onboardingModule
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.dsl.module
+import org.koin.test.KoinTest
 import pages.LoginPage
 import pages.MainPage
 
 
 @RunWith(value = AndroidJUnit4::class)
-class ScenarioTest : AbstractTest() {
+class ScenarioTest : AbstractTest(), KoinTest {
+
+    private lateinit var authWrapper: FakeAuthWrapper
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    @Before
+    fun setUp() {
+        authWrapper = FakeAuthWrapper()
+        stopKoin()
+
+        startKoin {
+            androidContext(ApplicationProvider.getApplicationContext())
+            modules(
+                onboardingModule,
+                loginModule,
+                mainModule,
+                module { single<AuthWrapper> { authWrapper } }
+            )
+        }
+    }
 
     @Test
     fun fullOnboardingScreen() {
@@ -73,22 +103,9 @@ class ScenarioTest : AbstractTest() {
     }
 
     @Test
-    fun successLoginIn() {
-        //TODO ADD MOCK SUCCESS IN LOGIN REPO
-        val onboardingPage = OnboardingPage(composeTestRule)
-        onboardingPage.clickSkipButton()
+    fun failureLoginInThenSuccess() {
+        authWrapper.setException(IllegalStateException("User cancelled"))
 
-        val loginPage = LoginPage(composeTestRule)
-        loginPage.checkVisibleNow()
-
-        val mainPage = MainPage(composeTestRule)
-        mainPage.checkVisibleNow()
-        mainPage.checkUserRepositories(userRepositories = MockData.mockedUserRepositoriesUi)
-    }
-
-    @Test
-    fun failureLoginIn() {
-        //TODO ADD MOCK FAILURE IN LOGIN REPO
         val onboardingPage = OnboardingPage(composeTestRule)
         onboardingPage.clickSkipButton()
 
@@ -96,6 +113,16 @@ class ScenarioTest : AbstractTest() {
 
         loginPage.clickSignInButton()
         loginPage.checkErrorMessageIsVisible("User cancelled")
+
+        composeTestRule.activityRule.assertAfterAndBeforeRecreate {
+            loginPage.checkErrorMessageIsVisible("User cancelled")
+        }
+        authWrapper.setException(null)
+        loginPage.clickSignInButton()
+
+        val mainPage = MainPage(composeTestRule)
+        mainPage.checkVisibleNow()
+        mainPage.checkUserRepositories(userRepositories = MockData.mockedUserRepositoriesUi)
     }
 }
 
