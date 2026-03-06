@@ -1,19 +1,26 @@
 package org.example.project.login.data
 
+import kotlinx.coroutines.CancellationException
+import org.example.project.AuthWrapper
+import org.example.project.UserToken
 import org.example.project.login.domain.LoginRepository
 
-class LoginRepositoryImpl : LoginRepository {
+class LoginRepositoryImpl(private val authWrapper: AuthWrapper) : LoginRepository {
 
-    override fun login(login: String, password: String): Result<Unit> {
-        return if (login == VALID_LOGIN && password == VALID_PASSWORD)
-            Result.success(Unit)
-        else
-            Result.failure(IllegalStateException("mock exception from login repository"))
+
+    override suspend fun userToken(): Result<String> {
+        try {
+            val token = authWrapper.userToken()
+            return Result.success(token)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            return Result.failure(IllegalStateException(e.message))
+        }
     }
 
-    companion object {
-        private const val VALID_LOGIN = "admin"
-        private const val VALID_PASSWORD = "admin1234"
-
+    override suspend fun saveUserToken(token: String) {
+        UserToken.token = token
     }
+
 }

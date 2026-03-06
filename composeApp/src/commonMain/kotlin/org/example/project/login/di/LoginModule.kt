@@ -7,7 +7,7 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val loginModule = module {
-    single<LoginRepository> { LoginRepositoryImpl() }
+    single<LoginRepository> { LoginRepositoryImpl(get()) }
     viewModel {
         LoginViewModel(
             savedStateHandle = get(),
