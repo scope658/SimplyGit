@@ -26,21 +26,19 @@ class LoginViewModel(
     private val _loginUiEvent: MutableSharedFlow<LoginUiEvent> = MutableSharedFlow(replay = 1)
     val loginUiEvent = _loginUiEvent.asSharedFlow()
 
-
     override fun loginIn() {
-
         _loginUiState.value = LoginUiState.Loading
         runAsync.runAsync(
             scope = viewModelScope,
             {
                 loginRepository.userToken()
-                    .onSuccess { userToken ->
-                        loginRepository.saveUserToken(token = userToken)
-                        runAsync.runSharedFlow(viewModelScope, action = {
-                            _loginUiEvent.emit(LoginUiEvent.LoginSuccessEvent)
-                        })
+            },
+            { result ->
+                result.onSuccess { userToken ->
+                    loginRepository.saveUserToken(token = userToken)
+                    _loginUiEvent.emit(LoginUiEvent.LoginSuccessEvent)
 
-                    }
+                }
                     .onFailure {
                         _loginUiState.value =
                             LoginUiState.Initial(
@@ -49,8 +47,7 @@ class LoginViewModel(
                                 )
                             )
                     }
-            },
-            {}
+            }
         )
     }
 

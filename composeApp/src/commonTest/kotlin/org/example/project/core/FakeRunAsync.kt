@@ -8,19 +8,10 @@ import kotlinx.coroutines.runBlocking
 
 class FakeRunAsync : RunAsync {
 
-    override fun runSharedFlow(
-        scope: CoroutineScope,
-        action: suspend () -> Unit,
-    ) {
-        scope.launch(Dispatchers.Unconfined) {
-            action.invoke()
-        }
-    }
-
     override fun <T : Any> runAsync(
         scope: CoroutineScope,
         background: suspend () -> T,
-        ui: (T) -> Unit,
+        ui: suspend (T) -> Unit,
     ) {
         runBlocking {
             ui.invoke(background.invoke())

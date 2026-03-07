@@ -53,9 +53,10 @@ class OnboardingViewModel(
 
     override fun skipOnboarding() {
 
-        runAsync.runSharedFlow(
+        runAsync.runAsync(
             viewModelScope,
-            action = { _onboardingEvent.emit(OnboardingEvent.Finished) }
+            background = { },
+            ui = { _onboardingEvent.emit(OnboardingEvent.Finished) }
         )
 
     }

@@ -50,7 +50,7 @@ class LoginViewModelTest {
         loginViewModel.loginIn()
 
         assertEquals(loadingUiState, loginUiState.value)
-        fakeLoginRunAsync.invokeBackground()
+        fakeLoginRunAsync.invokeUi()
 
         assertEquals(errorUiState, loginUiState.value)
 
@@ -75,7 +75,7 @@ class LoginViewModelTest {
         loginViewModel.loginIn()
 
         assertEquals(loadingUiState, loginUiState.value)
-        fakeLoginRunAsync.invokeBackground()
+        fakeLoginRunAsync.invokeUi()
         loginRepository.checkSavedToken("fakeToken")
         assertEquals(loadingUiState, loginUiState.value)
 
@@ -98,18 +98,21 @@ private class FakeLoginRunAsync(
     private val base: FakeRunAsync = FakeRunAsync()
 ) : RunAsync by base {
 
-    private lateinit var cachedBackground: suspend () -> Any
-
+    private lateinit var backgroundResult: Any
+    private lateinit var cachedUiAction: suspend (Any) -> Unit
     override fun <T : Any> runAsync(
         scope: CoroutineScope,
         background: suspend () -> T,
-        ui: (T) -> Unit
+        ui: suspend (T) -> Unit
     ) {
-        cachedBackground = background
+        runBlocking {
+            backgroundResult = background.invoke()
+            cachedUiAction = ui as suspend (Any) -> Unit
+        }
     }
 
-    fun invokeBackground() = runBlocking {
-        cachedBackground.invoke()
+    fun invokeUi() = runBlocking {
+        cachedUiAction.invoke(backgroundResult)
     }
 
 }

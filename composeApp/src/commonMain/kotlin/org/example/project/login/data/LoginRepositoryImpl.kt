@@ -1,6 +1,9 @@
 package org.example.project.login.data
 
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.withContext
 import org.example.project.AuthWrapper
 import org.example.project.TokenStorage
 import org.example.project.login.domain.LoginRepository
@@ -20,7 +23,8 @@ class LoginRepositoryImpl(private val authWrapper: AuthWrapper) : LoginRepositor
     }
 
     override suspend fun saveUserToken(token: String) {
-        TokenStorage.token = token
+        withContext(Dispatchers.IO) {
+            TokenStorage.token = token
+        }
     }
-
 }
