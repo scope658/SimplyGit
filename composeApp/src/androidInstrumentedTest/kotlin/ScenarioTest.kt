@@ -1,3 +1,4 @@
+import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -37,6 +38,7 @@ class ScenarioTest : AbstractTest(), KoinTest {
     @Before
     fun setUp() {
         authWrapper = FakeAuthWrapper()
+        authWrapper.setException(null)
         stopKoin()
 
         startKoin {
@@ -124,16 +126,103 @@ class ScenarioTest : AbstractTest(), KoinTest {
         mainPage.checkVisibleNow()
         mainPage.checkUserRepositories(userRepositories = MockData.mockedUserRepositoriesUi)
     }
+
+    @Test
+    fun failureThenRetryFirstRunAfterLogin() {
+        //TODO ADD MOCK EXCEPTION TO GITHUB API
+        skipOnboardingAndLogin(composeTestRule)
+
+        val mainPage = MainPage(composeTestRule)
+        mainPage.checkFailureState(errorMessage = "something went wrong")
+        //TODO ADD MOCK SUCCESS IN GITHUB API
+        mainPage.clickRetryButton()
+        mainPage.checkUserRepositories(MockData.mockedUserRepositoriesUi)
+    }
+
+    @Test
+    fun successSearchQueryResult() {
+        //TODO ADD FAKE USER GITHUB API RESULT
+        skipOnboardingAndLogin(composeTestRule)
+
+        val mainPage = MainPage(composeTestRule)
+
+        mainPage.inputQuery("search github repository")
+        mainPage.checkQueryText("search github repository")
+        mainPage.checkUserRepositories(userRepositories = MockData.mockedSearchRepositoriesUi)
+    }
+
+    @Test
+    fun emptySearchQueryResult() {
+        //TODO ADD EMPTY SEARCH GITHUB API RESULT
+        skipOnboardingAndLogin(composeTestRule)
+
+        val mainPage = MainPage(composeTestRule)
+
+        mainPage.inputQuery(query = "qweqwqweewqewqqweqwe")
+        mainPage.checkQueryText("qweqwqweewqewqqweqwe")
+        mainPage.checkEmptyResultStateVisible()
+
+        composeTestRule.activityRule.assertAfterAndBeforeRecreate {
+            mainPage.checkEmptyResultStateVisible()
+        }
+    }
+
+    @Test
+    fun failureThenSuccessSearchQueryResult() {
+        //TODO ADD MOCK FAILURE SEARCH GITHUB API
+        skipOnboardingAndLogin(composeTestRule)
+
+        val mainPage = MainPage(composeTestRule)
+        mainPage.inputQuery("search github repository")
+        mainPage.checkQueryText("search github repository")
+        mainPage.checkFailureState(errorMessage = "something went wrong")
+
+        composeTestRule.activityRule.assertAfterAndBeforeRecreate {
+            mainPage.checkFailureState(errorMessage = "something went wrong")
+        }
+
+        mainPage.inputQuery("new input query")
+        mainPage.checkQueryText("new input query")
+
+        mainPage.checkUserRepositories(userRepositories = MockData.mockedSearchRepositoriesUi)
+
+        composeTestRule.activityRule.assertAfterAndBeforeRecreate {
+            mainPage.checkUserRepositories(userRepositories = MockData.mockedSearchRepositoriesUi)
+        }
+    }
+
+    @Test
+    fun retryFailureSearchResult() {
+        skipOnboardingAndLogin(composeTestRule)
+
+        val mainPage = MainPage(composeTestRule)
+        mainPage.inputQuery("input")
+        mainPage.checkQueryText("input")
+
+        mainPage.checkFailureState(errorMessage = "something went wrong")
+        mainPage.clickRetryButton()
+
+        mainPage.checkUserRepositories(userRepositories = MockData.mockedSearchRepositoriesUi)
+
+    }
 }
 
 
 abstract class AbstractTest {
+
+
     protected fun ActivityScenarioRule<*>.assertAfterAndBeforeRecreate(
         block: () -> Unit,
     ) {
         block()
         this.scenario.recreate()
         block()
+    }
+    protected fun skipOnboardingAndLogin(composeTestRule: ComposeTestRule) {
+        val onboardingPage = OnboardingPage(composeTestRule = composeTestRule)
+        onboardingPage.clickSkipButton()
+        val loginPage = LoginPage(composeTestRule)
+        loginPage.clickSignInButton()
     }
 }
 
