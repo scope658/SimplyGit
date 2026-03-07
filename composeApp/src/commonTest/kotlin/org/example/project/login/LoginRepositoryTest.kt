@@ -1,6 +1,8 @@
-package org.example.project
+package org.example.project.login
 
 import kotlinx.coroutines.runBlocking
+import org.example.project.FakeAuthWrapper
+import org.example.project.TokenStorage
 import org.example.project.login.data.LoginRepositoryImpl
 import org.example.project.login.domain.LoginRepository
 import kotlin.test.BeforeTest

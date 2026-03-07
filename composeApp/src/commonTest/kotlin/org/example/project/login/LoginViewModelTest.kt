@@ -1,15 +1,13 @@
-package org.example.project
+package org.example.project.login
 
 import androidx.lifecycle.SavedStateHandle
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
-import org.example.project.core.FakeRunAsync
-import org.example.project.core.RunAsync
+import org.example.project.core.ControlledFakeRunAsync
 import org.example.project.login.domain.LoginRepository
 import org.example.project.login.presentation.ErrorState
 import org.example.project.login.presentation.LoginUiEvent
@@ -26,11 +24,11 @@ class LoginViewModelTest {
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var loginRepository: FakeLoginRepository
     private lateinit var savedStateHandle: SavedStateHandle
-    private lateinit var fakeLoginRunAsync: FakeLoginRunAsync
+    private lateinit var fakeLoginRunAsync: ControlledFakeRunAsync
 
     @BeforeTest
     fun setUp() {
-        fakeLoginRunAsync = FakeLoginRunAsync()
+        fakeLoginRunAsync = ControlledFakeRunAsync()
         savedStateHandle = SavedStateHandle()
         loginRepository = FakeLoginRepository()
         loginViewModel = LoginViewModel(
@@ -93,29 +91,6 @@ private val initialUiState = LoginUiState.Initial(errorState = ErrorState.Empty)
 private val errorUiState =
     LoginUiState.Initial(errorState = ErrorState.Error(message = "auth failed"))
 
-
-private class FakeLoginRunAsync(
-    private val base: FakeRunAsync = FakeRunAsync()
-) : RunAsync by base {
-
-    private lateinit var backgroundResult: Any
-    private lateinit var cachedUiAction: suspend (Any) -> Unit
-    override fun <T : Any> runAsync(
-        scope: CoroutineScope,
-        background: suspend () -> T,
-        ui: suspend (T) -> Unit
-    ) {
-        runBlocking {
-            backgroundResult = background.invoke()
-            cachedUiAction = ui as suspend (Any) -> Unit
-        }
-    }
-
-    fun invokeUi() = runBlocking {
-        cachedUiAction.invoke(backgroundResult)
-    }
-
-}
 
 private class FakeLoginRepository : LoginRepository {
 
