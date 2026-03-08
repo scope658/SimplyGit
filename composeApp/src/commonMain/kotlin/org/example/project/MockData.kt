@@ -1,5 +1,6 @@
 package org.example.project
 
+import org.example.project.main.data.cloud.RepoData
 import org.example.project.main.domain.UserRepository
 import org.example.project.main.presentation.UserRepositoryUi
 
@@ -165,6 +166,26 @@ object MockData {
     )
     val mockedSearchRepositoriesUi = mockedSearchResults.map {
         UserRepositoryUi(
+            id = it.id,
+            userPhotoImageUrl = it.userPhotoImageUrl,
+            userName = it.userName,
+            repositoryName = it.repositoryName,
+            programmingLanguage = it.programmingLanguage,
+            stars = it.stars
+        )
+    }
+    val mockedSearchDataRepositories = mockedSearchResults.map {
+        RepoData(
+            id = it.id,
+            userPhotoImageUrl = it.userPhotoImageUrl,
+            userName = it.userName,
+            repositoryName = it.repositoryName,
+            programmingLanguage = it.programmingLanguage,
+            stars = it.stars
+        )
+    }
+    val mockedUserDataRepositories = mockedRepositories.map {
+        RepoData(
             id = it.id,
             userPhotoImageUrl = it.userPhotoImageUrl,
             userName = it.userName,
