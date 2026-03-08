@@ -10,10 +10,12 @@ import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import androidx.test.espresso.Espresso
 import org.example.project.main.presentation.UserRepositoryUi
 
-
+@OptIn(ExperimentalTestApi::class)
 class MainPage(private val composeTestRule: ComposeTestRule) {
 
     private val userRepositoryLazyColum = composeTestRule.onNodeWithTag("main_lazy_column")
@@ -39,6 +41,7 @@ class MainPage(private val composeTestRule: ComposeTestRule) {
     fun inputQuery(query: String) {
         searchTextField
             .performTextInput(query)
+        Espresso.closeSoftKeyboard()
     }
 
     fun checkQueryText(query: String) {
@@ -46,10 +49,15 @@ class MainPage(private val composeTestRule: ComposeTestRule) {
             .assert(hasText(query))
     }
 
-    @OptIn(ExperimentalTestApi::class)
+    fun clearInputText() {
+        searchTextField
+            .performTextClearance()
+    }
+
     fun checkUserRepositories(userRepositories: List<UserRepositoryUi>) {
+        val id = userRepositories[4].id
         composeTestRule.waitUntilExactlyOneExists(
-            matcher = hasTestTag("main_lazy_column"),
+            matcher = hasTestTag("user_repo_card_$id"),
             timeoutMillis = 5000
         )
         userRepositories.forEach {
@@ -82,7 +90,12 @@ class MainPage(private val composeTestRule: ComposeTestRule) {
             .assertTextEquals(userRepo.stars.toString())
     }
 
+
     fun checkFailureState(errorMessage: String) {
+        composeTestRule.waitUntilExactlyOneExists(
+            matcher = hasTestTag("main_error_message"),
+            timeoutMillis = 5000
+        )
         this.errorMessage
             .assertIsDisplayed()
             .assertTextEquals(errorMessage)
