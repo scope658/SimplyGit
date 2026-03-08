@@ -19,8 +19,7 @@ class MainViewModel(
     private val repository: MainRepository,
     private val runAsync: RunAsync,
     private val savedStateHandle: SavedStateHandle
-) :
-    ViewModel() {
+) : ViewModel(), MainActions {
     private val _mainUiState: MutableStateFlow<MainUiState> =
         savedStateHandle.getMutableStateFlow(MAIN_UI_STATE_KEY, MainUiState.Loading)
     val mainUiState = _mainUiState.asStateFlow()
@@ -36,6 +35,7 @@ class MainViewModel(
                 .debounce(SEARCH_DEBOUNCE)
                 .filter { it.isNotBlank() }
                 .mapLatest {
+                    _mainUiState.value = MainUiState.Loading
                     repository.searchByQuery(it)
                 },
             onEach = { result ->
@@ -44,7 +44,9 @@ class MainViewModel(
         )
     }
 
-    fun loadUserRepo() {
+    override fun loadUserRepo() {
+        val mainUiState = _mainUiState.value
+        if (searchText.value.isNotBlank() || mainUiState is MainUiState.Success || mainUiState is MainUiState.EmptyResult) return
         _mainUiState.value = MainUiState.Loading
         runAsync.runAsync(
             scope = viewModelScope,
@@ -55,12 +57,12 @@ class MainViewModel(
         )
     }
 
-    fun query(userQuery: String) {
+    override fun query(userQuery: String) {
         _searchText.value = userQuery
         initSearch
     }
 
-    fun retry() {
+    override fun retry() {
         if (_searchText.value.isNotBlank()) {
             _mainUiState.value = MainUiState.Loading
             runAsync.runAsync(
