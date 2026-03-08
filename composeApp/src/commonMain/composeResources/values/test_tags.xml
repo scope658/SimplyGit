@@ -21,4 +21,11 @@
     <string name="sign_in_button_test_tag">sign_in_button</string>
     <string name="login_error_message_test_tag">error_message</string>
 
+    <string name="empty_icon_test_tag">empty_icon</string>
+    <string name="empty_result_text_test_tag">empty_result_text</string>
+    <string name="main_error_message_test_tag">main_error_message</string>
+    <string name="main_retry_button_test_tag">main_retry_button</string>
+
+    <string name="search_text_field_label_test_tag">search_text_field_label</string>
+    <string name="search_text_field_test_tag">search_text_field</string>
 </resources>

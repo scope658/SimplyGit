@@ -21,4 +21,9 @@
     <string name="invalid_login_or_password">Invalid login or password</string>
     <string name="hide_password">Hide password</string>
     <string name="show_password">Show password</string>
+
+    <string name="nothing_to_see_here">Nothing to see here</string>
+    <string name="retry">Retry</string>
+    <string name="search">Search</string>
+
 </resources>

@@ -21,4 +21,8 @@
     <string name="invalid_login_or_password">Неверный логин или пароль</string>
     <string name="hide_password">Скрыть пароль</string>
     <string name="show_password">Показать пароль</string>
+
+    <string name="nothing_to_see_here">Здесь ничего нет</string>
+    <string name="retry">Повторить</string>
+    <string name="search">Поиск</string>
 </resources>
