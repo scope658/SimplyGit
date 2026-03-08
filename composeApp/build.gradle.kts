@@ -42,6 +42,8 @@ kotlin {
 
             implementation(libs.appauth)
 
+            implementation(libs.ktor.client.android)
+
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -66,9 +68,15 @@ kotlin {
             implementation(libs.material.icons.extended.v173)
 
             implementation(libs.napier)
+
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+
         }
         iosMain.dependencies {
             implementation(libs.coil.network.ktor)
+            implementation(libs.ktor.client.darwin)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

@@ -3,8 +3,7 @@ package org.example.project.main
 import kotlinx.coroutines.runBlocking
 import org.example.project.MockData
 import org.example.project.main.data.MainRepositoryImpl
-import org.example.project.main.data.cloud.GithubApi
-import org.example.project.main.data.cloud.RepoData
+import org.example.project.main.data.cloud.FakeGithubApi
 import org.example.project.main.domain.MainRepository
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -58,28 +57,5 @@ class MainRepositoryTest {
     companion object {
         private const val FAKE_QUERY = "fake query"
         private const val FAKE_EXCEPTION_MESSAGE = "fake message"
-    }
-}
-
-
-class FakeGithubApi : GithubApi {
-    private var exception: Exception? = null
-
-    override suspend fun fetchByQuery(userQuery: String): List<RepoData> {
-        exception?.let {
-            throw it
-        }
-        return MockData.mockedSearchDataRepositories
-    }
-
-    override suspend fun userRepositories(): List<RepoData> {
-        exception?.let {
-            throw it
-        }
-        return MockData.mockedUserDataRepositories
-    }
-
-    fun setException(exception: Exception) {
-        this.exception = exception
     }
 }
