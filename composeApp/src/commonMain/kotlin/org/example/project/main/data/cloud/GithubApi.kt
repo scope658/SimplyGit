@@ -11,15 +11,17 @@ import org.example.project.MockData
 import org.example.project.TokenStorage
 
 interface GithubApi {
-    suspend fun fetchByQuery(userQuery: String): List<RepoData>
-    suspend fun userRepositories(): List<RepoData>
+    suspend fun fetchByQuery(userQuery: String, page: Int): List<RepoData>
+    suspend fun userRepositories(page: Int): List<RepoData>
 
     class Base(private val httpClient: HttpClient) : GithubApi {
 
-        override suspend fun fetchByQuery(userQuery: String): List<RepoData> {
+        override suspend fun fetchByQuery(userQuery: String, page: Int): List<RepoData> {
             val currentToken = TokenStorage.token
             val response = httpClient.get("search/repositories") {
                 parameter("q", userQuery)
+                parameter("per_page", 15)
+                parameter("page", page)
                 header("Authorization", "Bearer $currentToken")
             }
             val items = response.body<GithubSearchDto>().items
@@ -35,10 +37,12 @@ interface GithubApi {
             }
         }
 
-        override suspend fun userRepositories(): List<RepoData> {
+        override suspend fun userRepositories(page: Int): List<RepoData> {
             val token = TokenStorage.token
             val response = httpClient.get("user/repos") {
                 parameter("sort", "updated")
+                parameter("per_page", 15)
+                parameter("page", page)
                 header("Authorization", "Bearer $token")
             }
             val items = response.body<List<RepoDto>>()
@@ -60,14 +64,14 @@ class FakeGithubApi : GithubApi {
     private var exception: Exception? = null
     private var mockedSearchResult = MockData.mockedSearchDataRepositories
     private var mockedUserRepoResult = MockData.mockedUserDataRepositories
-    override suspend fun fetchByQuery(userQuery: String): List<RepoData> {
+    override suspend fun fetchByQuery(userQuery: String, page: Int): List<RepoData> {
         exception?.let {
             throw it
         }
         return mockedSearchResult
     }
 
-    override suspend fun userRepositories(): List<RepoData> {
+    override suspend fun userRepositories(page: Int): List<RepoData> {
         exception?.let {
             throw it
         }

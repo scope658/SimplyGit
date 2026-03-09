@@ -8,15 +8,15 @@ import org.example.project.main.domain.UserRepository
 
 class MainRepositoryImpl(private val githubApi: GithubApi) : MainRepository {
 
-    override suspend fun userRepo(): Result<List<UserRepository>> {
+    override suspend fun userRepo(page: Int): Result<List<UserRepository>> {
         return customRunCatching {
-            githubApi.userRepositories().toDomain()
+            githubApi.userRepositories(page).toDomain()
         }
     }
 
-    override suspend fun searchByQuery(userQuery: String): Result<List<UserRepository>> {
+    override suspend fun searchByQuery(userQuery: String, page: Int): Result<List<UserRepository>> {
         return customRunCatching {
-            githubApi.fetchByQuery(userQuery).toDomain()
+            githubApi.fetchByQuery(userQuery, page).toDomain()
         }
     }
 }

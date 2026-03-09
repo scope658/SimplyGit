@@ -194,5 +194,37 @@ object MockData {
             stars = it.stars
         )
     }
+    val secondUserRepoPage = mockedUserRepositoriesUi.map {
+        UserRepository(
+            id = it.id + 1,
+            userPhotoImageUrl = it.userPhotoImageUrl,
+            userName = it.userName,
+            repositoryName = it.repositoryName,
+            programmingLanguage = it.programmingLanguage,
+            stars = it.stars + 2,
+        )
+    }
+
+    val firstAndSecondUserRepo = mockedRepositories + secondUserRepoPage
+    val firstAndSecondUserRepoUi = firstAndSecondUserRepo.map {
+        UserRepositoryUi(
+            id = it.id,
+            userPhotoImageUrl = it.userPhotoImageUrl,
+            userName = it.userName,
+            repositoryName = it.repositoryName,
+            programmingLanguage = it.programmingLanguage,
+            stars = it.stars,
+        )
+    }
+    val mockForUseCaseTest = List(100) { index ->
+        UserRepository(
+            id = index,
+            userPhotoImageUrl = "photo_$index",
+            userName = "user_$index",
+            repositoryName = "repo_$index",
+            programmingLanguage = "Kotlin",
+            stars = index * 10,
+        )
+    }
 }
 

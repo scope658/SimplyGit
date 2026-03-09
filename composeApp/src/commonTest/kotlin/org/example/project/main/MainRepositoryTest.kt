@@ -23,14 +23,14 @@ class MainRepositoryTest {
     fun `success query`() = runBlocking {
 
         val expectedResult = Result.success(MockData.mockedSearchResults)
-        val actualResult = mainRepository.searchByQuery(FAKE_QUERY)
+        val actualResult = mainRepository.searchByQuery(FAKE_QUERY, 1)
 
         assertEquals(expectedResult, actualResult)
     }
 
     @Test
     fun `success user repositories`() = runBlocking {
-        val actualResult = mainRepository.userRepo()
+        val actualResult = mainRepository.userRepo(1)
         val expectedResult = Result.success(MockData.mockedRepositories)
 
         assertEquals(expectedResult, actualResult)
@@ -40,7 +40,7 @@ class MainRepositoryTest {
     fun `failure query`() = runBlocking {
         fakeGithubApi.setException(IllegalStateException(FAKE_EXCEPTION_MESSAGE))
 
-        val actualResult = mainRepository.searchByQuery(FAKE_QUERY)
+        val actualResult = mainRepository.searchByQuery(FAKE_QUERY, 1)
         val actualException = actualResult.exceptionOrNull()!!
         assertEquals(FAKE_EXCEPTION_MESSAGE, actualException.message)
     }
@@ -49,7 +49,7 @@ class MainRepositoryTest {
     fun `failure user repositories`() = runBlocking {
         fakeGithubApi.setException(IllegalStateException(FAKE_EXCEPTION_MESSAGE))
 
-        val actualResult = mainRepository.userRepo()
+        val actualResult = mainRepository.userRepo(1)
         val actualException = actualResult.exceptionOrNull()!!
         assertEquals(FAKE_EXCEPTION_MESSAGE, actualException.message)
     }
