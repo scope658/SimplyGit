@@ -53,12 +53,22 @@ private fun MainUiPreview() {
         override fun query(userQuery: String) = Unit
 
         override fun retry() = Unit
+        override fun loadMore(
+            isLoadMore: Boolean,
+            currentRepoList: List<UserRepositoryUi>,
+            page: Int
+        ) = Unit
 
     }
     Scaffold {
         Box(modifier = Modifier.padding(it)) {
             MainUi(
-                mainUiState = MainUiState.Success(result = MockData.mockedSearchRepositoriesUi),
+                mainUiState = MainUiState.Success(
+                    result = MockData.mockedSearchRepositoriesUi,
+                    page = 1,
+                    isLoadMore = true,
+                    pagingUiState = PagingUiState.Loading,
+                ),
                 "example search text",
                 mainActions
             )

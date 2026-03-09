@@ -9,6 +9,7 @@ val spacingS = 7.dp
 val spacingM = 10.dp
 val spacingL = 16.dp
 val spacingXL = 20.dp
+val spacingXXXL = 32.dp
 val spacingXXL = 40.dp
 val spacingHuge = 50.dp
 val spacingMaximum = 60.dp

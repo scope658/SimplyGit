@@ -38,21 +38,35 @@ import theme.fontSizeS
 import theme.fontSizeXXL
 import theme.progressIndicatorLarge
 
+
 interface MainUiState : CommonParcelable {
     @Composable
     fun Show(mainActions: MainActions)
 
     @CommonParcelize
     data class Success(
+        val page: Int,
+        val isLoadMore: Boolean,
+        val pagingUiState: PagingUiState,
         val result: List<UserRepositoryUi>
     ) : MainUiState {
         @Composable
         override fun Show(mainActions: MainActions) {
+
             LazyColumn(modifier = Modifier.testTag(stringResource(Res.string.main_lazy_column_test_tag))) {
                 items(items = result, key = { it.id }) { userRepositoryUi ->
                     RepositoryCard(userRepositoryUi)
                     HorizontalDivider()
                 }
+                pagingUiState.show(
+                    this,
+                    onScrolledToEnd = {
+                        mainActions.loadMore(
+                            isLoadMore = isLoadMore,
+                            currentRepoList = result,
+                            page = page,
+                        )
+                    })
             }
         }
     }
@@ -135,14 +149,32 @@ private fun MainLoadingPreview() {
 @Composable
 @Preview(showSystemUi = true)
 private fun MainSuccessPreview() {
-    MainUiState.Success(result = MockData.mockedUserRepositoriesUi).Show(mainActions)
+    MainUiState.Success(
+        result = MockData.mockedUserRepositoriesUi,
+        page = 1,
+        isLoadMore = true,
+        pagingUiState = PagingUiState.Loading,
+    ).Show(mainActions)
 }
+
+@Composable
+@Preview(showSystemUi = true)
+private fun MainSuccessWithPagingFailurePreview() {
+    MainUiState.Success(
+        result = MockData.mockedUserRepositoriesUi,
+        page = 1,
+        isLoadMore = true,
+        pagingUiState = PagingUiState.Failure("something went wrong"),
+    ).Show(mainActions)
+}
+
 
 @Composable
 @Preview(showSystemUi = true)
 private fun MainEmptyResultPreview() {
     MainUiState.EmptyResult.Show(mainActions)
 }
+
 
 private val mainActions = object : MainActions {
     override fun loadUserRepo() = Unit
@@ -151,5 +183,10 @@ private val mainActions = object : MainActions {
 
 
     override fun retry() = Unit
+    override fun loadMore(
+        isLoadMore: Boolean,
+        currentRepoList: List<UserRepositoryUi>,
+        page: Int
+    ) = Unit
 
 }

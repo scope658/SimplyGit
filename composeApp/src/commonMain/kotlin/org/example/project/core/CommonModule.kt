@@ -16,6 +16,7 @@ val commonModule = module {
                 url("https://api.github.com/")
                 header("User-Agent", "SimplyGit-App")
                 header("Accept", "application/vnd.github+json")
+
             }
             install(ContentNegotiation) {
                 json(Json {
