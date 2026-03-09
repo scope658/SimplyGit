@@ -6,12 +6,17 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlin.serialization)
+    kotlin("plugin.parcelize")
 }
 
 kotlin {
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
+            freeCompilerArgs.addAll(
+                "-P",
+                "plugin:org.jetbrains.kotlin.parcelize:additionalAnnotation=org.example.project.CommonParcelize"
+            )
         }
     }
     
@@ -31,6 +36,8 @@ kotlin {
             implementation(libs.androidx.activity.compose)
 
             implementation(libs.coil.network.okhttp)
+
+            implementation(libs.koin.android)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -47,6 +54,15 @@ kotlin {
             implementation(libs.navigation.compose)
 
             implementation(libs.kotlinx.serialization.json)
+
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+
+            implementation(libs.material.icons.extended.v173)
+        }
+        iosMain.dependencies {
+            implementation(libs.coil.network.ktor)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

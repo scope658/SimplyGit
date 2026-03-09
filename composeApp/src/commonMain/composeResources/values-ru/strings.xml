@@ -5,4 +5,20 @@
     <string name="sign_in">Войти</string>
     <string name="login_label">Логин</string>
     <string name="password_label">Пароль</string>
+
+    <string name="onboarding_first_title">Поиск репозиториев</string>
+    <string name="onboarding_first_desc">Находите публичные GitHub-репозитории через поиск.</string>
+
+    <string name="onboarding_second_title">Добавляйте в избранное</string>
+    <string name="onboarding_second_desc">Сохраняйте репозитории для быстрого доступа позже.</string>
+
+    <string name="onboarding_third_title">Удобная навигация</string>
+    <string name="onboarding_third_desc">Репозитории, избранное и профиль доступны в нижнем меню.</string>
+
+    <string name="onboarding_next">Далее</string>
+    <string name="onboarding_skip">Пропустить</string>
+
+    <string name="invalid_login_or_password">Неверный логин или пароль</string>
+    <string name="hide_password">Скрыть пароль</string>
+    <string name="show_password">Показать пароль</string>
 </resources>

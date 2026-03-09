@@ -5,4 +5,20 @@
     <string name="sign_in">Sign in</string>
     <string name="login_label">Login</string>
     <string name="password_label">Password</string>
+
+    <string name="onboarding_first_title">Search repositories</string>
+    <string name="onboarding_first_desc">Find public GitHub repositories using search.</string>
+
+    <string name="onboarding_second_title">Add to favorites</string>
+    <string name="onboarding_second_desc">Save repositories for quick access later.</string>
+
+    <string name="onboarding_third_title">Simple navigation</string>
+    <string name="onboarding_third_desc">Repositories, favorites, and profile are available in the bottom menu.</string>
+
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_skip">Skip</string>
+
+    <string name="invalid_login_or_password">Invalid login or password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="show_password">Show password</string>
 </resources>

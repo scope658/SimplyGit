@@ -5,3 +5,11 @@ interface Platform {
 }
 
 expect fun getPlatform(): Platform
+
+
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.BINARY)
+annotation class CommonParcelize
+
+
+expect interface CommonParcelable

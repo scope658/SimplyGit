@@ -8,6 +8,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.Serializable
+import org.example.project.login.presentation.LoginScreen
+import org.example.project.main.presentation.MainScreen
+import org.example.project.onboarding.presentation.OnboardingScreen
 import theme.CatAppTheme
 
 sealed interface Routes {
@@ -18,6 +21,8 @@ sealed interface Routes {
     @Serializable
     object Login : Routes
 
+    @Serializable
+    object Main : Routes
 }
 
 @Composable
@@ -30,16 +35,9 @@ fun App() {
                 startDestination = Routes.Onboarding,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                composable<Routes.Onboarding> {
-                    OnboardingScreen() {
-                        navController.navigate(Routes.Login) {
-                            popUpTo(Routes.Onboarding) {
-                                inclusive = true
-                            }
-                        }
-                    }
-                }
-                composable<Routes.Login> { LoginScreen() }
+                composable<Routes.Onboarding> { OnboardingScreen(navController) }
+                composable<Routes.Login> { LoginScreen(navController) }
+                composable<Routes.Main> { MainScreen() }
             }
         }
     }
