@@ -4,10 +4,13 @@ import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.flow.StateFlow
 import org.example.project.MockData
 import org.example.project.core.ControlledFakeRunAsync
-import org.example.project.main.domain.MainRepository
+import org.example.project.main.domain.GetPagedReposUseCase
+import org.example.project.main.domain.PagedResult
 import org.example.project.main.domain.UserRepository
+import org.example.project.main.presentation.MainUiMapper
 import org.example.project.main.presentation.MainUiState
 import org.example.project.main.presentation.MainViewModel
+import org.example.project.main.presentation.PagingUiState
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -15,25 +18,29 @@ import kotlin.test.assertEquals
 class MainViewModelTest {
 
     private lateinit var mainViewModel: MainViewModel
-    private lateinit var mainRepository: FakeMainRepository
     private lateinit var fakeRunAsync: ControlledFakeRunAsync
     private lateinit var savedStateHandle: SavedStateHandle
+    private lateinit var getPagedReposUseCase: FakeGetPagedReposUseCase
+    private lateinit var mainUiMapper: PagedResult.Mapper
 
     @BeforeTest
     fun setUp() {
+        mainUiMapper = MainUiMapper()
         savedStateHandle = SavedStateHandle()
-        mainRepository = FakeMainRepository()
         fakeRunAsync = ControlledFakeRunAsync()
+        getPagedReposUseCase = FakeGetPagedReposUseCase()
         mainViewModel = MainViewModel(
-            repository = mainRepository,
+            getPagedReposUseCase = getPagedReposUseCase,
+            mainUiMapper = mainUiMapper,
             runAsync = fakeRunAsync,
             savedStateHandle = savedStateHandle,
         )
     }
 
     @Test
-    fun `empty query result`() {
-        mainRepository.mockResult(emptyList())
+    fun `empty query result`() { //+
+        getPagedReposUseCase.mockPagedResult(mock = PagedResult.EmptyResult)
+
         val uiValue: StateFlow<MainUiState> = mainViewModel.mainUiState
         val searchText: StateFlow<String> = mainViewModel.searchText
 
@@ -49,7 +56,9 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `success query result`() {
+    fun `success query result`() {  //++
+        getPagedReposUseCase.mockPagedResult(mock = successSearchPagedResult)
+
         val uiValue: StateFlow<MainUiState> = mainViewModel.mainUiState
         val searchText: StateFlow<String> = mainViewModel.searchText
 
@@ -58,13 +67,15 @@ class MainViewModelTest {
         assertEquals(QUERY_EXAMPLE, searchText.value)
 
         fakeRunAsync.returnFlowResult()
-        assertEquals(successSearchResult, uiValue.value)
+        assertEquals(successSearchResultUi, uiValue.value)
         assertEquals(QUERY_EXAMPLE, searchText.value)
+
     }
 
     @Test
-    fun `failure query result`() {
-        mainRepository.mockFailure(failure = true)
+    fun `failure query result`() { //++
+        getPagedReposUseCase.mockPagedResult(mock = failurePagedResult)
+
         val uiValue: StateFlow<MainUiState> = mainViewModel.mainUiState
         val searchText: StateFlow<String> = mainViewModel.searchText
         mainViewModel.query(QUERY_EXAMPLE)
@@ -78,37 +89,42 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `retry search query`() {
-        mainRepository.mockFailure(true)
+    fun `retry search query`() { //++
+        getPagedReposUseCase.mockPagedResult(mock = failurePagedResult)
+
         val uiValue: StateFlow<MainUiState> = mainViewModel.mainUiState
         mainViewModel.query(QUERY_EXAMPLE)
 
         fakeRunAsync.returnFlowResult()
         assertEquals(failureResult, uiValue.value)
 
-        mainRepository.mockFailure(false)
+        getPagedReposUseCase.mockPagedResult(mock = successSearchPagedResult)
+
         mainViewModel.retry()
         assertEquals(MainUiState.Loading, uiValue.value)
         fakeRunAsync.invokeUi()
-        assertEquals(successSearchResult, uiValue.value)
+        assertEquals(successSearchResultUi, uiValue.value)
 
         //process death
-        val mainViewModel = MainViewModel(
-            repository = mainRepository,
+        mainViewModel = MainViewModel(
+            getPagedReposUseCase = getPagedReposUseCase,
+            mainUiMapper = mainUiMapper,
             runAsync = fakeRunAsync,
             savedStateHandle = savedStateHandle,
         )
 
         val newUiState: StateFlow<MainUiState> = mainViewModel.mainUiState
         val newSearchText = mainViewModel.searchText.value
-        assertEquals(successSearchResult, newUiState.value)
+
+        assertEquals(successSearchResultUi, newUiState.value)
         assertEquals(QUERY_EXAMPLE, newSearchText)
     }
 
 
     @Test
-    fun `success load user repositories`() {
-        mainRepository.mockResult(mockedResult = MockData.mockedRepositories)
+    fun `success load user repositories`() { //++
+        getPagedReposUseCase.mockPagedResult(mock = successUserRepoPagedResult)
+
         val uiValue: StateFlow<MainUiState> = mainViewModel.mainUiState
         val searchText: StateFlow<String> = mainViewModel.searchText
 
@@ -116,17 +132,16 @@ class MainViewModelTest {
         assertEquals(MainUiState.Loading, uiValue.value)
         assertEquals("", searchText.value)
 
-
         fakeRunAsync.invokeUi()
 
-        assertEquals(successUserRepoResult, uiValue.value)
+        assertEquals(successUserRepoResultUi, uiValue.value)
         assertEquals("", searchText.value)
     }
 
     @Test
     fun `failure load user repositories then success`() {
-        mainRepository.mockFailure(true)
-        mainRepository.mockResult(MockData.mockedRepositories)
+        getPagedReposUseCase.mockPagedResult(mock = failurePagedResult)
+
         val uiValue: StateFlow<MainUiState> = mainViewModel.mainUiState
         val searchText: StateFlow<String> = mainViewModel.searchText
 
@@ -139,7 +154,7 @@ class MainViewModelTest {
         assertEquals(failureResult, uiValue.value)
         assertEquals("", searchText.value)
 
-        mainRepository.mockFailure(false)
+        getPagedReposUseCase.mockPagedResult(mock = successUserRepoPagedResult)
 
         mainViewModel.retry()
         assertEquals(MainUiState.Loading, uiValue.value)
@@ -147,8 +162,114 @@ class MainViewModelTest {
 
         fakeRunAsync.invokeUi()
 
-        assertEquals(successUserRepoResult, uiValue.value)
+        assertEquals(successUserRepoResultUi, uiValue.value)
         assertEquals("", searchText.value)
+
+    }
+
+    @Test
+    fun `success user repo paging test`() {
+        getPagedReposUseCase.mockPagedResult(mock = successUserRepoPagedResult)
+
+        val uiState = mainViewModel.mainUiState
+        val searchText = mainViewModel.searchText
+
+        assertEquals(MainUiState.Loading, uiState.value)
+        assertEquals("", searchText.value)
+
+        mainViewModel.loadUserRepo()
+
+        fakeRunAsync.invokeUi()
+
+        assertEquals(successUserRepoResultUi, uiState.value)
+        assertEquals("", searchText.value)
+
+        getPagedReposUseCase.mockPagedResult(
+            mock = PagedResult.Success(
+                repos = MockData.firstAndSecondUserRepo,
+                isLoadMore = true,
+                isPagingException = false,
+                page = 2,
+            )
+        )
+
+        mainViewModel.loadMore(
+            isLoadMore = true,
+            currentRepoList = MockData.mockedUserRepositoriesUi,
+            page = 1
+        )
+
+        fakeRunAsync.invokeUi()
+
+        assertEquals(
+            successUserRepoResultUi.copy(
+                page = 2,
+                result = MockData.firstAndSecondUserRepoUi,
+                isLoadMore = true,
+            ),
+            uiState.value,
+        )
+
+        getPagedReposUseCase.mockPagedResult(
+            mock = PagedResult.Success(
+                repos = MockData.firstAndSecondUserRepo,
+                isLoadMore = false,
+                isPagingException = false,
+                page = 3,
+            )
+        )
+
+        mainViewModel.loadMore(
+            isLoadMore = true,
+            currentRepoList = MockData.firstAndSecondUserRepoUi,
+            page = 2,
+        )
+
+        fakeRunAsync.invokeUi()
+
+        assertEquals(
+            successUserRepoResultUi.copy(
+                page = 3,
+                result = MockData.firstAndSecondUserRepoUi,
+                isLoadMore = false,
+                pagingUiState = PagingUiState.Empty,
+            ),
+            uiState.value,
+        )
+    }
+
+    @Test
+    fun `failure query paging test`() {
+        val uiState = mainViewModel.mainUiState
+
+        getPagedReposUseCase.mockPagedResult(mock = successSearchPagedResult)
+
+        mainViewModel.query(QUERY_EXAMPLE)
+        fakeRunAsync.returnFlowResult()
+        assertEquals(successSearchResultUi, uiState.value)
+
+
+        getPagedReposUseCase.mockPagedResult(
+            mock = successSearchPagedResult.copy(
+                isPagingException = true,
+                isLoadMore = true,
+
+                )
+        )
+
+        mainViewModel.loadMore(
+            isLoadMore = true,
+            currentRepoList = MockData.mockedSearchRepositoriesUi,
+            page = 1,
+        )
+
+        fakeRunAsync.invokeUi()
+
+        assertEquals(
+            successSearchResultUi.copy(
+                pagingUiState = PagingUiState.Failure(message = "something went wrong"),
+            ), uiState.value
+        )
     }
 
     companion object {
@@ -157,47 +278,66 @@ class MainViewModelTest {
 
 }
 
-private val successSearchResult = MainUiState.Success(
-    result = MockData.mockedSearchRepositoriesUi
+private val successSearchResultUi = MainUiState.Success(
+    page = 1,
+    isLoadMore = true,
+    result = MockData.mockedSearchRepositoriesUi,
+    pagingUiState = PagingUiState.Loading,
 )
 
-private val successUserRepoResult = MainUiState.Success(
-    result = MockData.mockedUserRepositoriesUi
+private val successUserRepoResultUi = MainUiState.Success(
+    page = 1,
+    isLoadMore = true,
+    result = MockData.mockedUserRepositoriesUi,
+    pagingUiState = PagingUiState.Loading,
 )
+
 
 private val failureResult = MainUiState.Failure(
     message = "something went wrong"
 )
 
-private class FakeMainRepository : MainRepository {
+private val successSearchPagedResult =
+    PagedResult.Success(
+        isPagingException = false,
+        isLoadMore = true,
+        repos = MockData.mockedSearchResults,
+        page = 1,
+    )
 
-    private var mockedResult = MockData.mockedSearchResults
-    private var isFailure = false
+private val successUserRepoPagedResult =
+    PagedResult.Success(
+        isPagingException = false,
+        isLoadMore = true,
+        repos = MockData.mockedRepositories,
+        page = 1,
+    )
 
-    override suspend fun userRepo(): Result<List<UserRepository>> {
+private val failurePagedResult = PagedResult.Failure("something went wrong")
 
-        if (isFailure) {
-            return Result.failure<List<UserRepository>>(IllegalStateException("something went wrong"))
-        } else {
-            return Result.success(mockedResult)
-        }
+
+private class FakeGetPagedReposUseCase : GetPagedReposUseCase {
+
+    private lateinit var mockedPageResult: PagedResult
+
+    override suspend fun userRepo(
+        currentRepoList: List<UserRepository>,
+        page: Int
+    ): PagedResult {
+        return mockedPageResult
     }
 
-    override suspend fun searchByQuery(userQuery: String): Result<List<UserRepository>> {
-        if (isFailure) {
-            return Result.failure<List<UserRepository>>(IllegalStateException("something went wrong"))
-
-        } else {
-            return Result.success(mockedResult)
-        }
+    override suspend fun searchByQuery(
+        currentRepoList: List<UserRepository>,
+        userQuery: String,
+        page: Int
+    ): PagedResult {
+        return mockedPageResult
     }
 
-    fun mockResult(mockedResult: List<UserRepository>) {
-        this.mockedResult = mockedResult
+    fun mockPagedResult(mock: PagedResult) {
+        mockedPageResult = mock
     }
 
-    fun mockFailure(failure: Boolean) {
-        isFailure = failure
-
-    }
 }
+
