@@ -107,7 +107,7 @@ class MainViewModel(
             }
 
             isLoadMore && _searchText.value.isBlank() -> launchPagedRequest(
-                page = page,
+                page = page + 1,
                 currentRepoList = currentRepoList,
             ) { page, currentRepoList ->
                 getPagedReposUseCase.userRepo(

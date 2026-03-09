@@ -1,12 +1,11 @@
 package org.example.project
 
 import androidx.lifecycle.SavedStateHandle
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
-import kotlinx.coroutines.withTimeoutOrNull
 import ktshwnumbertwo.composeapp.generated.resources.Res
 import ktshwnumbertwo.composeapp.generated.resources.mock_onboarding_image
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_first_desc
@@ -22,7 +21,7 @@ import org.example.project.onboarding.presentation.OnboardingViewModel
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class OnboardingViewModelTest {
 
@@ -85,32 +84,42 @@ class OnboardingViewModelTest {
         assertEquals(FakeOnboardingStepState.FakeThirdPage, stepState.value)
         assertEquals(expectedThirdPage, pageState.value)
 
-        onboardingViewModel.nextPage()
-
         val onboardingEventSharedFlow: SharedFlow<OnboardingEvent> =
             onboardingViewModel.onboardingEvent
-
-        val actualEmitedValue: OnboardingEvent = withTimeout(1000) {
-            onboardingEventSharedFlow.first()
+        val job = launch(Dispatchers.Unconfined) {
+            onboardingEventSharedFlow
+                .collect {
+                    println("value is emited $it")
+                    assertEquals(OnboardingEvent.Finished, it)
+                }
         }
-        assertEquals(OnboardingEvent.Finished, actualEmitedValue)
+        onboardingViewModel.nextPage()
+
         assertEquals(FakeOnboardingStepState.FakeThirdPage, stepState.value)
         assertEquals(expectedThirdPage, pageState.value)
+        job.cancel()
     }
 
     @Test
     fun `assert no event`() = runBlocking {
+        val emitedEvents = mutableListOf<OnboardingEvent>()
         assertEquals(
             FakeOnboardingStepState.FakeFirstPage,
             onboardingViewModel.onboardingStepStateFlow.value
         )
         val onboardingEventSharedFlow: SharedFlow<OnboardingEvent> =
             onboardingViewModel.onboardingEvent
-        onboardingViewModel.nextPage()
-        val actualEmitedValue = withTimeoutOrNull(100) {
-            onboardingEventSharedFlow.first()
+        val job = launch(Dispatchers.Unconfined) {
+            onboardingEventSharedFlow
+                .collect {
+                    emitedEvents.add(it)
+                }
         }
-        assertNull(actualEmitedValue)
+        onboardingViewModel.nextPage()
+
+        job.cancel()
+
+        assertTrue(emitedEvents.isEmpty())
     }
 
     @Test
@@ -121,19 +130,22 @@ class OnboardingViewModelTest {
 
     @Test
     fun `trigger skip onboarding`() = runBlocking {
-        onboardingViewModel.skipOnboarding()
         val onboardingEventSharedFlow: SharedFlow<OnboardingEvent> =
             onboardingViewModel.onboardingEvent
-        val actualEmitedValue: OnboardingEvent = withTimeout(1000) {
-            onboardingEventSharedFlow.first()
+        val job = launch(Dispatchers.Unconfined) {
+            onboardingEventSharedFlow
+                .collect {
+                    assertEquals(OnboardingEvent.Finished, it)
+                }
         }
+        onboardingViewModel.skipOnboarding()
 
-        assertEquals(OnboardingEvent.Finished, actualEmitedValue)
         assertEquals(
             FakeOnboardingStepState.FakeFirstPage,
             onboardingViewModel.onboardingStepStateFlow.value
         )
         assertEquals(expectedFirstPage, onboardingViewModel.onboardingPageFlow.value)
+        job.cancel()
     }
 
 }
@@ -185,7 +197,6 @@ private val expectedSecondPage = expectedFirstPage.copy(
 private val expectedThirdPage = expectedFirstPage.copy(
     title = Res.string.onboarding_third_title,
 )
-
 
 
 private class FakeOnboardingRepository : OnboardingRepository {

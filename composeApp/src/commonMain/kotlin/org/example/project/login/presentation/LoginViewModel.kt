@@ -23,7 +23,7 @@ class LoginViewModel(
         )
     val loginUiState = _loginUiState.asStateFlow()
 
-    private val _loginUiEvent: MutableSharedFlow<LoginUiEvent> = MutableSharedFlow(replay = 1)
+    private val _loginUiEvent: MutableSharedFlow<LoginUiEvent> = MutableSharedFlow()
     val loginUiEvent = _loginUiEvent.asSharedFlow()
 
     override fun loginIn() {
@@ -43,7 +43,7 @@ class LoginViewModel(
                         _loginUiState.value =
                             LoginUiState.Initial(
                                 errorState = ErrorState.Error(
-                                    message = it.message ?: "something went wrong"
+                                    message = it.message ?: HARDCODED_FAILURE
                                 )
                             )
                     }
@@ -53,6 +53,7 @@ class LoginViewModel(
 
     companion object {
         private const val LOGIN_UI_STATE_KEY = "LOGIN_UI_STATE_KEY"
+        private const val HARDCODED_FAILURE = "something went wrong"
     }
 
 }

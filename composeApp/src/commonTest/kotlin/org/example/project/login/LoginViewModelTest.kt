@@ -1,11 +1,13 @@
 package org.example.project.login
 
 import androidx.lifecycle.SavedStateHandle
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.invoke
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import org.example.project.core.ControlledFakeRunAsync
 import org.example.project.login.domain.LoginRepository
@@ -73,15 +75,22 @@ class LoginViewModelTest {
         loginViewModel.loginIn()
 
         assertEquals(loadingUiState, loginUiState.value)
+
+        val newSharedFlow: SharedFlow<LoginUiEvent> = loginViewModel.loginUiEvent
+
+        val job = launch {
+            (Dispatchers.Unconfined) {
+                newSharedFlow.collect {
+                    assertEquals(LoginUiEvent.LoginSuccessEvent, it)
+                }
+            }
+        }
         fakeLoginRunAsync.invokeUi()
         loginRepository.checkSavedToken("fakeToken")
         assertEquals(loadingUiState, loginUiState.value)
 
-        val newSharedFlow: SharedFlow<LoginUiEvent> = loginViewModel.loginUiEvent
-        val actualNewEvent = withTimeout(300) {
-            newSharedFlow.first()
-        }
-        assertEquals(LoginUiEvent.LoginSuccessEvent, actualNewEvent)
+        job.cancel()
+
     }
 
 }

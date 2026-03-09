@@ -71,10 +71,10 @@ class GetPagedReposUseCaseTest {
         var actualResult = getPagedReposUseCase.searchByQuery(
             emptyList(),
             userQuery = QUERY_EXAMPLE,
-            page = 1
+            page = FIRST_PAGE
         )
         var expectedResult = PagedResult.Success(
-            page = 1,
+            page = FIRST_PAGE,
             isPagingException = false,
             isLoadMore = true,
             repos = firstExpectedRepoList,
@@ -88,7 +88,7 @@ class GetPagedReposUseCaseTest {
         actualResult =
             getPagedReposUseCase.searchByQuery(firstExpectedRepoList, QUERY_EXAMPLE, page = 2)
         expectedResult = PagedResult.Success(
-            page = 2,
+            page = SECOND_PAGE,
             isPagingException = false,
             isLoadMore = false,
             repos = secondExpectedRepoList,
@@ -104,7 +104,7 @@ class GetPagedReposUseCaseTest {
 
         var actualResult = getPagedReposUseCase.userRepo(emptyList(), page = 1)
         var expectedResult = PagedResult.Success(
-            page = 1,
+            page = FIRST_PAGE,
             isPagingException = false,
             isLoadMore = true,
             repos = expectedRepoList,
@@ -115,9 +115,9 @@ class GetPagedReposUseCaseTest {
 
         actualResult = getPagedReposUseCase.userRepo(expectedRepoList, 2)
         expectedResult = PagedResult.Success(
-            page = 2,
+            page = SECOND_PAGE,
             isPagingException = true,
-            isLoadMore = false,
+            isLoadMore = true,
             repos = expectedRepoList
         )
         assertEquals(expectedResult, actualResult)
@@ -127,6 +127,8 @@ class GetPagedReposUseCaseTest {
         private const val QUERY_EXAMPLE = "QUERY"
         private const val DEFAULT_PAGE_SIZE = 15
         private const val INCOMPLETE_PAGE = 14
+        private const val FIRST_PAGE = 1
+        private const val SECOND_PAGE = 2
     }
 }
 

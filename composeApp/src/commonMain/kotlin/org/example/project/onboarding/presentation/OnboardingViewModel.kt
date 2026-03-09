@@ -25,10 +25,10 @@ class OnboardingViewModel(
     val onboardingStepStateFlow = _onboardingStepStateFlow.asStateFlow()
 
     private val _onboardingPageFlow: MutableStateFlow<OnboardingPage> =
-        MutableStateFlow(value = onboardingStepState.currentState())
+        MutableStateFlow(value = onboardingStepState.currentState()) //TODO ADD ONE ONBOARDING UI STATE FLOW
     val onboardingPageFlow = _onboardingPageFlow.asStateFlow()
 
-    private val _onboardingEvent: MutableSharedFlow<OnboardingEvent> = MutableSharedFlow(replay = 1)
+    private val _onboardingEvent: MutableSharedFlow<OnboardingEvent> = MutableSharedFlow()
     val onboardingEvent = _onboardingEvent.asSharedFlow()
 
     init {
