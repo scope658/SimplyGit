@@ -231,6 +231,28 @@ class ScenarioTest : AbstractTest(), KoinTest {
         mainPage.checkUserRepositories(userRepositories = MockData.mockedSearchRepositoriesUi)
 
     }
+
+    @Test
+    fun userAlreadyOnboarded() {
+        //TODO ADD FAKE ONBOARDED TRUE TO DATA STORE MANAGER
+        val loginPage = LoginPage(composeTestRule)
+        loginPage.checkVisibleNow()
+
+        loginPage.clickSignInButton()
+
+        val mainPage = MainPage(composeTestRule)
+        mainPage.checkVisibleNow()
+
+    }
+
+    @Test
+    fun userAlreadyOnboardedAndLoggedIn() {
+        //TODO ADD FAKE ONBOARDED TRUE TO DATA STORE MANAGER
+        //TODO ADD FAKE LOGGED IN TRUE TO DATA STORE MANAGER
+        val mainPage = MainPage(composeTestRule)
+        mainPage.checkVisibleNow()
+
+    }
 }
 
 
