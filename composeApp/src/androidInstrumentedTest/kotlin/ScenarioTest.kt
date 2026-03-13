@@ -1,4 +1,6 @@
+import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ktshwnumbertwo.composeapp.generated.resources.Res
@@ -29,32 +31,15 @@ import pages.MainPage
 
 
 @RunWith(value = AndroidJUnit4::class)
-class ScenarioTest : AbstractTest(), KoinTest {
+class ScenarioTest : AbstractTest() {
 
-    private lateinit var authWrapper: FakeAuthWrapper
-    private lateinit var githubApi: FakeGithubApi
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     @Before
     fun setUp() {
-        authWrapper = FakeAuthWrapper()
-        githubApi = FakeGithubApi()
-
-        stopKoin()
-        startKoin {
-            androidContext(ApplicationProvider.getApplicationContext())
-            modules(
-                onboardingModule,
-                loginModule,
-                mainModule,
-                module {
-                    single<AuthWrapper> { authWrapper }
-                    single<GithubApi> { githubApi }
-                }
-            )
-        }
+        abstractSetUp()
     }
 
     @After
