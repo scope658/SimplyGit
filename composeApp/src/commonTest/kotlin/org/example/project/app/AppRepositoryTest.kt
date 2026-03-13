@@ -1,6 +1,7 @@
 package org.example.project.app
 
 import kotlinx.coroutines.runBlocking
+import org.example.project.app.data.AppRepositoryImpl
 import org.example.project.core.cache.DataStoreManager
 import kotlin.test.Test
 import kotlin.test.assertEquals
