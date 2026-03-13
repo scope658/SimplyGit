@@ -41,30 +41,15 @@ class ScenarioTest : AbstractTest(), KoinTest {
 
     @Before
     fun setUp() {
-        authWrapper = FakeAuthWrapper()
-        githubApi = FakeGithubApi()
-
-        stopKoin()
-        startKoin {
-            androidContext(ApplicationProvider.getApplicationContext())
-            modules(
-                onboardingModule,
-                loginModule,
-                mainModule,
-                module {
-                    single<AuthWrapper> { authWrapper }
-                    single<GithubApi> { githubApi }
-                }
-            )
-        }
+        abstractSetUp()
     }
 
     @After
     fun tearDown() {
         authWrapper.setException(null)
         githubApi.setException(null)
-    }
 
+    }
     @Test
     fun fullOnboardingScreen() {
         val onboardingPage = OnboardingPage(composeTestRule)
@@ -84,7 +69,7 @@ class ScenarioTest : AbstractTest(), KoinTest {
 
         onboardingPage.clickContinueButton()
 
-        composeTestRule.activityRule.assertAfterAndBeforeRecreate(
+        composeTestRule.activityRule.assertBeforeAndAfterRecreate(
             block = {
                 onboardingPage.checkVisibleNow(
                     imageRes = Res.drawable.third_onboarding_image,
@@ -129,7 +114,7 @@ class ScenarioTest : AbstractTest(), KoinTest {
         loginPage.clickSignInButton()
         loginPage.checkErrorMessageIsVisible("User cancelled")
 
-        composeTestRule.activityRule.assertAfterAndBeforeRecreate {
+        composeTestRule.activityRule.assertBeforeAndAfterRecreate {
             loginPage.checkErrorMessageIsVisible("User cancelled")
         }
         authWrapper.setException(null)
@@ -259,6 +244,7 @@ class ScenarioTest : AbstractTest(), KoinTest {
 
 
 abstract class AbstractTest {
+
     protected fun ActivityScenarioRule<*>.assertBeforeAndAfterRecreate(
         block: () -> Unit,
     ) {

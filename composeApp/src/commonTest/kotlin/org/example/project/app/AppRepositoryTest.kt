@@ -1,8 +1,8 @@
 package org.example.project.app
 
+import FakeDataStoreManager
 import kotlinx.coroutines.runBlocking
 import org.example.project.app.data.AppRepositoryImpl
-import org.example.project.core.cache.DataStoreManager
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -12,10 +12,11 @@ class AppRepositoryTest {
 
     @Test
     fun `user token and onboarding state`() = runBlocking {
-        val dataStoreManager = FakeDataStoreManager(
-            token = null,
-            isOnboarded = true,
-        )
+
+        val dataStoreManager = FakeDataStoreManager()
+        dataStoreManager.mockToken(null)
+        dataStoreManager.mockOnboardedFlag(true)
+
         val appRepository = AppRepositoryImpl(
             dataStoreManager = dataStoreManager,
         )
@@ -30,21 +31,4 @@ class AppRepositoryTest {
         isTokenSaved = appRepository.isTokenSaved()
         assertEquals(actual = isTokenSaved, expected = true)
     }
-}
-
-private class FakeDataStoreManager(private var token: String?, private val isOnboarded: Boolean) :
-    DataStoreManager.Read {
-
-    fun mockToken(token: String?) {
-        this.token = token
-    }
-
-    override suspend fun userToken(): String? {
-        return token
-    }
-
-    override suspend fun isOnboarded(): Boolean {
-        return isOnboarded
-    }
-
 }
