@@ -3,6 +3,7 @@ package org.example.project
 import android.app.Application
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
+import org.example.project.app.di.appModule
 import org.example.project.core.cloud.cloudModule
 import org.example.project.login.di.loginModule
 import org.example.project.main.di.mainModule
@@ -17,7 +18,14 @@ class MyApp : Application() {
         Napier.base(DebugAntilog())
         startKoin {
             androidContext(this@MyApp)
-            modules(onboardingModule, loginModule, mainModule, androidModule, cloudModule)
+            modules(
+                onboardingModule,
+                loginModule,
+                mainModule,
+                androidModule,
+                cloudModule,
+                appModule
+            )
         }
     }
 }
