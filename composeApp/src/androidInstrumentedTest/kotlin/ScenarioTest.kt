@@ -82,7 +82,7 @@ class ScenarioTest : AbstractTest(), KoinTest {
 
         onboardingPage.clickContinueButton()
 
-        composeTestRule.activityRule.assertAfterAndBeforeRecreate(
+        composeTestRule.activityRule.assertBeforeAndAfterRecreate(
             block = {
                 onboardingPage.checkVisibleNow(
                     imageRes = Res.drawable.third_onboarding_image,
@@ -127,7 +127,7 @@ class ScenarioTest : AbstractTest(), KoinTest {
         loginPage.clickSignInButton()
         loginPage.checkErrorMessageIsVisible("User cancelled")
 
-        composeTestRule.activityRule.assertAfterAndBeforeRecreate {
+        composeTestRule.activityRule.assertBeforeAndAfterRecreate {
             loginPage.checkErrorMessageIsVisible("User cancelled")
         }
         authWrapper.setException(null)
@@ -175,7 +175,7 @@ class ScenarioTest : AbstractTest(), KoinTest {
         mainPage.checkQueryText("qweqwqweewqewqqweqwe")
         mainPage.checkEmptyResultStateVisible()
 
-        composeTestRule.activityRule.assertAfterAndBeforeRecreate {
+        composeTestRule.activityRule.assertBeforeAndAfterRecreate {
             mainPage.checkEmptyResultStateVisible()
         }
     }
@@ -199,7 +199,7 @@ class ScenarioTest : AbstractTest(), KoinTest {
         mainPage.checkQueryText("search github repository")
         mainPage.checkFailureState(errorMessage = "something went wrong")
 
-        composeTestRule.activityRule.assertAfterAndBeforeRecreate {
+        composeTestRule.activityRule.assertBeforeAndAfterRecreate {
             mainPage.checkFailureState(errorMessage = "something went wrong")
         }
 
@@ -210,7 +210,7 @@ class ScenarioTest : AbstractTest(), KoinTest {
 
         mainPage.checkUserRepositories(userRepositories = MockData.mockedSearchRepositoriesUi)
 
-        composeTestRule.activityRule.assertAfterAndBeforeRecreate {
+        composeTestRule.activityRule.assertBeforeAndAfterRecreate {
             mainPage.checkUserRepositories(userRepositories = MockData.mockedSearchRepositoriesUi)
         }
     }
@@ -258,7 +258,7 @@ class ScenarioTest : AbstractTest(), KoinTest {
 
 abstract class AbstractTest {
 
-    protected fun ActivityScenarioRule<*>.assertAfterAndBeforeRecreate(
+    protected fun ActivityScenarioRule<*>.assertBeforeAndAfterRecreate(
         block: () -> Unit,
     ) {
         block()

@@ -1,4 +1,4 @@
-package org.example.project.core
+package org.example.project.core.cloud
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -9,7 +9,7 @@ import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 
 
-val commonModule = module {
+val cloudModule = module {
     single {
         HttpClient {
             defaultRequest {
