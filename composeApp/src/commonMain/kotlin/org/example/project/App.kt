@@ -37,7 +37,7 @@ fun App() {
         Scaffold { innerPadding ->
             NavHost(
                 navController = navController,
-                startDestination = Routes.Onboarding,
+                startDestination = Routes.App,
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable<Routes.App> {
