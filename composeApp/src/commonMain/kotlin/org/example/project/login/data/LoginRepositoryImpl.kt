@@ -5,22 +5,24 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import org.example.project.AuthWrapper
 import org.example.project.TokenStorage
-import org.example.project.core.runCatchingSuspend
+import org.example.project.core.customRunCatching
 import org.example.project.login.domain.LoginRepository
 
-class LoginRepositoryImpl(private val authWrapper: AuthWrapper) : LoginRepository {
+class LoginRepositoryImpl(
+    private val authWrapper: AuthWrapper,
+    private val dataStoreManager: DataStoreManager.SaveToken
+) : LoginRepository {
 
 
     override suspend fun userToken(): Result<String> {
         return runCatchingSuspend {
             authWrapper.userToken()
         }
-
     }
 
     override suspend fun saveUserToken(token: String) {
         withContext(Dispatchers.IO) {
-            TokenStorage.token = token
+            dataStoreManager.saveUserToken(token)
         }
     }
 }
