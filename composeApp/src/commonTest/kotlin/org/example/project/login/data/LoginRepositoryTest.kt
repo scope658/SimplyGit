@@ -1,9 +1,8 @@
-package org.example.project.login
+package org.example.project.login.data
 
 import kotlinx.coroutines.runBlocking
 import org.example.project.FakeAuthWrapper
 import org.example.project.TokenStorage
-import org.example.project.login.data.LoginRepositoryImpl
 import org.example.project.login.domain.LoginRepository
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -50,4 +49,3 @@ class LoginRepositoryTest {
         private const val FAKE_ERROR_MESSAGE = "fake error message"
     }
 }
-

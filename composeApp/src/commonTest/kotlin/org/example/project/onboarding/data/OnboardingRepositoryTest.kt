@@ -1,8 +1,7 @@
-package org.example.project.onboarding
+package org.example.project.onboarding.data
 
 import kotlinx.coroutines.runBlocking
 import org.example.project.core.cache.DataStoreManager
-import org.example.project.onboarding.data.OnboardingRepositoryImpl
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -1,11 +1,9 @@
-package org.example.project.app
+package org.example.project.app.data
 
 import FakeDataStoreManager
 import kotlinx.coroutines.runBlocking
-import org.example.project.app.data.AppRepositoryImpl
 import kotlin.test.Test
 import kotlin.test.assertEquals
-
 
 class AppRepositoryTest {
 

@@ -1,8 +1,7 @@
-package org.example.project.main
+package org.example.project.main.data
 
 import kotlinx.coroutines.runBlocking
 import org.example.project.MockData
-import org.example.project.main.data.MainRepositoryImpl
 import org.example.project.main.data.cloud.FakeGithubApi
 import org.example.project.main.domain.MainRepository
 import kotlin.test.BeforeTest

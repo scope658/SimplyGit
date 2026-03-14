@@ -1,40 +1,23 @@
-import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ktshwnumbertwo.composeapp.generated.resources.Res
 import ktshwnumbertwo.composeapp.generated.resources.first_onboarding_image
 import ktshwnumbertwo.composeapp.generated.resources.second_onboarding_image
 import ktshwnumbertwo.composeapp.generated.resources.third_onboarding_image
-import org.example.project.AuthWrapper
-import org.example.project.FakeAuthWrapper
 import org.example.project.MainActivity
 import org.example.project.MockData
-import org.example.project.login.di.loginModule
-import org.example.project.main.data.cloud.FakeGithubApi
-import org.example.project.main.data.cloud.GithubApi
-import org.example.project.main.di.mainModule
-import org.example.project.onboarding.di.onboardingModule
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.android.ext.koin.androidContext
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.dsl.module
-import org.koin.test.KoinTest
 import pages.LoginPage
 import pages.MainPage
 
 
 @RunWith(value = AndroidJUnit4::class)
-class ScenarioTest : AbstractTest(), KoinTest {
+class ScenarioTest : AbstractTest() {
 
-    private lateinit var authWrapper: FakeAuthWrapper
-    private lateinit var githubApi: FakeGithubApi
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
@@ -218,48 +201,5 @@ class ScenarioTest : AbstractTest(), KoinTest {
         mainPage.checkUserRepositories(userRepositories = MockData.mockedSearchRepositoriesUi)
 
     }
-
-    @Test
-    fun userAlreadyOnboarded() {
-        //TODO ADD FAKE ONBOARDED TRUE TO DATA STORE MANAGER
-        val loginPage = LoginPage(composeTestRule)
-        loginPage.checkVisibleNow()
-
-        loginPage.clickSignInButton()
-
-        val mainPage = MainPage(composeTestRule)
-        mainPage.checkVisibleNow()
-
-    }
-
-    @Test
-    fun userAlreadyOnboardedAndLoggedIn() {
-        //TODO ADD FAKE ONBOARDED TRUE TO DATA STORE MANAGER
-        //TODO ADD FAKE LOGGED IN TRUE TO DATA STORE MANAGER
-        val mainPage = MainPage(composeTestRule)
-        mainPage.checkVisibleNow()
-
-    }
 }
-
-
-abstract class AbstractTest {
-
-    protected fun ActivityScenarioRule<*>.assertBeforeAndAfterRecreate(
-        block: () -> Unit,
-    ) {
-        block()
-        this.scenario.recreate()
-        block()
-    }
-
-    protected fun skipOnboardingAndLogin(composeTestRule: ComposeTestRule) {
-        val onboardingPage = OnboardingPage(composeTestRule = composeTestRule)
-        onboardingPage.clickSkipButton()
-        val loginPage = LoginPage(composeTestRule)
-        loginPage.clickSignInButton()
-    }
-}
-
-
 

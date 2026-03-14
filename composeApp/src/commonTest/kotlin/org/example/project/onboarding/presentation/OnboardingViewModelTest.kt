@@ -1,4 +1,4 @@
-package org.example.project
+package org.example.project.onboarding.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.Dispatchers
@@ -12,12 +12,10 @@ import ktshwnumbertwo.composeapp.generated.resources.onboarding_first_desc
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_first_title
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_second_title
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_third_title
+import org.example.project.CommonParcelable
+import org.example.project.CommonParcelize
 import org.example.project.core.FakeRunAsync
 import org.example.project.onboarding.domain.OnboardingRepository
-import org.example.project.onboarding.presentation.OnboardingEvent
-import org.example.project.onboarding.presentation.OnboardingPage
-import org.example.project.onboarding.presentation.OnboardingStepState
-import org.example.project.onboarding.presentation.OnboardingViewModel
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

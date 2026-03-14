@@ -1,12 +1,7 @@
-package org.example.project.main
+package org.example.project.main.domain
 
 import kotlinx.coroutines.runBlocking
 import org.example.project.MockData
-import org.example.project.main.domain.GetPagedReposUseCase
-import org.example.project.main.domain.HandleMainRequest
-import org.example.project.main.domain.MainRepository
-import org.example.project.main.domain.PagedResult
-import org.example.project.main.domain.UserRepository
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
