@@ -28,6 +28,8 @@ class MainPage(private val composeTestRule: ComposeTestRule) {
 
     private val emptyResultIcon = composeTestRule.onNodeWithTag("empty_icon")
     private val emptyResultText = composeTestRule.onNodeWithTag("empty_result_text")
+
+    private val profileIcon = composeTestRule.onNodeWithTag("profile_icon")
     fun checkVisibleNow() {
 
         searchTextField
@@ -36,6 +38,9 @@ class MainPage(private val composeTestRule: ComposeTestRule) {
         searchTextFieldLabel
             .assertIsDisplayed()
             .assertTextEquals("Search")
+
+        profileIcon
+            .assertIsDisplayed()
     }
 
     fun inputQuery(query: String) {
@@ -114,5 +119,10 @@ class MainPage(private val composeTestRule: ComposeTestRule) {
         emptyResultText
             .assertIsDisplayed()
             .assertTextEquals("Nothing to see here")
+    }
+
+    fun clickProfileIcon() {
+        profileIcon
+            .performClick()
     }
 }
