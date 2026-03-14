@@ -16,7 +16,10 @@ fun OnboardingScreen(
     LaunchedEffect(Unit) {
         viewModel.onboardingEvent.collectLatest { event ->
             when (event) {
-                is OnboardingEvent.Finished -> onOnboardingFinished()
+                is OnboardingEvent.Finished -> {
+                    viewModel.finishOnboarding()
+                    onOnboardingFinished()
+                }
             }
         }
     }
