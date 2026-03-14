@@ -1,5 +1,6 @@
 package org.example.project.login.di
 
+import org.example.project.core.cache.DataStoreManager
 import org.example.project.login.data.LoginRepositoryImpl
 import org.example.project.login.domain.LoginRepository
 import org.example.project.login.presentation.LoginViewModel
@@ -7,7 +8,8 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val loginModule = module {
-    factory<LoginRepository> { LoginRepositoryImpl(get()) }
+    single<DataStoreManager.SaveToken> { DataStoreManager.Base(get()) }
+    factory<LoginRepository> { LoginRepositoryImpl(get(), get()) }
     viewModel {
         LoginViewModel(
             savedStateHandle = get(),
