@@ -1,7 +1,14 @@
 package org.example.project.main.data.cloud
 
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.parameter
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import org.example.project.MockData
-import org.example.project.main.data.RepoData
+import org.example.project.TokenStorage
 
 interface GithubApi {
     suspend fun fetchByQuery(userQuery: String, page: Int): List<RepoData>

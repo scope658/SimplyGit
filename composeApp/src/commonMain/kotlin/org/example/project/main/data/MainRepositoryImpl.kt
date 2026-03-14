@@ -2,6 +2,7 @@ package org.example.project.main.data
 
 import org.example.project.core.runCatchingSuspend
 import org.example.project.main.data.cloud.GithubApi
+import org.example.project.main.data.cloud.RepoData
 import org.example.project.main.domain.MainRepository
 import org.example.project.main.domain.UserRepository
 
