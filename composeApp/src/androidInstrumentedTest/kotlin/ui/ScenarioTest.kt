@@ -13,6 +13,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import pages.LoginPage
 import pages.MainPage
+import pages.ProfilePage
 
 
 @RunWith(value = AndroidJUnit4::class)
@@ -33,6 +34,7 @@ class ScenarioTest : AbstractTest() {
         githubApi.setException(null)
 
     }
+
     @Test
     fun fullOnboardingScreen() {
         val onboardingPage = OnboardingPage(composeTestRule)
@@ -200,6 +202,34 @@ class ScenarioTest : AbstractTest() {
 
         mainPage.checkUserRepositories(userRepositories = MockData.mockedSearchRepositoriesUi)
 
+    }
+
+    @Test
+    fun failureThenSuccessLoadUserProfile() {
+        skipOnboardingScreen()
+        val mainPage = MainPage(composeTestRule)
+        mainPage.checkVisibleNow()
+
+        mainPage.clickProfileIcon()
+        val profilePage = ProfilePage(composeTestRule)
+        //TODO ADD FAKE FAILURE PROFILE DATA
+        profilePage.checkErrorVisibleNow()
+
+
+        //TODO ADD SUCCESS PROFILE DATA
+        profilePage.clickRetryButton()
+
+        profilePage.checkVisibleNow(
+            userName = "scope",
+            bio = "fake bio",
+            repoCount = "12",
+            subscribersCount = "23"
+        )
+
+        profilePage.clickLogoutButton()
+
+        val loginPage = LoginPage(composeTestRule)
+        loginPage.checkVisibleNow()
     }
 }
 
