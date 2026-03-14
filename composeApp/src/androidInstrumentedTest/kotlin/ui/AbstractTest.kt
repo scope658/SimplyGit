@@ -1,12 +1,13 @@
 package ui
 
-import FakeDataStoreManager
+
 import OnboardingPage
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import org.example.project.AuthWrapper
 import org.example.project.FakeAuthWrapper
+import org.example.project.app.data.FakeGeneralDataStoreManager
 import org.example.project.app.di.appModule
 import org.example.project.core.cache.DataStoreManager
 import org.example.project.login.di.loginModule
@@ -25,11 +26,11 @@ abstract class AbstractTest : KoinTest {
 
     protected lateinit var authWrapper: FakeAuthWrapper
     protected lateinit var githubApi: FakeGithubApi
-    protected lateinit var fakeDataStoreManager: FakeDataStoreManager
+    protected lateinit var fakeDataStoreManager: FakeGeneralDataStoreManager
 
     protected fun abstractSetUp() {
 
-        fakeDataStoreManager = FakeDataStoreManager()
+        fakeDataStoreManager = FakeGeneralDataStoreManager()
         authWrapper = FakeAuthWrapper()
         githubApi = FakeGithubApi()
 
@@ -45,6 +46,7 @@ abstract class AbstractTest : KoinTest {
                     single<AuthWrapper> { authWrapper }
                     single<GithubApi> { githubApi }
                     single<DataStoreManager.Read> { fakeDataStoreManager }
+                    single<DataStoreManager.FinishOnboarding> { fakeDataStoreManager }
                 }
             )
         }
