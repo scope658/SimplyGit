@@ -1,10 +1,12 @@
 package org.example.project.onboarding.data
 
+import org.example.project.core.cache.DataStoreManager
 import org.example.project.onboarding.domain.OnboardingRepository
 
-class OnboardingRepositoryImpl : OnboardingRepository {
+class OnboardingRepositoryImpl(private val dataStoreManager: DataStoreManager.FinishOnboarding) :
+    OnboardingRepository {
 
     override suspend fun onboardingFinished() {
-        //TODO add flag to data store
+        dataStoreManager.finishOnboarding()
     }
 }
