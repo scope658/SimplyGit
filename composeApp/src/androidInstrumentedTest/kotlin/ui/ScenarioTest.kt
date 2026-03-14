@@ -1,14 +1,9 @@
-import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ktshwnumbertwo.composeapp.generated.resources.Res
 import ktshwnumbertwo.composeapp.generated.resources.first_onboarding_image
 import ktshwnumbertwo.composeapp.generated.resources.second_onboarding_image
 import ktshwnumbertwo.composeapp.generated.resources.third_onboarding_image
-import org.example.project.AuthWrapper
-import org.example.project.FakeAuthWrapper
 import org.example.project.MainActivity
 import org.example.project.MockData
 import org.example.project.login.di.loginModule
@@ -46,8 +41,8 @@ class ScenarioTest : AbstractTest() {
     fun tearDown() {
         authWrapper.setException(null)
         githubApi.setException(null)
-    }
 
+    }
     @Test
     fun fullOnboardingScreen() {
         val onboardingPage = OnboardingPage(composeTestRule)

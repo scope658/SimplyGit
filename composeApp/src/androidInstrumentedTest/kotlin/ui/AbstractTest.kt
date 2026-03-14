@@ -1,3 +1,7 @@
+package ui
+
+import FakeDataStoreManager
+import OnboardingPage
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.rules.ActivityScenarioRule

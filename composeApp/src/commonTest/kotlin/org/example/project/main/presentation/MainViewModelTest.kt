@@ -1,4 +1,4 @@
-package org.example.project.main
+package org.example.project.main.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.flow.StateFlow
@@ -7,10 +7,6 @@ import org.example.project.core.ControlledFakeRunAsync
 import org.example.project.main.domain.GetPagedReposUseCase
 import org.example.project.main.domain.PagedResult
 import org.example.project.main.domain.UserRepository
-import org.example.project.main.presentation.MainUiMapper
-import org.example.project.main.presentation.MainUiState
-import org.example.project.main.presentation.MainViewModel
-import org.example.project.main.presentation.PagingUiState
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

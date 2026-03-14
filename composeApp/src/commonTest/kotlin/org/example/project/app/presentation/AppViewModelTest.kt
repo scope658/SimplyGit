@@ -1,12 +1,10 @@
-package org.example.project.app
+package org.example.project.app.presentation
 
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.example.project.app.domain.AppRepository
-import org.example.project.app.presentation.AppEvent
-import org.example.project.app.presentation.AppViewModel
 import org.example.project.core.FakeRunAsync
 import kotlin.test.Test
 import kotlin.test.assertEquals

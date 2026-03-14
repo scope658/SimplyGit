@@ -1,3 +1,6 @@
+package ui
+
+import OnboardingPage
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
