@@ -47,6 +47,8 @@ abstract class AbstractTest : KoinTest {
                     single<GithubApi> { githubApi }
                     single<DataStoreManager.Read> { fakeDataStoreManager }
                     single<DataStoreManager.FinishOnboarding> { fakeDataStoreManager }
+                    single<DataStoreManager.ReadToken> { fakeDataStoreManager }
+                    single<DataStoreManager.SaveToken> { fakeDataStoreManager }
                 }
             )
         }
