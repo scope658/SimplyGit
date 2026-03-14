@@ -2,6 +2,7 @@ package org.example.project.main.data
 
 import kotlinx.coroutines.runBlocking
 import org.example.project.MockData
+import org.example.project.core.cache.DataStoreManager
 import org.example.project.main.data.cloud.FakeGithubApi
 import org.example.project.main.domain.MainRepository
 import kotlin.test.BeforeTest
@@ -11,11 +12,14 @@ import kotlin.test.assertEquals
 class MainRepositoryTest {
     private lateinit var mainRepository: MainRepository
     private lateinit var fakeGithubApi: FakeGithubApi
+    private lateinit var dataStoreManager: FakeDataStoreManager
 
     @BeforeTest
     fun setUp() {
+        dataStoreManager = FakeDataStoreManager()
         fakeGithubApi = FakeGithubApi()
-        mainRepository = MainRepositoryImpl(githubApi = fakeGithubApi)
+        mainRepository =
+            MainRepositoryImpl(githubApi = fakeGithubApi, dataStoreManager = dataStoreManager)
     }
 
     @Test
@@ -25,6 +29,8 @@ class MainRepositoryTest {
         val actualResult = mainRepository.searchByQuery(FAKE_QUERY, 1)
 
         assertEquals(expectedResult, actualResult)
+        dataStoreManager.checkCalledTimes(1)
+
     }
 
     @Test
@@ -33,6 +39,7 @@ class MainRepositoryTest {
         val expectedResult = Result.success(MockData.mockedRepositories)
 
         assertEquals(expectedResult, actualResult)
+        dataStoreManager.checkCalledTimes(1)
     }
 
     @Test
@@ -42,6 +49,7 @@ class MainRepositoryTest {
         val actualResult = mainRepository.searchByQuery(FAKE_QUERY, 1)
         val actualException = actualResult.exceptionOrNull()!!
         assertEquals(FAKE_EXCEPTION_MESSAGE, actualException.message)
+        dataStoreManager.checkCalledTimes(1)
     }
 
     @Test
@@ -51,10 +59,25 @@ class MainRepositoryTest {
         val actualResult = mainRepository.userRepo(1)
         val actualException = actualResult.exceptionOrNull()!!
         assertEquals(FAKE_EXCEPTION_MESSAGE, actualException.message)
+        dataStoreManager.checkCalledTimes(1)
     }
 
     companion object {
         private const val FAKE_QUERY = "fake query"
         private const val FAKE_EXCEPTION_MESSAGE = "fake message"
+    }
+}
+
+private class FakeDataStoreManager : DataStoreManager.ReadToken {
+
+    private var actualCalledTimes = 0
+    override suspend fun userToken(): String? {
+        actualCalledTimes++
+        return "fakeToken"
+    }
+
+
+    fun checkCalledTimes(expectedCalledTimes: Int) {
+        assertEquals(expectedCalledTimes, actualCalledTimes)
     }
 }
