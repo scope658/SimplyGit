@@ -16,15 +16,12 @@ import androidx.test.espresso.Espresso
 import org.example.project.main.presentation.UserRepositoryUi
 
 @OptIn(ExperimentalTestApi::class)
-class MainPage(private val composeTestRule: ComposeTestRule) {
+class MainPage(private val composeTestRule: ComposeTestRule) : AbstractPage(composeTestRule) {
 
     private val userRepositoryLazyColum = composeTestRule.onNodeWithTag("main_lazy_column")
     private val searchTextField = composeTestRule.onNodeWithTag("search_text_field")
     private val searchTextFieldLabel =
         composeTestRule.onNodeWithTag("search_text_field_label", useUnmergedTree = true)
-
-    private val retryButton = composeTestRule.onNodeWithTag("main_retry_button")
-    private val errorMessage = composeTestRule.onNodeWithTag("main_error_message")
 
     private val emptyResultIcon = composeTestRule.onNodeWithTag("empty_icon")
     private val emptyResultText = composeTestRule.onNodeWithTag("empty_result_text")
@@ -60,11 +57,6 @@ class MainPage(private val composeTestRule: ComposeTestRule) {
     }
 
     fun checkUserRepositories(userRepositories: List<UserRepositoryUi>) {
-        val id = userRepositories[4].id
-        composeTestRule.waitUntilExactlyOneExists(
-            matcher = hasTestTag("user_repo_card_$id"),
-            timeoutMillis = 5000
-        )
         userRepositories.forEach {
             assertRepositories(it)
         }
@@ -97,20 +89,11 @@ class MainPage(private val composeTestRule: ComposeTestRule) {
 
 
     fun checkFailureState(errorMessage: String) {
-        composeTestRule.waitUntilExactlyOneExists(
-            matcher = hasTestTag("main_error_message"),
-            timeoutMillis = 5000
-        )
         this.errorMessage
             .assertIsDisplayed()
             .assertTextEquals(errorMessage)
     }
 
-    fun clickRetryButton() {
-        retryButton
-            .performClick()
-
-    }
 
     fun checkEmptyResultStateVisible() {
         emptyResultIcon

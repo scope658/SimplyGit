@@ -1,5 +1,7 @@
 package org.example.project.profile.presentation
 
+import org.example.project.core.AbstractScreen
+
 interface ProfileUiState {
 
     data class Success(
@@ -12,8 +14,8 @@ interface ProfileUiState {
 
     data class Failure(
         val message: String,
-    ) : ProfileUiState
+    ) : ProfileUiState, AbstractScreen()
 
-    object Loading : ProfileUiState
+    object Loading : ProfileUiState, AbstractScreen()
 
 }
