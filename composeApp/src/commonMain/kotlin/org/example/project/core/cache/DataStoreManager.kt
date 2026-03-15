@@ -26,8 +26,9 @@ interface DataStoreManager {
         suspend fun finishOnboarding()
     }
 
+    interface TokenOperations : ReadToken, SaveToken
     interface Read : ReadToken, ReadOnboarding
-    interface All : Read, SaveToken, FinishOnboarding
+    interface All : Read, SaveToken, FinishOnboarding, TokenOperations
 
     class Base(private val dataStore: DataStore<Preferences>) : All {
 
