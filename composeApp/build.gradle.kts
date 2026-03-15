@@ -8,6 +8,8 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlin.serialization)
     kotlin("plugin.parcelize")
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.androidx.room)
 }
 
 kotlin {
@@ -75,6 +77,9 @@ kotlin {
 
             implementation(libs.androidx.datastore)
             implementation(libs.androidx.datastore.preferences)
+
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.sqlite.bundled)
         }
         iosMain.dependencies {
             implementation(libs.coil.network.ktor)
@@ -90,6 +95,8 @@ kotlin {
 
             implementation(libs.koin.test)
             implementation(libs.koin.test.junit4)
+
+            implementation(libs.room.testing)
         }
     }
 }
@@ -138,9 +145,14 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-}
 
+}
+room {
+    schemaDirectory("$projectDir/schemas")
+
+}
 dependencies {
     debugImplementation(libs.compose.uiTooling)
+    add("kspAndroid", libs.androidx.room.compiler)
 }
 
