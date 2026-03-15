@@ -1,9 +1,7 @@
-package org.example.project.profile
+package org.example.project.profile.data
 
 import kotlinx.coroutines.runBlocking
 import org.example.project.core.cache.DataStoreManager
-import org.example.project.profile.data.ProfileData
-import org.example.project.profile.data.ProfileRepositoryImpl
 import org.example.project.profile.data.cache.ProfileCache
 import org.example.project.profile.data.cache.ProfileDao
 import org.example.project.profile.data.cloud.ProfileGithubApi
