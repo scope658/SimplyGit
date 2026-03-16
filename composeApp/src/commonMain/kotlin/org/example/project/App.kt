@@ -13,6 +13,7 @@ import org.example.project.app.presentation.AppScreen
 import org.example.project.login.presentation.LoginScreen
 import org.example.project.main.presentation.MainScreen
 import org.example.project.onboarding.presentation.OnboardingScreen
+import org.example.project.profile.presentation.ProfileScreen
 import theme.CatAppTheme
 
 sealed interface Routes {
@@ -28,6 +29,9 @@ sealed interface Routes {
 
     @Serializable
     object Main : Routes
+
+    @Serializable
+    object Profile : Routes
 }
 
 @Composable
@@ -73,6 +77,15 @@ fun App() {
                 }
 
                 composable<Routes.Main> { MainScreen() }
+                composable<Routes.Profile> {
+                    ProfileScreen(onLogout = {
+                        navController.navigate(Routes.Login) {
+                            popUpTo(Routes.Profile) {
+                                inclusive = true
+                            }
+                        }
+                    })
+                }
             }
         }
     }
