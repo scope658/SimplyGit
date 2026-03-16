@@ -14,7 +14,7 @@ import org.example.project.profile.domain.ProfileRepository
 class ProfileViewModel(
     private val runAsync: RunAsync,
     private val profileRepository: ProfileRepository
-) : ViewModel() {
+) : ViewModel(), ProfileActions {
 
     private val _profileUiState: MutableStateFlow<ProfileUiState> =
         MutableStateFlow(value = ProfileUiState.Loading)
@@ -27,7 +27,7 @@ class ProfileViewModel(
         loadProfile()
     }
 
-    fun retry() {
+    override fun retry() {
         loadProfile()
     }
 
@@ -50,7 +50,7 @@ class ProfileViewModel(
     }
 
 
-    fun logout() {
+    override fun logout() {
         runAsync.runAsync(
             viewModelScope,
             background = { profileRepository.logout() },

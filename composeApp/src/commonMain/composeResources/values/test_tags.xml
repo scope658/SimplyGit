@@ -29,5 +29,10 @@
     <string name="search_text_field_label_test_tag">search_text_field_label</string>
     <string name="search_text_field_test_tag">search_text_field</string>
 
-
+    <string name="user_avatar_test_tag">user_avatar</string>
+    <string name="user_name_test_tag">user_name</string>
+    <string name="user_bio_test_tag">user_bio</string>
+    <string name="repo_count_test_tag">repo_count</string>
+    <string name="subscribers_count_test_tag">subscribers_count</string>
+    <string name="logout_button_test_tag">logout_button</string>
 </resources>

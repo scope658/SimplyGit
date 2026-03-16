@@ -2,8 +2,8 @@ package pages
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -27,12 +27,6 @@ class ProfilePage(private val composeTestRule: ComposeTestRule) : AbstractPage(c
         subscribersCount: String
     ) {
 
-        composeTestRule
-            .waitUntilDoesNotExist(
-                matcher = hasTestTag("profile_loading_indicator")
-            )
-
-
         avatar
             .assertIsDisplayed()
 
@@ -51,6 +45,10 @@ class ProfilePage(private val composeTestRule: ComposeTestRule) : AbstractPage(c
         this.subscribersCount
             .assertIsDisplayed()
             .assertTextEquals(subscribersCount)
+
+        this.logoutButton
+            .assertTextContains("Sign Out")
+            .assertIsDisplayed()
 
         this.errorMessage
             .assertDoesNotExist()

@@ -25,4 +25,9 @@
     <string name="nothing_to_see_here">Здесь ничего нет</string>
     <string name="retry">Повторить</string>
     <string name="search">Поиск</string>
+
+
+    <string name="profile_stats_followers">подписчиков</string>
+    <string name="profile_stats_repositories">репозиториев</string>
+    <string name="profile_logout_button">Выйти</string>
 </resources>
