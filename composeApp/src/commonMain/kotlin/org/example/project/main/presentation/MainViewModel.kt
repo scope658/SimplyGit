@@ -106,7 +106,7 @@ class MainViewModel(
         when {
             isCurrentlyFetching.value -> return
             isLoadMore && currentSearchText.isNotBlank() -> launchPagedRequest(
-                page = page + 1,
+                page = page,
                 currentRepoList
             ) { currentPage, currentRepoList ->
                 getPagedReposUseCase.searchByQuery(
@@ -117,7 +117,7 @@ class MainViewModel(
             }
 
             isLoadMore && _searchText.value.isBlank() -> launchPagedRequest(
-                page = page + 1,
+                page = page,
                 currentRepoList = currentRepoList,
             ) { page, currentRepoList ->
                 getPagedReposUseCase.userRepo(

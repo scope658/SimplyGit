@@ -3,7 +3,7 @@ package org.example.project.main.data
 import kotlinx.coroutines.runBlocking
 import org.example.project.MockData
 import org.example.project.core.cache.DataStoreManager
-import org.example.project.main.data.cloud.FakeGithubApi
+import org.example.project.core.cloud.FakeGithubApi
 import org.example.project.main.domain.MainRepository
 import kotlin.test.BeforeTest
 import kotlin.test.Test
