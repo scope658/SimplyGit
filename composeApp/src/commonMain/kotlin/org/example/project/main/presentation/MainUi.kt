@@ -16,10 +16,6 @@ import ktshwnumbertwo.composeapp.generated.resources.search
 import ktshwnumbertwo.composeapp.generated.resources.search_text_field_label_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.search_text_field_test_tag
 import org.example.project.MockData
-import org.example.project.main.presentation.screens.MainEmptyResultScreen
-import org.example.project.main.presentation.screens.MainFailureScreen
-import org.example.project.main.presentation.screens.MainLoadingScreen
-import org.example.project.main.presentation.screens.MainSuccessScreen
 import org.jetbrains.compose.resources.stringResource
 import theme.searchTextFieldShape
 import theme.spacingL
