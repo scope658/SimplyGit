@@ -1,5 +1,6 @@
 package org.example.project.main.di
 
+import org.example.project.core.cache.DataStoreManager
 import org.example.project.main.data.MainRepositoryImpl
 import org.example.project.main.data.cloud.GithubApi
 import org.example.project.main.domain.GetPagedReposUseCase
@@ -17,11 +18,13 @@ val mainModule = module {
     single<GithubApi> { GithubApiImpl(get()) }
     single<MainRepository> { MainRepositoryImpl(get()) }
     single<PagedResult.Mapper> { MainUiMapper() }
+    factory<HandleUserRepoRequest> { HandleUserRepoRequest() }
     single<HandleMainRequest> { HandleMainRequest() }
     single<GetPagedReposUseCase> {
         GetPagedReposUseCaseImpl(
             handleMainRequest = get(),
-            repository = get()
+            repository = get(),
+            handleUserRepoRequest = get()
         )
     }
     viewModel {

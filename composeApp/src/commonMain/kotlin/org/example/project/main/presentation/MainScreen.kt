@@ -11,9 +11,10 @@ fun MainScreen(mainViewModel: MainViewModel = koinViewModel(), onProfileClick: (
     val searchText by mainViewModel.searchText.collectAsStateWithLifecycle()
 
     MainUi(
-        mainUiState = mainUiState,
+        mainUiState = mainUiState.mainUiState,
         searchText = searchText,
         mainActions = mainViewModel,
-        onProfileClick = onProfileClick
+        onProfileClick = onProfileClick,
+        isRefreshing = mainUiState.isRefreshing,
     )
 }

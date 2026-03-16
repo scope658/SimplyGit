@@ -14,6 +14,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.github.aakira.napier.Napier
 import ktshwnumbertwo.composeapp.generated.resources.Res
 import ktshwnumbertwo.composeapp.generated.resources.search
 import ktshwnumbertwo.composeapp.generated.resources.search_text_field_label_test_tag
@@ -32,6 +34,7 @@ import theme.spacingL
 
 @Composable
 fun MainUi(
+    isRefreshing: Boolean,
     mainUiState: MainUiState,
     searchText: String,
     mainActions: MainActions,
@@ -68,25 +71,24 @@ fun MainUi(
             )
         }
         PullToRefreshBox(
-            isRefreshing = false,
+            isRefreshing = isRefreshing,
             onRefresh = {
+                mainActions.refresh()
+            }{
+                when (val state = mainUiState) {
+                    is MainUiState.Loading -> MainLoadingScreen()
+                    is MainUiState.EmptyResult -> MainEmptyResultScreen()
+                    is MainUiState.Failure -> MainFailureScreen(
+                        message = state.message,
+                        onRetryClick = { mainActions.retry() }
+                    )
 
-            }
-        ) {
-            when (val state = mainUiState) {
-                is MainUiState.Loading -> MainLoadingScreen()
-                is MainUiState.EmptyResult -> MainEmptyResultScreen()
-                is MainUiState.Failure -> MainFailureScreen(
-                    message = state.message,
-                    onRetryClick = { mainActions.retry() }
-                )
-
-                is MainUiState.Success -> MainSuccessScreen(
-                    state,
-                    actions = mainActions,
-                )
-            }
-        }
+                    is MainUiState.Success -> MainSuccessScreen(
+                        state,
+                        actions = mainActions,
+                    )
+                }
+            })
     }
 }
 
@@ -101,10 +103,11 @@ private fun MainUiPreview() {
 
         override fun retry() = Unit
         override fun loadMore(
-            isLoadMore: Boolean,
             currentRepoList: List<UserRepositoryUi>,
             page: Int
         ) = Unit
+
+        override fun refresh() = Unit
 
     }
     Scaffold {
@@ -116,9 +119,10 @@ private fun MainUiPreview() {
                     isLoadMore = true,
                     pagingUiState = PagingUiState.Loading,
                 ),
-                "example search text",
-                mainActions,
-                {}
+                searchText = "example search text",
+                mainActions = mainActions,
+                onProfileClick = {},
+                isRefreshing = false,
             )
         }
     }
