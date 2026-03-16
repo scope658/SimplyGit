@@ -1,21 +1,10 @@
-package org.example.project.main.data.cloud
+package org.example.project.core.cloud
 
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.request.parameter
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.example.project.MockData
+import org.example.project.main.data.cloud.GithubApi
+import org.example.project.main.data.cloud.RepoData
 import org.example.project.profile.data.ProfileData
 import org.example.project.profile.data.cloud.ProfileGithubApi
-
-interface GithubApi {
-    suspend fun fetchByQuery(userQuery: String, page: Int): List<RepoData>
-    suspend fun userRepositories(page: Int): List<RepoData>
-
-}
 
 class FakeGithubApi : GithubApi, ProfileGithubApi {
 
