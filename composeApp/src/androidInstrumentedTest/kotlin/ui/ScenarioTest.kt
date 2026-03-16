@@ -224,16 +224,18 @@ class ScenarioTest : AbstractTest() {
         mainPage.checkVisibleNow()
 
         mainPage.clickProfileIcon()
-        mainPage.waitUntilLoadingDoesNotExist()
 
+        githubApi.isUserProfileIsFailure(true)
         val profilePage = ProfilePage(composeTestRule)
-        //TODO ADD FAKE FAILURE PROFILE DATA
+
+
+        profilePage.waitUntilLoadingDoesNotExist()
 
         composeTestRule.activityRule.assertBeforeAndAfterRecreate {
             profilePage.checkErrorMessageIsVisible("something went wrong")
         }
 
-        //TODO ADD SUCCESS PROFILE DATA
+        githubApi.isUserProfileIsFailure(false)
         profilePage.clickRetryButton()
 
         profilePage.waitUntilLoadingDoesNotExist()
