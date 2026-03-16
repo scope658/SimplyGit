@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import org.example.project.core.RunAsync
 import org.example.project.profile.domain.Profile
 import org.example.project.profile.domain.ProfileRepository
@@ -16,45 +17,74 @@ class ProfileViewModel(
     private val profileRepository: ProfileRepository
 ) : ViewModel(), ProfileActions {
 
-    private val _profileUiState: MutableStateFlow<ProfileUiState> =
-        MutableStateFlow(value = ProfileUiState.Loading)
+    private val _profileUiState: MutableStateFlow<ProfileScreenState> =
+        MutableStateFlow(
+            value = ProfileScreenState(
+                isRefreshing = true,
+                profileUiState = ProfileUiState.Loading
+            )
+        )
     val profileUiState = _profileUiState.asStateFlow()
 
     private val _profileEvent: MutableSharedFlow<ProfileEvent> = MutableSharedFlow()
     val profileEvent = _profileEvent.asSharedFlow()
 
     init {
-        loadProfile()
+        loadProfile {
+            profileRepository.loadUserProfile()
+        }
     }
 
     override fun retry() {
-        loadProfile()
+        _profileUiState.update {
+            it.copy(
+                profileUiState = ProfileUiState.Loading
+            )
+        }
+        loadProfile {
+            profileRepository.refreshUserProfile()
+        }
     }
 
-    private fun loadProfile() {
-        _profileUiState.value = ProfileUiState.Loading
-        runAsync.runAsync(
-            scope = viewModelScope,
-            background = { profileRepository.userProfile() },
-            ui = { result ->
-                result
-                    .onSuccess { userProfile ->
-                        _profileUiState.value = userProfile.successToUi()
-                    }
-                    .onFailure {
-                        _profileUiState.value =
-                            ProfileUiState.Failure(message = it.message ?: HARDCODED_FAILURE)
-                    }
-            },
-        )
+    override fun refresh() {
+        _profileUiState.update {
+            it.copy(isRefreshing = true)
+        }
+        loadProfile {
+            profileRepository.refreshUserProfile()
+        }
     }
-
 
     override fun logout() {
         runAsync.runAsync(
             viewModelScope,
             background = { profileRepository.logout() },
             ui = { _profileEvent.emit(ProfileEvent.Logout) }
+        )
+    }
+
+    private fun loadProfile(block: suspend () -> Result<Profile>) {
+        val profileUiState = _profileUiState.value
+        runAsync.runAsync(
+            scope = viewModelScope,
+            background = block,
+            ui = { result ->
+                result
+                    .onSuccess { userProfile ->
+                        _profileUiState.value = profileUiState.copy(
+                            profileUiState = userProfile.successToUi(),
+                            isRefreshing = false,
+                        )
+                    }
+                    .onFailure {
+                        _profileUiState.value = profileUiState.copy(
+                            isRefreshing = false,
+                            profileUiState = ProfileUiState.Failure(
+                                message = it.message ?: HARDCODED_FAILURE
+                            )
+                        )
+                    }
+            },
         )
     }
 
@@ -68,5 +98,5 @@ fun Profile.successToUi() = ProfileUiState.Success(
     userName = this.userName,
     bio = this.bio,
     repoCount = this.repoCount.toString(),
-    subscribersCount = this.subscribersCount.toString()
+    subscribersCount = this.subscribersCount.toString(),
 )

@@ -1,31 +1,42 @@
 package org.example.project.main.presentation
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import ktshwnumbertwo.composeapp.generated.resources.Res
 import ktshwnumbertwo.composeapp.generated.resources.search
 import ktshwnumbertwo.composeapp.generated.resources.search_text_field_label_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.search_text_field_test_tag
 import org.example.project.MockData
-import org.example.project.main.presentation.screens.MainEmptyResultScreen
-import org.example.project.main.presentation.screens.MainFailureScreen
-import org.example.project.main.presentation.screens.MainLoadingScreen
-import org.example.project.main.presentation.screens.MainSuccessScreen
 import org.jetbrains.compose.resources.stringResource
 import theme.searchTextFieldShape
 import theme.spacingL
 
 @Composable
-fun MainUi(mainUiState: MainUiState, searchText: String, mainActions: MainActions) {
+fun MainUi(
+    mainUiState: MainUiState,
+    searchText: String,
+    mainActions: MainActions,
+    onProfileClick: () -> Unit
+) {
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -56,18 +67,25 @@ fun MainUi(mainUiState: MainUiState, searchText: String, mainActions: MainAction
 
             )
         }
-        when (val state = mainUiState) {
-            is MainUiState.Loading -> MainLoadingScreen()
-            is MainUiState.EmptyResult -> MainEmptyResultScreen()
-            is MainUiState.Failure -> MainFailureScreen(
-                message = state.message,
-                onRetryClick = { mainActions.retry() }
-            )
+        PullToRefreshBox(
+            isRefreshing = false,
+            onRefresh = {
 
-            is MainUiState.Success -> MainSuccessScreen(
-                state,
-                actions = mainActions,
-            )
+            }
+        ) {
+            when (val state = mainUiState) {
+                is MainUiState.Loading -> MainLoadingScreen()
+                is MainUiState.EmptyResult -> MainEmptyResultScreen()
+                is MainUiState.Failure -> MainFailureScreen(
+                    message = state.message,
+                    onRetryClick = { mainActions.retry() }
+                )
+
+                is MainUiState.Success -> MainSuccessScreen(
+                    state,
+                    actions = mainActions,
+                )
+            }
         }
     }
 }
@@ -99,7 +117,8 @@ private fun MainUiPreview() {
                     pagingUiState = PagingUiState.Loading,
                 ),
                 "example search text",
-                mainActions
+                mainActions,
+                {}
             )
         }
     }

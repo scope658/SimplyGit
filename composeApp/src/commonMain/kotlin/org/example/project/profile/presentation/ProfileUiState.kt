@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
@@ -55,7 +57,6 @@ import theme.spacingXS
 import theme.tinyAvatarBorder
 import theme.tinyThicknessDivider
 
-
 interface ProfileUiState {
 
     @Composable
@@ -69,11 +70,13 @@ interface ProfileUiState {
     ) : ProfileUiState {
         @Composable
         override fun Show(profileActions: ProfileActions) {
+            val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.White)
                     .padding(spacingL)
+                    .verticalScroll(scrollState)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -212,7 +215,7 @@ private fun SuccessPreview() {
                 userName = "scope",
                 bio = "fake bio",
                 repoCount = "12",
-                subscribersCount = "23"
+                subscribersCount = "23",
             ).Show(profileActions = previewProfileActions)
         }
     }
@@ -228,5 +231,6 @@ private val previewProfileActions = object : ProfileActions {
     override fun logout() = Unit
 
     override fun retry() = Unit
+    override fun refresh() = Unit
 
 }

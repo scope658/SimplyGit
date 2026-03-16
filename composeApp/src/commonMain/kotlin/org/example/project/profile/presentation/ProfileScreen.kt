@@ -1,5 +1,6 @@
 package org.example.project.profile.presentation
 
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,5 +23,10 @@ fun ProfileScreen(
                 }
             }
     }
-    uiState.Show(profileViewModel)
+    PullToRefreshBox(
+        isRefreshing = uiState.isRefreshing,
+        onRefresh = { profileViewModel.refresh() }
+    ) {
+        uiState.profileUiState.Show(profileActions = profileViewModel)
+    }
 }
