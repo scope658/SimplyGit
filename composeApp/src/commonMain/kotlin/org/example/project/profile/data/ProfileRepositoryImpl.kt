@@ -13,7 +13,7 @@ class ProfileRepositoryImpl(
     private val githubApi: ProfileGithubApi,
     private val dataStoreManager: DataStoreManager.TokenOperations,
 ) : ProfileRepository {
-    override suspend fun userProfile(): Result<Profile> {
+    override suspend fun refreshUserProfile(): Result<Profile> {
         try {
             val userToken = dataStoreManager.userToken()
             val profileData = githubApi.userProfile(userToken ?: "")
@@ -34,6 +34,15 @@ class ProfileRepositoryImpl(
     override suspend fun logout() {
         dataStoreManager.saveUserToken("")
         profileDao.clearAll()
+    }
+
+    override suspend fun loadUserProfile(): Result<Profile> {
+        val profileCache = profileDao.readUserProfile()
+        if (profileCache != null) {
+            return Result.success(profileCache.toDomain())
+        } else {
+            return refreshUserProfile()
+        }
     }
 }
 

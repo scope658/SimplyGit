@@ -159,7 +159,6 @@ private val mockedSuccessResult = Profile(
     bio = "fakeBio",
     repoCount = 12,
     subscribersCount = 33,
-    isFromCache = false,
 )
 
 private class FakeProfileRepository : ProfileRepository {

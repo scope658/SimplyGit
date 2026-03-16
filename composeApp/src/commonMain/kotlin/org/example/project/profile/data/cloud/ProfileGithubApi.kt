@@ -23,7 +23,7 @@ interface ProfileGithubApi {
                 avatar = response.avatarUrl,
                 userName = response.login,
                 bio = response.bio.orEmpty(),
-                repoCount = response.publicRepos,
+                repoCount = response.publicRepos + response.totalPrivateRepos,
                 subscribersCount = response.followers
             )
         }
@@ -39,5 +39,7 @@ data class GitHubUserDto(
     val bio: String?,
     @SerialName("public_repos")
     val publicRepos: Int,
+    @SerialName("total_private_repos")
+    val totalPrivateRepos: Int = 0,
     val followers: Int
 )

@@ -32,9 +32,37 @@ class ProfileRepositoryTest {
     }
 
     @Test
+    fun `first load user profile then cache`() = runBlocking {
+        profileGithubApi.isFailure(false)
+        profileDao.mockCache(null)
+
+        val actual = profileRepository.loadUserProfile()
+        val expected = Result.success(expectedSuccessResult)
+
+        assertEquals(expected, actual)
+        profileDao.checkSaveCalled(profileCache)
+    }
+
+    @Test
+    fun `load user profile from cache`() = runBlocking {
+        profileGithubApi.isFailure(false)
+        profileDao.mockCache(profileCache)
+
+        val actualResult = profileRepository.loadUserProfile()
+        val expected = Result.success(expectedSuccessResult)
+
+        assertEquals(expected, actualResult)
+    }
+
+    @Test
     fun `success fetch user profile then cache`() = runBlocking {
-        val actualResult = profileRepository.userProfile()
-        val expectedResult = Result.success(expectedSuccessResult)
+        profileGithubApi.isFailure(false)
+        profileDao.mockCache(null)
+
+        val actualResult = profileRepository.refreshUserProfile()
+        val expectedResult = Result.success(
+            expectedSuccessResult
+        )
 
         assertEquals(expectedResult, actualResult)
         profileDao.checkSaveCalled(expectedCache = profileCache)
@@ -45,7 +73,7 @@ class ProfileRepositoryTest {
         profileGithubApi.isFailure(true)
         profileDao.mockCache(cache = profileCache)
 
-        val actualResult = profileRepository.userProfile()
+        val actualResult = profileRepository.refreshUserProfile()
         val expectedResult = Result.success(expectedSuccessResult)
 
         assertEquals(actualResult, expectedResult)
@@ -56,7 +84,7 @@ class ProfileRepositoryTest {
         profileGithubApi.isFailure(true)
         profileDao.mockCache(null)
 
-        val actualResult = profileRepository.userProfile()
+        val actualResult = profileRepository.refreshUserProfile()
         assertTrue(actualResult.isFailure)
 
         val exception = actualResult.exceptionOrNull()!!
@@ -150,7 +178,7 @@ private class FakeProfileDao : ProfileDao {
         profileCache = cache
     }
 
-    fun checkSaveCalled(expectedCache: ProfileCache) {
+    fun checkSaveCalled(expectedCache: ProfileCache?) {
         assertEquals(expectedCache, profileCache)
     }
 
