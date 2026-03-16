@@ -22,4 +22,5 @@ fun ProfileScreen(
                 }
             }
     }
+    uiState.Show(profileViewModel)
 }
