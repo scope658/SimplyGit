@@ -5,7 +5,6 @@ import OnboardingPage
 import android.content.Context
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.room.Room
-import androidx.room.RoomDatabase
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import org.example.project.AuthWrapper
@@ -26,6 +25,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
+import org.koin.dsl.onClose
 import org.koin.test.KoinTest
 import pages.LoginPage
 
@@ -60,12 +60,14 @@ abstract class AbstractTest : KoinTest {
                     single<DataStoreManager.SaveToken> { fakeDataStoreManager }
                     single<DataStoreManager.TokenOperations> { fakeDataStoreManager }
                     single<ProfileGithubApi> { githubApi }
-                    single<RoomDatabase.Builder<AppDatabase>> {
+                    single<AppDatabase> {
                         val context = ApplicationProvider.getApplicationContext<Context>()
                         Room.inMemoryDatabaseBuilder<AppDatabase>(
                             context,
                             AppDatabase::class.java
-                        )
+                        ).build()
+                    } onClose {
+                        it?.close()
                     }
                 }
             )
