@@ -2,9 +2,7 @@ package org.example.project.main.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.serialization.saved
 import androidx.lifecycle.viewModelScope
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +27,9 @@ class MainViewModel(
         key = MAIN_UI_STATE_KEY,
         init = { MainUiState.Loading })
 
-    private val _mainUiState: MutableStateFlow<MainUiState> = MutableStateFlow(savedState)
+    private val _mainUiState: MutableStateFlow<MainScreenState> = MutableStateFlow(
+        MainScreenState(isRefreshing = false, mainUiState = savedState)
+    )
     val mainUiState = _mainUiState.asStateFlow()
 
     private val _searchText =
@@ -98,14 +98,13 @@ class MainViewModel(
     }
 
     override fun loadMore(
-        isLoadMore: Boolean,
         currentRepoList: List<UserRepositoryUi>,
         page: Int
     ) {
         val currentSearchText = _searchText.value
         when {
             isCurrentlyFetching.value -> return
-            isLoadMore && currentSearchText.isNotBlank() -> launchPagedRequest(
+            currentSearchText.isNotBlank() -> launchPagedRequest(
                 page = page,
                 currentRepoList
             ) { currentPage, currentRepoList ->
@@ -115,16 +114,17 @@ class MainViewModel(
                     page = currentPage
                 )
             }
+        }
+    }
 
-            isLoadMore && _searchText.value.isBlank() -> launchPagedRequest(
-                page = page,
-                currentRepoList = currentRepoList,
-            ) { page, currentRepoList ->
-                getPagedReposUseCase.userRepo(
-                    currentRepoList = currentRepoList.toDomain(),
-                    page
-                )
-            }
+    override fun refresh() {
+        _mainUiState.update {
+            it.copy(
+                isRefreshing = true,
+            )
+        }
+        launchPagedRequest { _, _ ->
+            getPagedReposUseCase.refresh()
         }
     }
 
@@ -141,15 +141,9 @@ class MainViewModel(
             },
             ui = { pagedResult ->
                 isCurrentlyFetching.value = false
-
-                changeValue(pagedResult.map(mapper = mainUiMapper))
+                _mainUiState.value = pagedResult.map(mapper = mainUiMapper)
             }
         )
-    }
-
-    private fun changeValue(mainUiState: MainUiState) {
-        savedState = mainUiState
-        _mainUiState.value = savedState
     }
 
     companion object {
