@@ -27,22 +27,35 @@ import theme.spacingL
 @Composable
 fun MainUi(mainUiState: MainUiState, searchText: String, mainActions: MainActions) {
     Column {
-        OutlinedTextField(
-            value = searchText,
-            label = {
-                Text(
-                    text = stringResource(Res.string.search),
-                    modifier = Modifier.testTag(stringResource(Res.string.search_text_field_label_test_tag))
-                )
-            },
-            onValueChange = mainActions::query,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(spacingL)
-                .testTag(stringResource(Res.string.search_text_field_test_tag)),
-            shape = searchTextFieldShape,
-            singleLine = true,
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            OutlinedTextField(
+                value = searchText,
+                label = {
+                    Text(
+                        text = stringResource(Res.string.search),
+                        modifier = Modifier.testTag(stringResource(Res.string.search_text_field_label_test_tag))
+                    )
+                },
+                onValueChange = mainActions::query,
+                modifier = Modifier
+                    .padding(spacingL)
+                    .testTag(stringResource(Res.string.search_text_field_test_tag)),
+                shape = searchTextFieldShape,
+                singleLine = true,
+            )
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = "profile",
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable { onProfileClick() }
+                    .size(45.dp).testTag("profile_icon")
+
+            )
+        }
         when (val state = mainUiState) {
             is MainUiState.Loading -> MainLoadingScreen()
             is MainUiState.EmptyResult -> MainEmptyResultScreen()
@@ -63,7 +76,11 @@ fun MainUi(mainUiState: MainUiState, searchText: String, mainActions: MainAction
 @Preview(showBackground = true, showSystemUi = true)
 private fun MainUiPreview() {
     val mainActions = object : MainActions {
+        override fun loadUserRepo() = Unit
+
+
         override fun query(userQuery: String) = Unit
+
         override fun retry() = Unit
         override fun loadMore(
             isLoadMore: Boolean,

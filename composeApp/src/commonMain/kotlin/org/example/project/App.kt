@@ -76,7 +76,11 @@ fun App() {
                     })
                 }
 
-                composable<Routes.Main> { MainScreen() }
+                composable<Routes.Main> {
+                    MainScreen(onProfileClick = {
+                        navController.navigate(Routes.Profile)
+                    })
+                }
                 composable<Routes.Profile> {
                     ProfileScreen(onLogout = {
                         navController.navigate(Routes.Login) {
