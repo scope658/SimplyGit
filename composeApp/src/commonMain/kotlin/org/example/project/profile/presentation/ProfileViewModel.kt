@@ -20,7 +20,7 @@ class ProfileViewModel(
     private val _profileUiState: MutableStateFlow<ProfileScreenState> =
         MutableStateFlow(
             value = ProfileScreenState(
-                isRefreshing = true,
+                isRefreshing = false,
                 profileUiState = ProfileUiState.Loading
             )
         )
