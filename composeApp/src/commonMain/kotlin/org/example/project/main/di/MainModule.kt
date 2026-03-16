@@ -1,5 +1,6 @@
 package org.example.project.main.di
 
+import org.example.project.core.cache.DataStoreManager
 import org.example.project.main.data.MainRepositoryImpl
 import org.example.project.main.data.cloud.GithubApi
 import org.example.project.main.domain.GetPagedReposUseCase
@@ -12,11 +13,18 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val mainModule = module {
+    single<UserRepoDao> { get<AppDatabase>().userRepoDao() }
     single<GithubApi> { GithubApiImpl(get()) }
     single<DataStoreManager.ReadToken> { DataStoreManager.Base(dataStore = get()) }
-    single<MainRepository> { MainRepositoryImpl(githubApi = get(), dataStoreManager = get()) }
+    single<MainRepository> {
+        MainRepositoryImpl(
+            githubApi = get(), dataStoreManager = get(),
+            dao = get()
+        )
+    }
     single<PagedResult.Mapper> { MainUiMapper() }
     single<HandleMainRequest> { HandleMainRequest() }
+    factory<HandleUserRepoRequest> { HandleUserRepoRequest.Base() }
     single<GetPagedReposUseCase> {
         GetPagedReposUseCaseImpl(
             handleMainRequest = get(),
