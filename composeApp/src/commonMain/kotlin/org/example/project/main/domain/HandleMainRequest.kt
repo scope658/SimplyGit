@@ -15,7 +15,7 @@ class HandleMainRequest {
                     PagedResult.EmptyResult
                 } else {
                     PagedResult.Success(
-                        page = page,
+                        page = page + 1,
                         isPagingException = false,
                         isLoadMore = isLoadMore,
                         repos = totalRepos
@@ -24,23 +24,24 @@ class HandleMainRequest {
             },
             onFailure = {
 
-                if (page == FIRST_RUN_PAGE_SIZE) {
-                    PagedResult.Failure(it.message ?: HARDCODED_FAILURE)
-                } else {
-                    PagedResult.Success(
-                        page,
-                        isPagingException = true,
-                        isLoadMore = true,
-                        currentRepositories
-                    )
+                    if (page == FIRST_RUN_PAGE_SIZE) {
+                        PagedResult.Failure(it.message ?: HARDCODED_FAILURE)
+                    } else {
+                        PagedResult.Success(
+                            page,
+                            isPagingException = true,
+                            isLoadMore = true,
+                            currentRepositories
+                        )
+                    }
                 }
-            }
-        )
-    }
+            )
+        }
 
-    companion object {
-        private const val DEFAULT_PAGE_SIZE = 15
-        private const val FIRST_RUN_PAGE_SIZE = 1
-        private const val HARDCODED_FAILURE = "something went wrong"
+        companion object {
+            private const val DEFAULT_PAGE_SIZE = 15
+            private const val FIRST_RUN_PAGE_SIZE = 1
+            private const val HARDCODED_FAILURE = "something went wrong"
+        }
     }
 }
