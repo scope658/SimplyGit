@@ -23,7 +23,7 @@ class FakeGithubApi : GithubApi, ProfileGithubApi {
         return mockedSearchResult
     }
 
-    override suspend fun userRepositories(page: Int, userToken: String): List<RepoData> {
+    override suspend fun userRepositories(userToken: String): List<RepoData> {
         exception?.let {
             throw it
         }

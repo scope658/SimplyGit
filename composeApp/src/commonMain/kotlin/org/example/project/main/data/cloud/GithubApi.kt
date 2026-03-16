@@ -7,9 +7,6 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.example.project.MockData
-import org.example.project.profile.data.ProfileData
-import org.example.project.profile.data.cloud.ProfileGithubApi
 
 interface GithubApi {
     suspend fun fetchByQuery(userQuery: String, page: Int): List<RepoData>
