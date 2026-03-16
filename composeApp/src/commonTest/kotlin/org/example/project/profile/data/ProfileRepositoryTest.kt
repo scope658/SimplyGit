@@ -2,6 +2,7 @@ package org.example.project.profile.data
 
 import kotlinx.coroutines.runBlocking
 import org.example.project.core.cache.DataStoreManager
+import org.example.project.main.data.cache.UserRepoDao
 import org.example.project.profile.data.cache.ProfileCache
 import org.example.project.profile.data.cache.ProfileDao
 import org.example.project.profile.data.cloud.ProfileGithubApi
@@ -18,16 +19,20 @@ class ProfileRepositoryTest {
     private lateinit var profileDao: FakeProfileDao
     private lateinit var profileGithubApi: FakeProfileGithubApi
     private lateinit var dataStoreManager: FakeDataStoreManager
+    private lateinit var fakeRepoDao: FakeRepoDao
 
     @BeforeTest
     fun setUp() {
+        fakeRepoDao = FakeRepoDao()
         dataStoreManager = FakeDataStoreManager()
         profileDao = FakeProfileDao()
         profileGithubApi = FakeProfileGithubApi()
         profileRepository = ProfileRepositoryImpl(
             profileDao = profileDao,
             githubApi = profileGithubApi,
-            dataStoreManager = dataStoreManager
+            dataStoreManager = dataStoreManager,
+            userReposDao = fakeRepoDao,
+
         )
     }
 
@@ -96,6 +101,7 @@ class ProfileRepositoryTest {
         profileRepository.logout()
         dataStoreManager.checkSaveIsCalled("")
         profileDao.checkClearAllCalled(1)
+        fakeRepoDao.checkClearIsCalled(1)
     }
 
     companion object {
@@ -194,5 +200,18 @@ private class FakeProfileDao : ProfileDao {
         clearCalledTimes++
     }
 
+}
+
+private class FakeRepoDao : UserRepoDao.ClearAll {
+    private var clearCalledTimes = 0
+    override suspend fun clearAll() {
+        clearCalledTimes++
+    }
+
+    fun checkClearIsCalled(expectedTimes: Int) {
+        assertEquals(
+            expectedTimes, clearCalledTimes
+        )
+    }
 }
 
