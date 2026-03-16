@@ -4,6 +4,8 @@ import kotlinx.coroutines.runBlocking
 import org.example.project.MockData
 import org.example.project.core.cache.DataStoreManager
 import org.example.project.core.cloud.FakeGithubApi
+import org.example.project.main.data.cache.RepoCache
+import org.example.project.main.data.cache.UserRepoDao
 import org.example.project.main.domain.MainRepository
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -13,13 +15,19 @@ class MainRepositoryTest {
     private lateinit var mainRepository: MainRepository
     private lateinit var fakeGithubApi: FakeGithubApi
     private lateinit var dataStoreManager: FakeDataStoreManager
+    private lateinit var fakeDao: FakeDao
 
     @BeforeTest
     fun setUp() {
+        fakeDao = FakeDao()
         dataStoreManager = FakeDataStoreManager()
         fakeGithubApi = FakeGithubApi()
         mainRepository =
-            MainRepositoryImpl(githubApi = fakeGithubApi, dataStoreManager = dataStoreManager)
+            MainRepositoryImpl(
+                githubApi = fakeGithubApi,
+                dataStoreManager = dataStoreManager,
+                dao = fakeDao
+            )
     }
 
     @Test
@@ -34,12 +42,14 @@ class MainRepositoryTest {
     }
 
     @Test
-    fun `success user repositories`() = runBlocking {
-        val actualResult = mainRepository.userRepo(1)
-        val expectedResult = Result.success(MockData.mockedRepositories)
+    fun `success user repositories then cache`() = runBlocking {
+        fakeGithubApi.setException(null)
+        val actualResult = mainRepository.userRepo()
+        val expectedResult = Result.success(MockData.mockedUserDataRepositories.toDomainRepos())
 
         assertEquals(expectedResult, actualResult)
         dataStoreManager.checkCalledTimes(1)
+        fakeDao.checkAddIsCalled(MockData.mockedUserDataRepositories.toCache())
     }
 
     @Test
@@ -53,18 +63,77 @@ class MainRepositoryTest {
     }
 
     @Test
-    fun `failure user repositories`() = runBlocking {
+    fun `failure user repositories no cache`() = runBlocking { //user repo trigger refresh
         fakeGithubApi.setException(IllegalStateException(FAKE_EXCEPTION_MESSAGE))
 
-        val actualResult = mainRepository.userRepo(1)
+        val actualResult = mainRepository.userRepo()
         val actualException = actualResult.exceptionOrNull()!!
         assertEquals(FAKE_EXCEPTION_MESSAGE, actualException.message)
         dataStoreManager.checkCalledTimes(1)
     }
 
+    @Test
+    fun `success refresh`() = runBlocking {
+        fakeGithubApi.setException(null)
+
+        val actualResult = mainRepository.refresh()
+        val expectedResult = Result.success(MockData.mockedUserDataRepositories.toDomainRepos())
+
+        assertEquals(actualResult, expectedResult)
+        dataStoreManager.checkCalledTimes(1)
+        fakeDao.checkAddIsCalled(MockData.mockedUserDataRepositories.toCache())
+    }
+
+    @Test
+    fun `failure but cache contain`() = runBlocking {
+        fakeDao.addUserRepos(expectedListUserRepos)
+        fakeGithubApi.setException(IllegalStateException(FAKE_EXCEPTION_MESSAGE))
+
+        val actualResult = mainRepository.userRepo()
+        val expectedResult = Result.success(expectedListUserRepos.toDomain())
+
+        assertEquals(expectedResult, actualResult)
+    }
+
     companion object {
         private const val FAKE_QUERY = "fake query"
         private const val FAKE_EXCEPTION_MESSAGE = "fake message"
+    }
+}
+
+private val expectedListUserRepos = listOf(
+    RepoCache(
+        id = 2L,
+        userPhotoUrl = "fake photo",
+        userName = "fakeName",
+        repoName = "fake name",
+        programmingLanguage = "lang",
+        stars = 23,
+    ), RepoCache(
+        id = 3L,
+        userPhotoUrl = "fake photo",
+        userName = "fakeName",
+        repoName = "fake name",
+        programmingLanguage = "lang",
+        stars = 23,
+    )
+)
+
+
+private class FakeDao : UserRepoDao {
+
+    private var list = mutableListOf<RepoCache>()
+
+    override suspend fun readUserRepos(): List<RepoCache> {
+        return list
+    }
+
+    override suspend fun addUserRepos(userRepos: List<RepoCache>) {
+        list.addAll(userRepos)
+    }
+
+    fun checkAddIsCalled(expectedList: List<RepoCache>) {
+        assertEquals(expectedList, list)
     }
 }
 
