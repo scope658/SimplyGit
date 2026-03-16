@@ -90,7 +90,8 @@ interface ProfileUiState {
                             .clip(CircleShape)
                             .border(tinyAvatarBorder, Color.LightGray, CircleShape)
                             .testTag(stringResource(Res.string.user_avatar_test_tag)),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
+
                     )
 
                     Spacer(modifier = Modifier.width(spacingL))

@@ -2,6 +2,7 @@ package org.example.project.profile.data
 
 import kotlinx.coroutines.CancellationException
 import org.example.project.core.cache.DataStoreManager
+import org.example.project.main.data.cache.UserRepoDao
 import org.example.project.profile.data.cache.ProfileCache
 import org.example.project.profile.data.cache.ProfileDao
 import org.example.project.profile.data.cloud.ProfileGithubApi
@@ -12,6 +13,7 @@ class ProfileRepositoryImpl(
     private val profileDao: ProfileDao,
     private val githubApi: ProfileGithubApi,
     private val dataStoreManager: DataStoreManager.TokenOperations,
+    private val userReposDao: UserRepoDao.ClearAll
 ) : ProfileRepository {
     override suspend fun refreshUserProfile(): Result<Profile> {
         try {
@@ -34,6 +36,7 @@ class ProfileRepositoryImpl(
     override suspend fun logout() {
         dataStoreManager.saveUserToken("")
         profileDao.clearAll()
+        userReposDao.clearAll()
     }
 
     override suspend fun loadUserProfile(): Result<Profile> {

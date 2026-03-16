@@ -2,6 +2,7 @@ package org.example.project.profile.di
 
 import org.example.project.core.cache.DataStoreManager
 import org.example.project.core.cache.db.AppDatabase
+import org.example.project.main.data.cache.UserRepoDao
 import org.example.project.profile.data.ProfileRepositoryImpl
 import org.example.project.profile.data.cache.ProfileDao
 import org.example.project.profile.data.cloud.ProfileGithubApi
@@ -15,11 +16,13 @@ val profileModule = module {
     single<ProfileDao> { get<AppDatabase>().profileDao() }
     single<DataStoreManager.TokenOperations> { DataStoreManager.Base(get()) }
     single<ProfileGithubApi> { ProfileGithubApi.Base(httpClient = get()) }
+    single<UserRepoDao.ClearAll> { get<AppDatabase>().userRepoDao() }
     factory<ProfileRepository> {
         ProfileRepositoryImpl(
             profileDao = get(),
             githubApi = get(),
-            dataStoreManager = get()
+            dataStoreManager = get(),
+            userReposDao = get()
         )
     }
     viewModel {

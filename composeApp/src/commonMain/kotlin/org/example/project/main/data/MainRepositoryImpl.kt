@@ -13,9 +13,9 @@ class MainRepositoryImpl(
 ) : MainRepository {
 
     override suspend fun userRepo(): Result<List<UserRepository>> {
-        val contains = dao.readUserRepos()
-        return if (contains.isNotEmpty()) {
-            Result.success(contains.toDomain())
+        val userRepos = dao.readUserRepos()
+        return if (userRepos.isNotEmpty()) {
+            Result.success(userRepos.toDomain())
         } else {
             refresh()
         }
@@ -37,7 +37,12 @@ class MainRepositoryImpl(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            return Result.failure(Throwable(e.message))
+            val userRepos = dao.readUserRepos()
+            if (userRepos.isNotEmpty()) {
+                return Result.success(userRepos.toDomain())
+            } else {
+                return Result.failure(Throwable(e.message))
+            }
         }
     }
 }
