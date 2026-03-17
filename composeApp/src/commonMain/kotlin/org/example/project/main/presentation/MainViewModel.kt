@@ -18,7 +18,7 @@ import org.example.project.main.domain.UserRepository
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class MainViewModel(
     private val getPagedReposUseCase: GetPagedReposUseCase,
-    private val mainUiMapper: PagedResult.Mapper,
+    private val mainUiMapper: PagedResult.Mapper<MainUiState>,
     private val runAsync: RunAsync,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel(), MainActions {

@@ -17,7 +17,7 @@ class MainViewModelTest {
     private lateinit var fakeRunAsync: ControlledFakeRunAsync
     private lateinit var savedStateHandle: SavedStateHandle
     private lateinit var getPagedReposUseCase: FakeGetPagedReposUseCase
-    private lateinit var mainUiMapper: PagedResult.Mapper
+    private lateinit var mainUiMapper: PagedResult.Mapper<MainUiState>
 
     @BeforeTest
     fun setUp() {
