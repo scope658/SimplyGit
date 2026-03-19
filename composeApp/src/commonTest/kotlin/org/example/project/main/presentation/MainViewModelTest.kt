@@ -6,7 +6,12 @@ import org.example.project.MockData
 import org.example.project.core.ControlledFakeRunAsync
 import org.example.project.main.domain.GetPagedReposUseCase
 import org.example.project.main.domain.PagedResult
+import org.example.project.main.domain.PaginationResult
 import org.example.project.main.domain.UserRepository
+import org.example.project.main.presentation.mappers.MainUiMapper
+import org.example.project.main.presentation.mappers.PagingUiStateMapper
+import org.example.project.main.presentation.mappers.UserRepoToUiMapper
+import org.example.project.main.presentation.mappers.UserRepoUiToDomain
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -18,10 +23,19 @@ class MainViewModelTest {
     private lateinit var savedStateHandle: SavedStateHandle
     private lateinit var getPagedReposUseCase: FakeGetPagedReposUseCase
     private lateinit var mainUiMapper: PagedResult.Mapper<MainUiState>
+    private lateinit var userRepoUiToDomain: UserRepositoryUi.Mapper<UserRepository>
 
     @BeforeTest
     fun setUp() {
-        mainUiMapper = MainUiMapper()
+        val userRepoToUiMapper: UserRepository.Mapper<UserRepositoryUi> = UserRepoToUiMapper()
+        val pagingUiStateMapper: PaginationResult.Mapper<PagingUiState> = PagingUiStateMapper()
+        userRepoUiToDomain = UserRepoUiToDomain()
+
+        mainUiMapper = MainUiMapper(
+            userRepoToUiMapper = userRepoToUiMapper,
+            pagingUiStateMapper = pagingUiStateMapper
+        )
+
         savedStateHandle = SavedStateHandle()
         fakeRunAsync = ControlledFakeRunAsync()
         getPagedReposUseCase = FakeGetPagedReposUseCase()
@@ -30,8 +44,8 @@ class MainViewModelTest {
             mainUiMapper = mainUiMapper,
             runAsync = fakeRunAsync,
             savedStateHandle = savedStateHandle,
-
-            )
+            userRepoUiToDomain = userRepoUiToDomain,
+        )
     }
 
     @Test
@@ -120,6 +134,7 @@ class MainViewModelTest {
             mainUiMapper = mainUiMapper,
             runAsync = fakeRunAsync,
             savedStateHandle = savedStateHandle,
+            userRepoUiToDomain = userRepoUiToDomain
         )
 
         val newUiState: StateFlow<MainScreenState> = mainViewModel.mainUiState
@@ -193,8 +208,7 @@ class MainViewModelTest {
 
         getPagedReposUseCase.mockPagedResult(
             mock = successSearchPagedResult.copy(
-                isPagingException = true,
-                isLoadMore = true,
+                paginationResult = PaginationResult.Failure("something went wrong")
             )
         )
 
@@ -241,7 +255,7 @@ class MainViewModelTest {
 
 private val successUserRepoResultUi = MainUiState.Success(
     page = 0,
-    isLoadMore = false,
+
     result = MockData.mockedUserRepositoriesUi,
     pagingUiState = PagingUiState.Empty,
 )
@@ -249,7 +263,6 @@ private val successUserRepoResultUi = MainUiState.Success(
 private val successSearchResultUi =
     MainUiState.Success(
         page = 1,
-        isLoadMore = true,
         result = MockData.mockedSearchRepositoriesUi,
         pagingUiState = PagingUiState.Loading,
     )
@@ -270,16 +283,14 @@ private val failureResult = MainUiState.Failure(
 
 private val successSearchPagedResult =
     PagedResult.Success(
-        isPagingException = false,
-        isLoadMore = true,
+        paginationResult = PaginationResult.ReadyForNext,
         repos = MockData.mockedSearchResults,
         page = 1,
     )
 
 private val successUserRepoPagedResult =
     PagedResult.Success(
-        isPagingException = false,
-        isLoadMore = false,
+        paginationResult = PaginationResult.ReachedBottom,
         repos = MockData.mockedRepositories,
         page = 0,
     )

@@ -19,6 +19,7 @@ import org.example.project.main.domain.UserRepository
 class MainViewModel(
     private val getPagedReposUseCase: GetPagedReposUseCase,
     private val mainUiMapper: PagedResult.Mapper<MainUiState>,
+    private val userRepoUiToDomain: UserRepositoryUi.Mapper<UserRepository>,
     private val runAsync: RunAsync,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel(), MainActions {
@@ -88,7 +89,7 @@ class MainViewModel(
             launchPagedRequest { firstPage, currentEmptyList ->
                 getPagedReposUseCase.searchByQuery(
                     page = firstPage,
-                    currentRepoList = currentEmptyList.toDomain(),
+                    currentRepoList = currentEmptyList.map { it.map(mapper = userRepoUiToDomain) },
                     userQuery = _searchText.value
                 )
             }
@@ -109,7 +110,7 @@ class MainViewModel(
                 currentRepoList
             ) { currentPage, currentRepoList ->
                 getPagedReposUseCase.searchByQuery(
-                    currentRepoList = currentRepoList.toDomain(),
+                    currentRepoList = currentRepoList.map { it.map(userRepoUiToDomain) },
                     userQuery = currentSearchText,
                     page = currentPage
                 )
@@ -152,16 +153,4 @@ class MainViewModel(
         private const val SEARCH_DEBOUNCE = 350L
         private const val CURRENTLY_FETCHING_KEY = "CURRENTLY_FETCHING_KEY"
     }
-}
-
-
-fun List<UserRepositoryUi>.toDomain() = this.map {
-    UserRepository(
-        id = it.id,
-        userPhotoImageUrl = it.userPhotoImageUrl,
-        userName = it.userName,
-        repositoryName = it.repositoryName,
-        programmingLanguage = it.programmingLanguage,
-        stars = it.stars
-    )
 }

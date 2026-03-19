@@ -13,9 +13,8 @@ interface HandleUserRepoRequest {
                     } else {
                         PagedResult.Success(
                             page = 0,
-                            isPagingException = false,
-                            isLoadMore = false,
                             repos = repos,
+                            paginationResult = PaginationResult.ReachedBottom
                         )
                     }
                 },

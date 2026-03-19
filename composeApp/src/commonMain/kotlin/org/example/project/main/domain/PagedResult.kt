@@ -7,9 +7,8 @@ interface PagedResult {
     interface Mapper<T> {
         fun mapSuccess(
             page: Int,
-            isPagingException: Boolean,
-            isLoadMore: Boolean,
-            repos: List<UserRepository>
+            repos: List<UserRepository>,
+            paginationResult: PaginationResult,
         ): T
 
         fun mapFailure(message: String): T
@@ -19,12 +18,11 @@ interface PagedResult {
 
     data class Success(
         val page: Int,
-        val isPagingException: Boolean,
-        val isLoadMore: Boolean,
+        val paginationResult: PaginationResult,
         val repos: List<UserRepository>,
     ) : PagedResult {
         override fun <T : Any> map(mapper: Mapper<T>): T {
-            return mapper.mapSuccess(page = page, isPagingException, isLoadMore, repos)
+            return mapper.mapSuccess(page = page, repos = repos, paginationResult)
         }
     }
 

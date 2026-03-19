@@ -113,7 +113,6 @@ private fun MainUiPreview() {
                 mainUiState = MainUiState.Success(
                     result = MockData.mockedSearchRepositoriesUi,
                     page = 1,
-                    isLoadMore = true,
                     pagingUiState = PagingUiState.Loading,
                 ),
                 "example search text",

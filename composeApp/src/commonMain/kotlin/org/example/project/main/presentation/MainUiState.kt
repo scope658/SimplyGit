@@ -9,7 +9,6 @@ sealed interface MainUiState {
     @Serializable
     data class Success(
         val page: Int,
-        val isLoadMore: Boolean,
         val pagingUiState: PagingUiState,
         val result: List<UserRepositoryUi>
     ) : MainUiState
