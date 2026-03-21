@@ -5,13 +5,8 @@ import org.example.project.main.domain.UserRepository
 
 class RepoDataToDomain : RepoData.Mapper<UserRepository> {
     override fun map(
-        id: Int,
-        userPhotoImageUrl: String,
-        userName: String,
-        repositoryName: String,
-        programmingLanguage: String,
-        stars: Int
-    ): UserRepository {
+        repoData: RepoData
+    ): UserRepository = with(repoData) {
         return UserRepository(
             id = id,
             userPhotoImageUrl = userPhotoImageUrl,

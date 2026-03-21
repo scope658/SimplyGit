@@ -5,13 +5,8 @@ import org.example.project.main.presentation.UserRepositoryUi
 
 class UserRepoUiToDomain : UserRepositoryUi.Mapper<UserRepository> {
     override fun map(
-        id: Int,
-        userPhotoImageUrl: String,
-        userName: String,
-        repositoryName: String,
-        programmingLanguage: String,
-        stars: Int
-    ): UserRepository {
+        userRepositoryUi: UserRepositoryUi
+    ): UserRepository = with(userRepositoryUi) {
         return UserRepository(
             id,
             userPhotoImageUrl,
@@ -21,5 +16,4 @@ class UserRepoUiToDomain : UserRepositoryUi.Mapper<UserRepository> {
             stars
         )
     }
-
 }

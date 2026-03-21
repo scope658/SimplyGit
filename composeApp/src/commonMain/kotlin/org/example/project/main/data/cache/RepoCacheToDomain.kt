@@ -4,13 +4,8 @@ import org.example.project.main.domain.UserRepository
 
 class RepoCacheToDomain : RepoCache.Mapper<UserRepository> {
     override fun map(
-        id: Long,
-        userPhotoUrl: String,
-        userName: String,
-        repoName: String,
-        programmingLanguage: String,
-        stars: Int
-    ): UserRepository {
+        repoCache: RepoCache
+    ): UserRepository = with(repoCache) {
         return UserRepository(
             id.toInt(),
             userPhotoUrl,

@@ -13,23 +13,13 @@ data class UserRepositoryUi(
 ) {
     interface Mapper<T> {
         fun map(
-            id: Int,
-            userPhotoImageUrl: String,
-            userName: String,
-            repositoryName: String,
-            programmingLanguage: String,
-            stars: Int
+            userRepositoryUi: UserRepositoryUi
         ): T
     }
 
     fun <T : Any> map(mapper: Mapper<T>): T {
         return mapper.map(
-            id,
-            userPhotoImageUrl,
-            userName,
-            repositoryName,
-            programmingLanguage,
-            stars
+            this
         )
     }
 }

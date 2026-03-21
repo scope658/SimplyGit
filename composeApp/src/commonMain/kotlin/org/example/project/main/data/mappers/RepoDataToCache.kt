@@ -5,13 +5,8 @@ import org.example.project.main.data.cache.RepoCache
 
 class RepoDataToCache : RepoData.Mapper<RepoCache> {
     override fun map(
-        id: Int,
-        userPhotoImageUrl: String,
-        userName: String,
-        repositoryName: String,
-        programmingLanguage: String,
-        stars: Int
-    ): RepoCache {
+        repoData: RepoData
+    ): RepoCache = with(repoData) {
         return RepoCache(
             id.toLong(),
             userPhotoImageUrl,

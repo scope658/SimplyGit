@@ -16,16 +16,11 @@ data class RepoCache(
 ) {
     interface Mapper<T> {
         fun map(
-            id: Long,
-            userPhotoUrl: String,
-            userName: String,
-            repoName: String,
-            programmingLanguage: String,
-            stars: Int
+            repoCache: RepoCache
         ): T
     }
 
     fun <T : Any> map(mapper: Mapper<T>): T {
-        return mapper.map(id, userPhotoUrl, userName, repoName, programmingLanguage, stars)
+        return mapper.map(this)
     }
 }
