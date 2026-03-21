@@ -12,21 +12,23 @@ import org.example.project.profile.domain.ProfileRepository
 class ProfileRepositoryImpl(
     private val profileDao: ProfileDao,
     private val githubApi: ProfileGithubApi,
-    private val dataStoreManager: DataStoreManager.TokenOperations,
-    private val userReposDao: UserRepoDao.ClearAll
+    private val dataStoreManager: DataStoreManager.SaveToken,
+    private val userReposDao: UserRepoDao.ClearAll,
+    private val profileDataToDomain: ProfileData.Mapper<Profile>,
+    private val profileDataToCache: ProfileData.Mapper<ProfileCache>,
+    private val profileCacheToDomain: ProfileCache.Mapper<Profile>
 ) : ProfileRepository {
     override suspend fun refreshUserProfile(): Result<Profile> {
         try {
-            val userToken = dataStoreManager.userToken()
-            val profileData = githubApi.userProfile(userToken ?: "")
-            profileDao.saveUserProfile(profileCache = profileData.toCache())
-            return Result.success(profileData.toDomain())
+            val profileData = githubApi.userProfile()
+            profileDao.saveUserProfile(profileCache = profileData.map(profileDataToCache))
+            return Result.success(profileData.map(profileDataToDomain))
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             val profileCache = profileDao.readUserProfile()
             return if (profileCache != null) {
-                Result.success(profileCache.toDomain())
+                Result.success(profileCache.map(mapper = profileCacheToDomain))
             } else {
                 Result.failure(e)
             }
@@ -42,34 +44,9 @@ class ProfileRepositoryImpl(
     override suspend fun loadUserProfile(): Result<Profile> {
         val profileCache = profileDao.readUserProfile()
         if (profileCache != null) {
-            return Result.success(profileCache.toDomain())
+            return Result.success(profileCache.map(mapper = profileCacheToDomain))
         } else {
             return refreshUserProfile()
         }
     }
 }
-
-fun ProfileCache.toDomain() = Profile(
-    avatar = this.avatar,
-    userName = this.userName,
-    bio = this.bio,
-    repoCount = this.repoCount,
-    subscribersCount = this.subscribersCount
-)
-
-fun ProfileData.toDomain() = Profile(
-    avatar = this.avatar,
-    userName = this.userName,
-    bio = this.bio,
-    repoCount = this.repoCount,
-    subscribersCount = this.subscribersCount
-)
-
-fun ProfileData.toCache() = ProfileCache(
-    userId = this.userId,
-    userName = this.userName,
-    avatar = this.avatar,
-    bio = this.bio,
-    repoCount = this.repoCount,
-    subscribersCount = this.subscribersCount
-)

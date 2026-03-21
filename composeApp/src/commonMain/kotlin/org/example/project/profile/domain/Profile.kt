@@ -6,4 +6,14 @@ data class Profile(
     val bio: String,
     val repoCount: Int,
     val subscribersCount: Int,
-)
+) {
+    interface Mapper<T> {
+        fun mapSuccess(
+            profile: Profile
+        ): T
+    }
+
+    fun <T : Any> mapSuccess(mapper: Mapper<T>): T {
+        return mapper.mapSuccess(profile = this)
+    }
+}

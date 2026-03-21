@@ -14,7 +14,8 @@ import org.example.project.profile.domain.ProfileRepository
 
 class ProfileViewModel(
     private val runAsync: RunAsync,
-    private val profileRepository: ProfileRepository
+    private val profileRepository: ProfileRepository,
+    private val profileUiMapper: Profile.Mapper<ProfileUiState>
 ) : ViewModel(), ProfileActions {
 
     private val _profileUiState: MutableStateFlow<ProfileScreenState> =
@@ -72,7 +73,7 @@ class ProfileViewModel(
                 result
                     .onSuccess { userProfile ->
                         _profileUiState.value = profileUiState.copy(
-                            profileUiState = userProfile.successToUi(),
+                            profileUiState = userProfile.mapSuccess(mapper = profileUiMapper),
                             isRefreshing = false,
                         )
                     }
@@ -92,11 +93,3 @@ class ProfileViewModel(
         private const val HARDCODED_FAILURE = "something went wrong"
     }
 }
-
-fun Profile.successToUi() = ProfileUiState.Success(
-    avatar = this.avatar,
-    userName = this.userName,
-    bio = this.bio,
-    repoCount = this.repoCount.toString(),
-    subscribersCount = this.subscribersCount.toString(),
-)

@@ -7,4 +7,12 @@ data class ProfileData(
     val bio: String,
     val repoCount: Int,
     val subscribersCount: Int,
-)
+) {
+    interface Mapper<T> {
+        fun map(profileData: ProfileData): T
+    }
+
+    fun <T : Any> map(mapper: Mapper<T>): T {
+        return mapper.map(this)
+    }
+}

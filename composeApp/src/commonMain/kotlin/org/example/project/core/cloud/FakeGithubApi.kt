@@ -42,7 +42,7 @@ class FakeGithubApi : GithubApi, ProfileGithubApi {
     }
 
 
-    override suspend fun userProfile(userToken: String): ProfileData {
+    override suspend fun userProfile(): ProfileData {
         if (profileIsFailureFlag) {
             throw IllegalStateException("something went wrong")
         } else {

@@ -17,14 +17,17 @@ class ProfileViewModelTest {
     private lateinit var profileViewModel: ProfileViewModel
     private lateinit var profileRepository: FakeProfileRepository
     private lateinit var runAsync: ControlledFakeRunAsync
+    private lateinit var profileUiMapper: Profile.Mapper<ProfileUiState>
 
     @BeforeTest
     fun setUp() {
+        profileUiMapper = ProfileUiMapper()
         runAsync = ControlledFakeRunAsync()
         profileRepository = FakeProfileRepository()
         profileViewModel = ProfileViewModel(
             runAsync,
             profileRepository,
+            profileUiMapper
         )
     }
 
@@ -36,6 +39,7 @@ class ProfileViewModelTest {
         profileViewModel = ProfileViewModel(
             runAsync,
             profileRepository,
+            profileUiMapper
         )
 
         val profileUiState: StateFlow<ProfileScreenState> = profileViewModel.profileUiState
