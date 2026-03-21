@@ -48,9 +48,7 @@ class AndroidAuthWrapperImpl(context: Context) : AuthWrapper {
     private suspend fun exchangeCodeForToken(response: AuthorizationResponse): String =
         suspendCancellableCoroutine { continuation ->
 
-
             val tokenRequest = response.createTokenExchangeRequest()
-
 
             authService.performTokenRequest(
                 tokenRequest,
