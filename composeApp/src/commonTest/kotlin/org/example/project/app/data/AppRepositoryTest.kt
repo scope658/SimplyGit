@@ -45,8 +45,8 @@ private class FakeDataStoreManager :
         this.onboardingFlag = flag
     }
 
-    override suspend fun userToken(): String? {
-        return token
+    override suspend fun userToken(): String {
+        return token ?: ""
     }
 
     override suspend fun isOnboarded(): Boolean {
