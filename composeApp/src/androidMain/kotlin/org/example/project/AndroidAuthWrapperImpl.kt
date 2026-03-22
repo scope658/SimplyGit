@@ -38,7 +38,7 @@ class AndroidAuthWrapperImpl(context: Context) : AuthWrapper {
             ?: throw ActionCancelledException
 
         val response = AuthorizationResponse.fromIntent(resultIntent)
-            ?: throw IllegalStateException()
+            ?: throw ActionCancelledException
 
         return exchangeCodeForToken(response)
 

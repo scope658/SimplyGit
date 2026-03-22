@@ -45,7 +45,7 @@ import ktshwnumbertwo.composeapp.generated.resources.subscribers_count_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.user_avatar_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.user_bio_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.user_name_test_tag
-import org.example.project.core.AbstractScreen
+import org.example.project.core.presentation.AbstractScreen
 import org.jetbrains.compose.resources.stringResource
 import theme.avatarSizeHuge
 import theme.iconSizeTiny

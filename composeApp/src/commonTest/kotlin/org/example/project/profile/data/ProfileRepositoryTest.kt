@@ -1,7 +1,10 @@
 package org.example.project.profile.data
 
 import kotlinx.coroutines.runBlocking
+import org.example.project.core.HandleDomainError
 import org.example.project.core.cache.DataStoreManager
+import org.example.project.core.domain.DomainException
+import org.example.project.core.domain.ServiceUnavailableException
 import org.example.project.main.data.cache.UserRepoDao
 import org.example.project.profile.data.cache.ProfileCache
 import org.example.project.profile.data.cache.ProfileCacheToDomain
@@ -41,6 +44,7 @@ class ProfileRepositoryTest {
             profileDataToDomain = profileDataToDomain,
             profileDataToCache = profileDataToCache,
             profileCacheToDomain = profileCacheToDomain,
+            handleDomainError = HandleDomainError.Base(),
         )
     }
 
@@ -100,8 +104,11 @@ class ProfileRepositoryTest {
         val actualResult = profileRepository.refreshUserProfile()
         assertTrue(actualResult.isFailure)
 
-        val exception = actualResult.exceptionOrNull()!!
-        assertEquals(FAKE_MESSAGE, exception.message)
+        actualResult.onFailure {
+            val error = it as DomainException
+            assertEquals(ServiceUnavailableException, error)
+        }
+        Unit
     }
 
     @Test

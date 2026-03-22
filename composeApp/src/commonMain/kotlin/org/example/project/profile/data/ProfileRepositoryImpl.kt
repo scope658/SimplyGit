@@ -1,6 +1,7 @@
 package org.example.project.profile.data
 
 import kotlinx.coroutines.CancellationException
+import org.example.project.core.HandleDomainError
 import org.example.project.core.cache.DataStoreManager
 import org.example.project.main.data.cache.UserRepoDao
 import org.example.project.profile.data.cache.ProfileCache
@@ -16,7 +17,8 @@ class ProfileRepositoryImpl(
     private val userReposDao: UserRepoDao.ClearAll,
     private val profileDataToDomain: ProfileData.Mapper<Profile>,
     private val profileDataToCache: ProfileData.Mapper<ProfileCache>,
-    private val profileCacheToDomain: ProfileCache.Mapper<Profile>
+    private val profileCacheToDomain: ProfileCache.Mapper<Profile>,
+    private val handleDomainError: HandleDomainError,
 ) : ProfileRepository {
     override suspend fun refreshUserProfile(): Result<Profile> {
         try {
@@ -30,7 +32,8 @@ class ProfileRepositoryImpl(
             return if (profileCache != null) {
                 Result.success(profileCache.map(mapper = profileCacheToDomain))
             } else {
-                Result.failure(e)
+                val handledException = handleDomainError.handle(e)
+                Result.failure(handledException)
             }
         }
     }

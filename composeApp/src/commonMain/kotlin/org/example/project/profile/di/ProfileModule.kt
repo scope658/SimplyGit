@@ -36,6 +36,7 @@ val profileModule = module {
             profileDataToDomain = get(named("DataToDomain")),
             profileDataToCache = get(named("DataToCache")),
             profileCacheToDomain = get(named("cacheToDomain")),
+            handleDomainError = get(),
         )
     }
 
@@ -44,7 +45,8 @@ val profileModule = module {
         ProfileViewModel(
             runAsync = get(),
             profileRepository = get(),
-            profileUiMapper = get()
+            profileUiMapper = get(),
+            manageResource = get()
         )
     }
 }
