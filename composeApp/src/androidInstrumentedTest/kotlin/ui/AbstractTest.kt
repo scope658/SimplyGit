@@ -15,6 +15,7 @@ import org.example.project.core.cache.FakeGeneralDataStoreManager
 import org.example.project.core.cache.cacheModule
 import org.example.project.core.cache.db.AppDatabase
 import org.example.project.core.cloud.FakeGithubApi
+import org.example.project.core.di.coreModule
 import org.example.project.login.di.loginModule
 import org.example.project.main.data.cloud.GithubApi
 import org.example.project.main.di.mainModule
@@ -51,6 +52,7 @@ abstract class AbstractTest : KoinTest {
                 appModule,
                 cacheModule,
                 profileModule,
+                coreModule,
                 module {
                     single<AuthWrapper> { authWrapper }
                     single<GithubApi> { githubApi }
@@ -58,7 +60,6 @@ abstract class AbstractTest : KoinTest {
                     single<DataStoreManager.FinishOnboarding> { fakeDataStoreManager }
                     single<DataStoreManager.ReadToken> { fakeDataStoreManager }
                     single<DataStoreManager.SaveToken> { fakeDataStoreManager }
-                    single<DataStoreManager.TokenOperations> { fakeDataStoreManager }
                     single<ProfileGithubApi> { githubApi }
                     single<AppDatabase> {
                         val context = ApplicationProvider.getApplicationContext<Context>()
