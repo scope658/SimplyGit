@@ -2,6 +2,7 @@ package org.example.project.main.domain
 
 import kotlinx.coroutines.runBlocking
 import org.example.project.MockData
+import org.example.project.core.FakeManageResource
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -15,8 +16,12 @@ class GetPagedReposUseCaseTest {
 
     @BeforeTest
     fun setUp() {
-        handleUserRepoRequest = HandleUserRepoRequest.Base()
-        handleMainRequest = HandleMainRequest.Base()
+        handleUserRepoRequest = HandleUserRepoRequest.Base(
+            manageResource = FakeManageResource()
+        )
+        handleMainRequest = HandleMainRequest.Base(
+            manageResource = FakeManageResource()
+        )
         mainRepository = FakeMainRepository()
         getPagedReposUseCase =
             GetPagedReposUseCase.Base(
@@ -47,7 +52,7 @@ class GetPagedReposUseCaseTest {
         mainRepository.mockFailure(true)
 
         val actualResuslt = getPagedReposUseCase.allUserRepos()
-        val expectedResult = PagedResult.Failure("something went wrong")
+        val expectedResult = PagedResult.Failure("service unavailable")
 
         assertEquals(actualResuslt, expectedResult)
     }

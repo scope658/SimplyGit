@@ -43,6 +43,8 @@ val mainModule = module {
             repoCacheToDomain = get(named("cacheToDomain")),
             repoDataToCache = get(named("RepoDataToCache")),
             repoDataToDomain = get(named("RepoDataToDomain")),
+            customRunCatching = get(),
+            handleDomainError = get(),
         )
     }
     factory<PaginationResult.Mapper<PagingUiState>> { PagingUiStateMapper() }
@@ -53,8 +55,16 @@ val mainModule = module {
             userRepoToUiMapper = get(),
         )
     }
-    single<HandleMainRequest> { HandleMainRequest.Base() }
-    factory<HandleUserRepoRequest> { HandleUserRepoRequest.Base() }
+    single<HandleMainRequest> {
+        HandleMainRequest.Base(
+            manageResource = get()
+        )
+    }
+    factory<HandleUserRepoRequest> {
+        HandleUserRepoRequest.Base(
+            manageResource = get()
+        )
+    }
     factory<UserRepositoryUi.Mapper<UserRepository>> { UserRepoUiToDomain() }
     single<GetPagedReposUseCase> {
         GetPagedReposUseCaseImpl(

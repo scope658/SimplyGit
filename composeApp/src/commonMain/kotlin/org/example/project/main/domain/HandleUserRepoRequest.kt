@@ -1,10 +1,14 @@
 package org.example.project.main.domain
 
+import org.example.project.core.domain.DomainException
+import org.example.project.core.domain.ManageResource
+import org.example.project.core.domain.ServiceUnavailableException
+
 interface HandleUserRepoRequest {
 
     suspend fun handle(block: suspend () -> Result<List<UserRepository>>): PagedResult
 
-    class Base : HandleUserRepoRequest {
+    class Base(private val manageResource: ManageResource) : HandleUserRepoRequest {
         override suspend fun handle(block: suspend () -> Result<List<UserRepository>>): PagedResult {
             block.invoke().fold(
                 onSuccess = { repos ->
@@ -19,7 +23,9 @@ interface HandleUserRepoRequest {
                     }
                 },
                 onFailure = {
-                    return PagedResult.Failure(it.message.orEmpty())
+                    val error = it as? DomainException ?: ServiceUnavailableException
+                    val exceptionMessage = error.exceptionString(manageResource)
+                    return PagedResult.Failure(exceptionMessage)
                 }
             )
         }

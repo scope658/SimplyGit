@@ -2,7 +2,11 @@ package org.example.project.main.data
 
 import kotlinx.coroutines.runBlocking
 import org.example.project.MockData
+import org.example.project.core.CustomRunCatching
+import org.example.project.core.HandleDomainError
 import org.example.project.core.cloud.FakeGithubApi
+import org.example.project.core.domain.DomainException
+import org.example.project.core.domain.ServiceUnavailableException
 import org.example.project.main.data.cache.RepoCache
 import org.example.project.main.data.cache.RepoCacheToDomain
 import org.example.project.main.data.cache.UserRepoDao
@@ -18,7 +22,6 @@ class MainRepositoryTest {
     private lateinit var mainRepository: MainRepository
     private lateinit var fakeGithubApi: FakeGithubApi
     private lateinit var fakeDao: FakeDao
-
     @BeforeTest
     fun setUp() {
         fakeDao = FakeDao()
@@ -26,6 +29,7 @@ class MainRepositoryTest {
         val repoCacheToDomain: RepoCache.Mapper<UserRepository> = RepoCacheToDomain()
         val repoDataToCache: RepoData.Mapper<RepoCache> = RepoDataToCache()
         val repoDataToDomain: RepoData.Mapper<UserRepository> = RepoDataToDomain()
+        val customRunCatching = CustomRunCatching.Base(handleDomainError = HandleDomainError.Base())
         mainRepository =
             MainRepositoryImpl(
                 githubApi = fakeGithubApi,
@@ -33,6 +37,8 @@ class MainRepositoryTest {
                 repoCacheToDomain = repoCacheToDomain,
                 repoDataToCache = repoDataToCache,
                 repoDataToDomain = repoDataToDomain,
+                customRunCatching = customRunCatching,
+                handleDomainError = HandleDomainError.Base(),
             )
     }
 
@@ -61,17 +67,24 @@ class MainRepositoryTest {
         fakeGithubApi.setException(IllegalStateException(FAKE_EXCEPTION_MESSAGE))
 
         val actualResult = mainRepository.searchByQuery(FAKE_QUERY, 1)
-        val actualException = actualResult.exceptionOrNull()!!
-        assertEquals(FAKE_EXCEPTION_MESSAGE, actualException.message)
+        actualResult
+            .onFailure {
+                val error = it as DomainException
+                assertEquals(ServiceUnavailableException, error)
+            }
+        Unit
     }
 
     @Test
     fun `failure user repositories no cache`() = runBlocking { //user repo trigger refresh
         fakeGithubApi.setException(IllegalStateException(FAKE_EXCEPTION_MESSAGE))
 
-        val actualResult = mainRepository.userRepo()
-        val actualException = actualResult.exceptionOrNull()!!
-        assertEquals(FAKE_EXCEPTION_MESSAGE, actualException.message)
+        mainRepository.userRepo()
+            .onFailure {
+                val error = it as DomainException
+                assertEquals(ServiceUnavailableException, error)
+            }
+        Unit
     }
 
     @Test

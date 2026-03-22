@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -40,7 +41,8 @@ fun MainUi(isRefreshing: Boolean,
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
         ) {
             OutlinedTextField(
                 value = searchText,
@@ -53,7 +55,8 @@ fun MainUi(isRefreshing: Boolean,
                 onValueChange = mainActions::query,
                 modifier = Modifier
                     .padding(spacingL)
-                    .testTag(stringResource(Res.string.search_text_field_test_tag)),
+                    .testTag(stringResource(Res.string.search_text_field_test_tag))
+                    .weight(1f),
                 shape = searchTextFieldShape,
                 singleLine = true,
             )

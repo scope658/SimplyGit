@@ -10,3 +10,5 @@ actual fun getPlatform(): Platform = AndroidPlatform()
 
 actual typealias CommonParcelable = android.os.Parcelable
 
+
+actual typealias PlatformNetworkException = java.net.UnknownHostException

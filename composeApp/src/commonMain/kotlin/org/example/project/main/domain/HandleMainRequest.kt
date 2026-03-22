@@ -1,7 +1,7 @@
 package org.example.project.main.domain
 
 
-class HandleMainRequest {
+class HandleMainRequest(private val manageResource: ManageResource) {
     suspend fun handle(
         page: Int,
         currentRepositories: List<UserRepository>,
@@ -10,28 +10,32 @@ class HandleMainRequest {
         return block.invoke().fold(
             onSuccess = { userRepositories ->
                 val totalRepos = currentRepositories + userRepositories
-                val isLoadMore = userRepositories.size == DEFAULT_PAGE_SIZE
+                val pagingState = if (userRepositories.size == DEFAULT_PAGE_SIZE) {
+                    PaginationResult.ReadyForNext
+                } else {
+                    PaginationResult.ReachedBottom
+                }
+
                 if (page == 1 && userRepositories.isEmpty()) {
                     PagedResult.EmptyResult
                 } else {
                     PagedResult.Success(
-                        page = page,
-                        isPagingException = false,
-                        isLoadMore = isLoadMore,
-                        repos = totalRepos
+                        page = page + 1,
+                        repos = totalRepos,
+                        paginationResult = pagingState
                     )
                 }
             },
             onFailure = {
-
+                val error = it as? DomainException ?: ServiceUnavailableException
+                val exceptionMessage = error.exceptionString(manageResource)
                 if (page == FIRST_RUN_PAGE_SIZE) {
-                    PagedResult.Failure(it.message ?: HARDCODED_FAILURE)
+                    PagedResult.Failure(message = exceptionMessage)
                 } else {
                     PagedResult.Success(
-                        page,
-                        isPagingException = true,
-                        isLoadMore = true,
-                        currentRepositories
+                        page = page,
+                        repos = currentRepositories,
+                        paginationResult = PaginationResult.Failure(message = exceptionMessage)
                     )
                 }
             }
