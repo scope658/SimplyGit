@@ -15,7 +15,7 @@ interface DataStoreManager {
     }
 
     interface ReadToken {
-        suspend fun userToken(): String?
+        suspend fun userToken(): String
     }
 
     interface ReadOnboarding {
@@ -37,11 +37,11 @@ interface DataStoreManager {
             }
         }
 
-        override suspend fun userToken(): String? {
+        override suspend fun userToken(): String {
             val token = dataStore.data.map {
                 it[USER_TOKEN_KEY]
             }.first()
-            return token
+            return token ?: ""
         }
 
         override suspend fun isOnboarded(): Boolean {
@@ -63,5 +63,4 @@ interface DataStoreManager {
 
         }
     }
-
 }

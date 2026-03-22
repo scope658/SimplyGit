@@ -7,7 +7,7 @@ class AppRepositoryImpl(private val dataStoreManager: DataStoreManager.Read) : A
 
     override suspend fun isTokenSaved(): Boolean {
         val token = dataStoreManager.userToken()
-        return token != null
+        return token.isNotEmpty()
     }
 
     override suspend fun isUserOnboarded(): Boolean {

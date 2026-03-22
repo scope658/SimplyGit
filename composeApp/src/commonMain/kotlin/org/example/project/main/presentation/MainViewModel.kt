@@ -126,13 +126,15 @@ class MainViewModel(
     }
 
     override fun refresh() {
-        _mainUiState.update {
-            it.copy(
-                isRefreshing = true,
-            )
-        }
-        launchPagedRequest { _, _ ->
-            getPagedReposUseCase.refresh()
+        if (_searchText.value.isEmpty()) {
+            _mainUiState.update {
+                it.copy(
+                    isRefreshing = true,
+                )
+            }
+            launchPagedRequest { _, _ ->
+                getPagedReposUseCase.refresh()
+            }
         }
     }
 

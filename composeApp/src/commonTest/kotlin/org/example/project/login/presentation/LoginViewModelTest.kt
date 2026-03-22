@@ -99,7 +99,7 @@ class LoginViewModelTest {
 private val loadingUiState = LoginUiState.Loading
 private val initialUiState = LoginUiState.Initial(errorState = ErrorState.Empty)
 private val errorUiState =
-    LoginUiState.Initial(errorState = ErrorState.Error(message = "auth failed"))
+    LoginUiState.Initial(errorState = ErrorState.Error(message = "service unavailable"))
 
 
 private class FakeLoginRepository : LoginRepository {
