@@ -4,8 +4,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import org.example.project.AuthWrapper
-import org.example.project.core.cache.DataStoreManager
-import org.example.project.core.customRunCatching
+import org.example.project.core.data.CustomRunCatching
+import org.example.project.core.data.cache.DataStoreManager
 import org.example.project.login.domain.LoginRepository
 
 class LoginRepositoryImpl(

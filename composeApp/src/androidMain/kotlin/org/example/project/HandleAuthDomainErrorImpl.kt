@@ -1,7 +1,7 @@
 package org.example.project
 
 import net.openid.appauth.AuthorizationException
-import org.example.project.core.HandleDomainError
+import org.example.project.core.data.HandleDomainError
 import org.example.project.core.domain.NoConnectionException
 import org.example.project.core.domain.ServiceUnavailableException
 import org.example.project.login.domain.ActionCancelledException

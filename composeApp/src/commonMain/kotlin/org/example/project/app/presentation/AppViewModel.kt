@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import org.example.project.app.domain.AppRepository
-import org.example.project.core.RunAsync
+import org.example.project.core.presentation.RunAsync
 
 class AppViewModel(private val runAsync: RunAsync, private val appRepository: AppRepository) :
     ViewModel() {

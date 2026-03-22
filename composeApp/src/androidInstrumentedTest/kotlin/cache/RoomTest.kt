@@ -6,7 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.runBlocking
 import kotlinx.io.IOException
-import org.example.project.core.cache.db.AppDatabase
+import org.example.project.core.data.cache.db.AppDatabase
 import org.example.project.main.data.cache.RepoCache
 import org.example.project.main.data.cache.UserRepoDao
 import org.example.project.profile.data.cache.ProfileCache

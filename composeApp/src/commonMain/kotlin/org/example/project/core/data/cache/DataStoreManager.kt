@@ -1,4 +1,4 @@
-package org.example.project.core.cache
+package org.example.project.core.data.cache
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences

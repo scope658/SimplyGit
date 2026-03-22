@@ -1,7 +1,9 @@
 package org.example.project.main.data
 
+import io.github.aakira.napier.Napier
 import io.ktor.utils.io.CancellationException
-import org.example.project.core.customRunCatching
+import org.example.project.core.CustomRunCatching
+import org.example.project.core.HandleDomainError
 import org.example.project.main.data.cache.RepoCache
 import org.example.project.main.data.cache.UserRepoDao
 import org.example.project.main.data.cloud.GithubApi
@@ -42,6 +44,7 @@ class MainRepositoryImpl(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            Napier.d(e.toString(), tag = "dd12")
             val domainException = handleDomainError.handle(e)
             val userRepos = dao.readUserRepos()
             if (userRepos.isNotEmpty()) {

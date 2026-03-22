@@ -2,9 +2,9 @@ package org.example.project.main.data
 
 import kotlinx.coroutines.runBlocking
 import org.example.project.MockData
-import org.example.project.core.CustomRunCatching
-import org.example.project.core.HandleDomainError
-import org.example.project.core.cloud.FakeGithubApi
+import org.example.project.core.data.CustomRunCatching
+import org.example.project.core.data.HandleDomainError
+import org.example.project.core.data.cloud.FakeGithubApi
 import org.example.project.core.domain.DomainException
 import org.example.project.core.domain.ServiceUnavailableException
 import org.example.project.main.data.cache.RepoCache

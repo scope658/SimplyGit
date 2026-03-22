@@ -1,7 +1,7 @@
 package org.example.project.app.data
 
 import org.example.project.app.domain.AppRepository
-import org.example.project.core.cache.DataStoreManager
+import org.example.project.core.data.cache.DataStoreManager
 
 class AppRepositoryImpl(private val dataStoreManager: DataStoreManager.Read) : AppRepository {
 

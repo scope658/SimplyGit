@@ -1,8 +1,8 @@
 package org.example.project.onboarding.di
 
 
-import org.example.project.core.RunAsync
-import org.example.project.core.cache.DataStoreManager
+import org.example.project.core.presentation.RunAsync
+import org.example.project.core.data.cache.DataStoreManager
 import org.example.project.onboarding.data.OnboardingRepositoryImpl
 import org.example.project.onboarding.domain.OnboardingRepository
 import org.example.project.onboarding.presentation.OnboardingStepState

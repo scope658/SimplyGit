@@ -1,4 +1,4 @@
-package org.example.project.core.cache.db
+package org.example.project.core.data.cache.db
 
 import androidx.room.ConstructedBy
 import androidx.room.Database

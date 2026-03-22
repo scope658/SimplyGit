@@ -1,8 +1,8 @@
 package org.example.project.profile.data
 
 import kotlinx.coroutines.runBlocking
-import org.example.project.core.HandleDomainError
-import org.example.project.core.cache.DataStoreManager
+import org.example.project.core.data.HandleDomainError
+import org.example.project.core.data.cache.DataStoreManager
 import org.example.project.core.domain.DomainException
 import org.example.project.core.domain.ServiceUnavailableException
 import org.example.project.main.data.cache.UserRepoDao

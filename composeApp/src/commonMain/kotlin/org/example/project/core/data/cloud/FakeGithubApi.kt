@@ -1,4 +1,4 @@
-package org.example.project.core.cloud
+package org.example.project.core.data.cloud
 
 import org.example.project.MockData
 import org.example.project.main.data.RepoData

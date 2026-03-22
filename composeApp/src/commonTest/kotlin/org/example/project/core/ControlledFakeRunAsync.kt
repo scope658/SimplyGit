@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import org.example.project.core.presentation.RunAsync
 
 class ControlledFakeRunAsync : RunAsync {
 

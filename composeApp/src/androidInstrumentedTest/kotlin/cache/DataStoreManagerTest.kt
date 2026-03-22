@@ -8,7 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import org.example.project.core.cache.DataStoreManager
+import org.example.project.core.data.cache.DataStoreManager
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

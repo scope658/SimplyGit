@@ -1,6 +1,6 @@
 package org.example.project.profile.di
 
-import org.example.project.core.cache.db.AppDatabase
+import org.example.project.core.data.cache.db.AppDatabase
 import org.example.project.main.data.cache.UserRepoDao
 import org.example.project.profile.data.ProfileData
 import org.example.project.profile.data.ProfileRepositoryImpl

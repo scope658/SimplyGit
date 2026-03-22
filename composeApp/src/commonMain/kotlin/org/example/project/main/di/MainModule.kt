@@ -1,7 +1,7 @@
 package org.example.project.main.di
 
-import org.example.project.core.cache.DataStoreManager
-import org.example.project.core.cache.db.AppDatabase
+import org.example.project.core.data.cache.DataStoreManager
+import org.example.project.core.data.cache.db.AppDatabase
 import org.example.project.main.data.MainRepositoryImpl
 import org.example.project.main.data.RepoData
 import org.example.project.main.data.cache.RepoCache

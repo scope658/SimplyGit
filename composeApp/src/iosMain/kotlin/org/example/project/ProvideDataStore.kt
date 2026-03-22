@@ -1,7 +1,7 @@
 package org.example.project
 
 import kotlinx.cinterop.ExperimentalForeignApi
-import org.example.project.core.cache.CommonDataStore
+import org.example.project.core.data.cache.CommonDataStore
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSURL

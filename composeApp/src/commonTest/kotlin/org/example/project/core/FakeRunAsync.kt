@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.example.project.core.presentation.RunAsync
 
 class FakeRunAsync : RunAsync {
 

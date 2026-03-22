@@ -1,4 +1,4 @@
-package org.example.project.core
+package org.example.project.core.data
 
 import kotlinx.coroutines.CancellationException
 

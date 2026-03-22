@@ -10,11 +10,11 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import org.example.project.AuthWrapper
 import org.example.project.FakeAuthWrapper
 import org.example.project.app.di.appModule
-import org.example.project.core.cache.DataStoreManager
-import org.example.project.core.cache.FakeGeneralDataStoreManager
-import org.example.project.core.cache.cacheModule
-import org.example.project.core.cache.db.AppDatabase
-import org.example.project.core.cloud.FakeGithubApi
+import org.example.project.core.data.cache.DataStoreManager
+import org.example.project.core.data.cache.FakeGeneralDataStoreManager
+import org.example.project.core.data.cache.cacheModule
+import org.example.project.core.data.cache.db.AppDatabase
+import org.example.project.core.data.cloud.FakeGithubApi
 import org.example.project.core.di.coreModule
 import org.example.project.login.di.loginModule
 import org.example.project.main.data.cloud.GithubApi

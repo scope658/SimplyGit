@@ -3,10 +3,10 @@ package org.example.project.login.data
 import io.ktor.client.network.sockets.SocketTimeoutException
 import kotlinx.coroutines.runBlocking
 import org.example.project.FakeAuthWrapper
-import org.example.project.core.CustomRunCatching
+import org.example.project.core.data.CustomRunCatching
 import org.example.project.core.FakeManageResource
-import org.example.project.core.HandleDomainError
-import org.example.project.core.cache.DataStoreManager
+import org.example.project.core.data.HandleDomainError
+import org.example.project.core.data.cache.DataStoreManager
 import org.example.project.core.domain.DomainException
 import org.example.project.login.domain.LoginRepository
 import kotlin.test.BeforeTest

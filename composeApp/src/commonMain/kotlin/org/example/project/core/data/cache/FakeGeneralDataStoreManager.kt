@@ -1,4 +1,4 @@
-package org.example.project.core.cache
+package org.example.project.core.data.cache
 
 
 class FakeGeneralDataStoreManager :

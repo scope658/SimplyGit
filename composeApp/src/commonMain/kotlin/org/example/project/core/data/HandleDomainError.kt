@@ -1,4 +1,4 @@
-package org.example.project.core
+package org.example.project.core.data
 
 import io.ktor.client.network.sockets.SocketTimeoutException
 import io.ktor.client.plugins.HttpRequestTimeoutException

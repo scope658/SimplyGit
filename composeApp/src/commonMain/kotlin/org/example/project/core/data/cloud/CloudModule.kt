@@ -1,4 +1,4 @@
-package org.example.project.core.cloud
+package org.example.project.core.data.cloud
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpSend
@@ -8,7 +8,7 @@ import io.ktor.client.plugins.plugin
 import io.ktor.client.request.header
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import org.example.project.core.cache.DataStoreManager
+import org.example.project.core.data.cache.DataStoreManager
 import org.koin.dsl.module
 
 
