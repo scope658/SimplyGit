@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import org.example.project.core.ControlledFakeRunAsync
+import org.example.project.core.FakeManageResource
 import org.example.project.login.domain.LoginRepository
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -23,16 +24,19 @@ class LoginViewModelTest {
     private lateinit var loginRepository: FakeLoginRepository
     private lateinit var savedStateHandle: SavedStateHandle
     private lateinit var fakeLoginRunAsync: ControlledFakeRunAsync
+    private lateinit var fakeManageResource: FakeManageResource
 
     @BeforeTest
     fun setUp() {
+        fakeManageResource = FakeManageResource()
         fakeLoginRunAsync = ControlledFakeRunAsync()
         savedStateHandle = SavedStateHandle()
         loginRepository = FakeLoginRepository()
         loginViewModel = LoginViewModel(
             savedStateHandle = savedStateHandle,
             loginRepository = loginRepository,
-            runAsync = fakeLoginRunAsync
+            runAsync = fakeLoginRunAsync,
+            manageResource = fakeManageResource,
         )
     }
 
@@ -54,7 +58,8 @@ class LoginViewModelTest {
         loginViewModel = LoginViewModel(
             savedStateHandle = savedStateHandle,
             loginRepository = loginRepository,
-            runAsync = fakeLoginRunAsync
+            runAsync = fakeLoginRunAsync,
+            fakeManageResource
         )
 
         val newState = loginViewModel.loginUiState.value

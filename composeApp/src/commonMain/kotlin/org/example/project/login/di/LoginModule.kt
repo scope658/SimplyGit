@@ -9,12 +9,18 @@ import org.koin.dsl.module
 
 val loginModule = module {
     single<DataStoreManager.SaveToken> { DataStoreManager.Base(get()) }
-    factory<LoginRepository> { LoginRepositoryImpl(get(), get()) }
+    factory<LoginRepository> {
+        LoginRepositoryImpl(
+            get(), get(),
+            customRunCatching = get()
+        )
+    }
     viewModel {
         LoginViewModel(
             savedStateHandle = get(),
             runAsync = get(),
             loginRepository = get(),
+            manageResource = get(),
         )
     }
 }
