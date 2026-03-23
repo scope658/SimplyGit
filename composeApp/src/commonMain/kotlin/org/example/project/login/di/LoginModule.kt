@@ -8,7 +8,7 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val loginModule = module {
-    single<DataStoreManager.SaveToken> { DataStoreManager.Base(get()) }
+    factory<DataStoreManager.SaveToken> { DataStoreManager.Base(get()) }
     factory<LoginRepository> {
         LoginRepositoryImpl(
             get(), get(),

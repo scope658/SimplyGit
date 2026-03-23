@@ -36,7 +36,7 @@ val mainModule = module {
     factory<RepoCache.Mapper<UserRepository>>(named("cacheToDomain")) { RepoCacheToDomain() }
     factory<RepoData.Mapper<RepoCache>>(named("RepoDataToCache")) { RepoDataToCache() }
     factory<RepoData.Mapper<UserRepository>>(named("RepoDataToDomain")) { RepoDataToDomain() }
-    single<MainRepository> {
+    factory<MainRepository> {
         MainRepositoryImpl(
             githubApi = get(),
             dao = get(),
@@ -49,13 +49,13 @@ val mainModule = module {
     }
     factory<PaginationResult.Mapper<PagingUiState>> { PagingUiStateMapper() }
     factory<UserRepository.Mapper<UserRepositoryUi>> { UserRepoToUiMapper() }
-    single<PagedResult.Mapper<MainUiState>> {
+    factory<PagedResult.Mapper<MainUiState>> {
         MainUiMapper(
             pagingUiStateMapper = get(),
             userRepoToUiMapper = get(),
         )
     }
-    single<HandleMainRequest> {
+    factory<HandleMainRequest> {
         HandleMainRequest.Base(
             manageResource = get()
         )
@@ -66,7 +66,7 @@ val mainModule = module {
         )
     }
     factory<UserRepositoryUi.Mapper<UserRepository>> { UserRepoUiToDomain() }
-    single<GetPagedReposUseCase> {
+    factory<GetPagedReposUseCase> {
         GetPagedReposUseCaseImpl(
             handleMainRequest = get(),
             repository = get(),
