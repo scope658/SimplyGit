@@ -9,3 +9,4 @@ class AndroidPlatform : Platform {
 actual fun getPlatform(): Platform = AndroidPlatform()
 
 actual typealias CommonParcelable = android.os.Parcelable
+

@@ -2,7 +2,9 @@ package org.example.project.main.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.serialization.saved
 import androidx.lifecycle.viewModelScope
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,8 +25,11 @@ class MainViewModel(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel(), MainActions {
 
-    private val _mainUiState: MutableStateFlow<MainUiState> =
-        savedStateHandle.getMutableStateFlow(MAIN_UI_STATE_KEY, MainUiState.Loading)
+    private var savedState: MainUiState by savedStateHandle.saved(
+        key = MAIN_UI_STATE_KEY,
+        init = { MainUiState.Loading })
+
+    private val _mainUiState: MutableStateFlow<MainUiState> = MutableStateFlow(savedState)
     val mainUiState = _mainUiState.asStateFlow()
 
     private val _searchText =
@@ -41,7 +46,7 @@ class MainViewModel(
                 .debounce(SEARCH_DEBOUNCE)
                 .filter { it.isNotBlank() }
                 .mapLatest {
-                    _mainUiState.value = MainUiState.Loading
+                    changeValue(MainUiState.Loading)
                     getPagedReposUseCase.searchByQuery(
                         userQuery = it,
                         currentRepoList = emptyList(),
@@ -49,15 +54,20 @@ class MainViewModel(
                     )
                 },
             onEach = { result ->
-                _mainUiState.value = result.map(mainUiMapper)
+                changeValue(result.map(mapper = mainUiMapper))
             }
         )
     }
 
-    override fun loadUserRepo() {
+    init {
+        Napier.d(message = "init in main", tag = "dd25")
+        loadUserRepo()
+    }
+
+    private fun loadUserRepo() {
         val mainUiState = _mainUiState.value
         if (searchText.value.isNotBlank() || mainUiState is MainUiState.Success || mainUiState is MainUiState.EmptyResult) return
-        _mainUiState.value = MainUiState.Loading
+        changeValue(MainUiState.Loading)
         launchPagedRequest { firstPage, currentEmptyList ->
             getPagedReposUseCase.userRepo(
                 page = firstPage,
@@ -74,7 +84,7 @@ class MainViewModel(
     override fun retry() {
 
         if (_searchText.value.isNotBlank()) {
-            _mainUiState.value = MainUiState.Loading
+            changeValue(MainUiState.Loading)
             launchPagedRequest { firstPage, currentEmptyList ->
                 getPagedReposUseCase.searchByQuery(
                     page = firstPage,
@@ -131,9 +141,15 @@ class MainViewModel(
             },
             ui = { pagedResult ->
                 isCurrentlyFetching.value = false
-                _mainUiState.value = pagedResult.map(mapper = mainUiMapper)
+
+                changeValue(pagedResult.map(mapper = mainUiMapper))
             }
         )
+    }
+
+    private fun changeValue(mainUiState: MainUiState) {
+        savedState = mainUiState
+        _mainUiState.value = savedState
     }
 
     companion object {

@@ -16,6 +16,10 @@ import ktshwnumbertwo.composeapp.generated.resources.search
 import ktshwnumbertwo.composeapp.generated.resources.search_text_field_label_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.search_text_field_test_tag
 import org.example.project.MockData
+import org.example.project.main.presentation.screens.MainEmptyResultScreen
+import org.example.project.main.presentation.screens.MainFailureScreen
+import org.example.project.main.presentation.screens.MainLoadingScreen
+import org.example.project.main.presentation.screens.MainSuccessScreen
 import org.jetbrains.compose.resources.stringResource
 import theme.searchTextFieldShape
 import theme.spacingL
@@ -39,7 +43,19 @@ fun MainUi(mainUiState: MainUiState, searchText: String, mainActions: MainAction
             shape = searchTextFieldShape,
             singleLine = true,
         )
-        mainUiState.Show(mainActions)
+        when (val state = mainUiState) {
+            is MainUiState.Loading -> MainLoadingScreen()
+            is MainUiState.EmptyResult -> MainEmptyResultScreen()
+            is MainUiState.Failure -> MainFailureScreen(
+                message = state.message,
+                onRetryClick = { mainActions.retry() }
+            )
+
+            is MainUiState.Success -> MainSuccessScreen(
+                state,
+                actions = mainActions,
+            )
+        }
     }
 }
 
@@ -47,11 +63,7 @@ fun MainUi(mainUiState: MainUiState, searchText: String, mainActions: MainAction
 @Preview(showBackground = true, showSystemUi = true)
 private fun MainUiPreview() {
     val mainActions = object : MainActions {
-        override fun loadUserRepo() = Unit
-
-
         override fun query(userQuery: String) = Unit
-
         override fun retry() = Unit
         override fun loadMore(
             isLoadMore: Boolean,

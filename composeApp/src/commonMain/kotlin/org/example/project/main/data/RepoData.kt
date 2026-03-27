@@ -1,4 +1,4 @@
-package org.example.project.main.data.cloud
+package org.example.project.main.data
 
 data class RepoData(
     val id: Int,

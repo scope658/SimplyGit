@@ -28,7 +28,7 @@ class AndroidAuthWrapperImpl(context: Context) : AuthWrapper {
 
         val request = AuthorizationRequest.Builder(
             serviceConfig, CLIENT_ID, ResponseTypeValues.CODE, REDIRECT_URI.toUri()
-        ).setScopes(*SCOPES).build()
+        ).setScopes(listOf(REPO, USER)).build()
 
 
         val authIntent = authService.getAuthorizationRequestIntent(request)
@@ -71,9 +71,10 @@ class AndroidAuthWrapperImpl(context: Context) : AuthWrapper {
         }
 
     companion object {
+        private const val REPO = "repo"
+        private const val USER = "USER"
         private const val AUTH_FAILED = "Auth failed"
         private const val USER_CANCELLED = "User cancelled"
-        private val SCOPES = arrayOf("repo", "user")
         private const val AUTHORIZATION_ENDPOINT = "https://github.com/login/oauth/authorize"
         private const val TOKEN_ENDPOINT = "https://github.com/login/oauth/access_token"
         private const val CLIENT_ID = "Ov23ligplx8h0iayKRbf"

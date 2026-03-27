@@ -1,6 +1,6 @@
 package org.example.project
 
-import org.example.project.main.data.cloud.RepoData
+import org.example.project.main.data.RepoData
 import org.example.project.main.domain.UserRepository
 import org.example.project.main.presentation.UserRepositoryUi
 

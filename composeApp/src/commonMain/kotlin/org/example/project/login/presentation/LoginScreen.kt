@@ -5,6 +5,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
+import org.example.project.login.presentation.screens.InitialLoginScreen
+import org.example.project.login.presentation.screens.LoadingLoginScreen
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -22,5 +24,10 @@ fun LoginScreen(
             }
         }
     }
-    loginUiState.Show(loginViewModel)
+
+    when (val state = loginUiState) {
+        is LoginUiState.Initial -> InitialLoginScreen(state.errorState, actions = loginViewModel)
+        is LoginUiState.Loading -> LoadingLoginScreen()
+    }
 }
+
