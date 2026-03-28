@@ -3,6 +3,10 @@ package org.example.project.main.presentation
 import kotlinx.serialization.Serializable
 
 
+data class MainScreenState(
+    val isRefreshing: Boolean,
+    val mainUiState: MainUiState,
+)
 @Serializable
 sealed interface MainUiState {
 

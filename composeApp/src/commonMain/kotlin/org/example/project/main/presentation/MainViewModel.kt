@@ -2,6 +2,7 @@ package org.example.project.main.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.serialization.saved
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -11,7 +12,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
-import org.example.project.core.RunAsync
+import org.example.project.core.presentation.RunAsync
 import org.example.project.main.domain.GetPagedReposUseCase
 import org.example.project.main.domain.PagedResult
 import org.example.project.main.domain.UserRepository
@@ -48,9 +49,7 @@ class MainViewModel(
                 .debounce(SEARCH_DEBOUNCE)
                 .filter { it.isNotBlank() }
                 .mapLatest {
-                    _mainUiState.update {
-                        it.copy(mainUiState = MainUiState.Loading)
-                    }
+                    updateUiState(MainUiState.Loading)
                     getPagedReposUseCase.searchByQuery(
                         userQuery = it,
                         currentRepoList = emptyList(),
@@ -58,23 +57,19 @@ class MainViewModel(
                     )
                 },
             onEach = { result ->
-                _mainUiState.update {
-                    it.copy(
-                        mainUiState = result.map(mainUiMapper)
-                    )
-                }
+                updateUiState(result.map(mainUiMapper))
             }
         )
     }
 
-    override fun loadUserRepo() {
+    init {
+        loadUserRepo()
+    }
+
+    private fun loadUserRepo() {
         val mainUiState = _mainUiState.value.mainUiState
         if (searchText.value.isNotBlank() || mainUiState is MainUiState.Success || mainUiState is MainUiState.EmptyResult) return
-        _mainUiState.update {
-            it.copy(
-                mainUiState = MainUiState.Loading
-            )
-        }
+        updateUiState(MainUiState.Loading)
         launchPagedRequest { firstPage, currentEmptyList ->
             getPagedReposUseCase.allUserRepos()
         }
@@ -88,11 +83,7 @@ class MainViewModel(
     override fun retry() {
 
         if (_searchText.value.isNotBlank()) {
-            _mainUiState.update {
-                it.copy(
-                    mainUiState = MainUiState.Loading
-                )
-            }
+            updateUiState(MainUiState.Loading)
             launchPagedRequest { firstPage, currentEmptyList ->
                 getPagedReposUseCase.searchByQuery(
                     page = firstPage,
@@ -151,13 +142,16 @@ class MainViewModel(
             },
             ui = { pagedResult ->
                 isCurrentlyFetching.value = false
-                _mainUiState.update {
-                    it.copy(
-                        isRefreshing = false,
-                        mainUiState = pagedResult.map(mainUiMapper)
-                    )
-                }
+                updateUiState(pagedResult.map(mapper = mainUiMapper))
             }
+        )
+    }
+
+    private fun updateUiState(expectedUiState: MainUiState) {
+        savedState = expectedUiState
+        _mainUiState.value = MainScreenState(
+            isRefreshing = false,
+            mainUiState = savedState
         )
     }
 

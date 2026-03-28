@@ -23,21 +23,27 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.github.aakira.napier.Napier
 import ktshwnumbertwo.composeapp.generated.resources.Res
 import ktshwnumbertwo.composeapp.generated.resources.search
 import ktshwnumbertwo.composeapp.generated.resources.search_text_field_label_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.search_text_field_test_tag
 import org.example.project.MockData
+import org.example.project.core.presentation.GeneralFailureScreen
+import org.example.project.core.presentation.GeneralLoadingIndicator
+import org.example.project.main.presentation.screens.MainEmptyResultScreen
+import org.example.project.main.presentation.screens.MainSuccessScreen
 import org.jetbrains.compose.resources.stringResource
 import theme.searchTextFieldShape
 import theme.spacingL
 
 @Composable
-fun MainUi(isRefreshing: Boolean,
+fun MainUi(
+    isRefreshing: Boolean,
     mainUiState: MainUiState,
     searchText: String,
-    mainActions: MainActions) {
+    mainActions: MainActions,
+    onProfileClick: () -> Unit,
+) {
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -77,11 +83,11 @@ fun MainUi(isRefreshing: Boolean,
             }
         ) {
             when (val state = mainUiState) {
-                is MainUiState.Loading -> MainLoadingScreen()
+                is MainUiState.Loading -> GeneralLoadingIndicator()
                 is MainUiState.EmptyResult -> MainEmptyResultScreen()
-                is MainUiState.Failure -> MainFailureScreen(
+                is MainUiState.Failure -> GeneralFailureScreen(
                     message = state.message,
-                    onRetryClick = { mainActions.retry() }
+                    retryAction = { mainActions.retry() }
                 )
 
                 is MainUiState.Success -> MainSuccessScreen(
@@ -97,17 +103,14 @@ fun MainUi(isRefreshing: Boolean,
 @Preview(showBackground = true, showSystemUi = true)
 private fun MainUiPreview() {
     val mainActions = object : MainActions {
-        override fun loadUserRepo() = Unit
-
-
         override fun query(userQuery: String) = Unit
-
         override fun retry() = Unit
         override fun loadMore(
-            isLoadMore: Boolean,
             currentRepoList: List<UserRepositoryUi>,
             page: Int
         ) = Unit
+
+        override fun refresh() = Unit
 
     }
     Scaffold {
@@ -118,9 +121,10 @@ private fun MainUiPreview() {
                     page = 1,
                     pagingUiState = PagingUiState.Loading,
                 ),
-                "example search text",
-                mainActions,
-                {}
+                searchText = "example search text",
+                mainActions = mainActions,
+                onProfileClick = {},
+                isRefreshing = false,
             )
         }
     }

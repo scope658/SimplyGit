@@ -41,7 +41,6 @@ class FakeGithubApi : GithubApi, ProfileGithubApi {
         mockedUserRepoResult = emptyList()
     }
 
-
     override suspend fun userProfile(): ProfileData {
         if (profileIsFailureFlag) {
             throw IllegalStateException("something went wrong")

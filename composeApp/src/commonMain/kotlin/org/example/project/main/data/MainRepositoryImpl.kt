@@ -2,8 +2,8 @@ package org.example.project.main.data
 
 import io.github.aakira.napier.Napier
 import io.ktor.utils.io.CancellationException
-import org.example.project.core.CustomRunCatching
-import org.example.project.core.HandleDomainError
+import org.example.project.core.data.CustomRunCatching
+import org.example.project.core.data.HandleDomainError
 import org.example.project.main.data.cache.RepoCache
 import org.example.project.main.data.cache.UserRepoDao
 import org.example.project.main.data.cloud.GithubApi

@@ -14,6 +14,7 @@ import org.junit.runner.RunWith
 import pages.LoginPage
 import pages.MainPage
 import pages.ProfilePage
+import ui.AbstractTest
 import java.net.UnknownHostException
 
 

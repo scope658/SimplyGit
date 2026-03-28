@@ -2,16 +2,18 @@ package org.example.project.main.di
 
 import org.example.project.core.data.cache.DataStoreManager
 import org.example.project.core.data.cache.db.AppDatabase
+import org.example.project.core.presentation.RunAsync
 import org.example.project.main.data.MainRepositoryImpl
 import org.example.project.main.data.RepoData
 import org.example.project.main.data.cache.RepoCache
 import org.example.project.main.data.cache.RepoCacheToDomain
 import org.example.project.main.data.cache.UserRepoDao
 import org.example.project.main.data.cloud.GithubApi
+import org.example.project.main.data.cloud.GithubApiImpl
 import org.example.project.main.data.mappers.RepoDataToCache
 import org.example.project.main.data.mappers.RepoDataToDomain
 import org.example.project.main.domain.GetPagedReposUseCase
-import org.example.project.main.domain.HandleMainRequest
+import org.example.project.main.domain.GetPagedReposUseCaseImpl
 import org.example.project.main.domain.HandleUserRepoRequest
 import org.example.project.main.domain.MainRepository
 import org.example.project.main.domain.PagedResult
@@ -55,30 +57,25 @@ val mainModule = module {
             userRepoToUiMapper = get(),
         )
     }
-    factory<HandleMainRequest> {
-        HandleMainRequest.Base(
-            manageResource = get()
-        )
-    }
     factory<HandleUserRepoRequest> {
-        HandleUserRepoRequest.Base(
+        HandleUserRepoRequest(
             manageResource = get()
         )
     }
     factory<UserRepositoryUi.Mapper<UserRepository>> { UserRepoUiToDomain() }
     factory<GetPagedReposUseCase> {
         GetPagedReposUseCaseImpl(
-            handleMainRequest = get(),
             repository = get(),
-            handleUserRepoRequest = get()
+            handleUserRepoRequest = get(),
+            manageResource = get()
         )
     }
     viewModel {
         MainViewModel(
             getPagedReposUseCase = get(),
             mainUiMapper = get(),
-            runAsync = get(),
             savedStateHandle = get(),
+            runAsync = get<RunAsync>(),
             userRepoUiToDomain = get(),
         )
     }

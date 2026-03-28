@@ -39,7 +39,7 @@ private fun MainSuccessPreview() {
         mainUiState = MainUiState.Success(
             result = MockData.mockedUserRepositoriesUi,
             page = 1,
-            isLoadMore = true,
+
             pagingUiState = PagingUiState.Loading,
         ), actions = mainPreviewActions
     )
@@ -52,7 +52,7 @@ private fun MainSuccessWithPagingFailurePreview() {
         mainUiState = MainUiState.Success(
             result = MockData.mockedUserRepositoriesUi,
             page = 1,
-            isLoadMore = true,
+
             pagingUiState = PagingUiState.Failure("failure message"),
         ),
         actions = mainPreviewActions,
@@ -63,8 +63,10 @@ private val mainPreviewActions = object : MainActions {
     override fun query(userQuery: String) = Unit
     override fun retry() = Unit
     override fun loadMore(
-        isLoadMore: Boolean,
         currentRepoList: List<UserRepositoryUi>,
         page: Int
     ) = Unit
+
+    override fun refresh() = Unit
+
 }
