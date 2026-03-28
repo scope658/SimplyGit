@@ -28,8 +28,8 @@ import ktshwnumbertwo.composeapp.generated.resources.search_text_field_label_tes
 import ktshwnumbertwo.composeapp.generated.resources.search_text_field_test_tag
 import org.example.project.MockData
 import org.example.project.core.GeneralFailureScreen
+import org.example.project.core.GeneralLoadingIndicator
 import org.example.project.main.presentation.screens.MainEmptyResultScreen
-import org.example.project.main.presentation.screens.MainLoadingScreen
 import org.example.project.main.presentation.screens.MainSuccessScreen
 import org.jetbrains.compose.resources.stringResource
 import theme.searchTextFieldShape
@@ -79,7 +79,7 @@ fun MainUi(
                 mainActions.refresh()
             }) {
             when (val state = mainUiState) {
-                is MainUiState.Loading -> MainLoadingScreen()
+                is MainUiState.Loading -> GeneralLoadingIndicator()
                 is MainUiState.EmptyResult -> MainEmptyResultScreen()
                 is MainUiState.Failure -> GeneralFailureScreen(
                     message = state.message,
