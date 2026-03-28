@@ -4,19 +4,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import org.example.project.AuthWrapper
-import org.example.project.core.data.CustomRunCatching
+import org.example.project.core.data.RunCatchingSuspend
+
 import org.example.project.core.data.cache.DataStoreManager
 import org.example.project.login.domain.LoginRepository
 
 class LoginRepositoryImpl(
     private val authWrapper: AuthWrapper,
     private val dataStoreManager: DataStoreManager.SaveToken,
-    private val customRunCatching: CustomRunCatching,
+    private val customRunCatching: RunCatchingSuspend,
 ) : LoginRepository {
 
 
     override suspend fun userToken(): Result<String> {
-        return customRunCatching.cath {
+        return customRunCatching.catch {
             authWrapper.userToken()
         }
     }

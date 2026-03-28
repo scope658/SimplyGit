@@ -1,9 +1,8 @@
 package org.example.project.main.data
 
-import io.github.aakira.napier.Napier
 import io.ktor.utils.io.CancellationException
-import org.example.project.core.data.CustomRunCatching
 import org.example.project.core.data.HandleDomainError
+import org.example.project.core.data.RunCatchingSuspend
 import org.example.project.main.data.cache.RepoCache
 import org.example.project.main.data.cache.UserRepoDao
 import org.example.project.main.data.cloud.GithubApi
@@ -13,7 +12,7 @@ import org.example.project.main.domain.UserRepository
 class MainRepositoryImpl(
     private val githubApi: GithubApi,
     private val dao: UserRepoDao,
-    private val customRunCatching: CustomRunCatching,
+    private val customRunCatching: RunCatchingSuspend,
     private val repoCacheToDomain: RepoCache.Mapper<UserRepository>,
     private val repoDataToCache: RepoData.Mapper<RepoCache>,
     private val repoDataToDomain: RepoData.Mapper<UserRepository>,
@@ -30,7 +29,7 @@ class MainRepositoryImpl(
     }
 
     override suspend fun searchByQuery(userQuery: String, page: Int): Result<List<UserRepository>> {
-        return customRunCatching.cath {
+        return customRunCatching.catch {
             githubApi.fetchByQuery(userQuery, page)
                 .map { it.map(mapper = repoDataToDomain) }
         }
@@ -44,7 +43,6 @@ class MainRepositoryImpl(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Napier.d(e.toString(), tag = "dd12")
             val domainException = handleDomainError.handle(e)
             val userRepos = dao.readUserRepos()
             if (userRepos.isNotEmpty()) {

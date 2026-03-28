@@ -2,8 +2,8 @@ package org.example.project.main.data
 
 import kotlinx.coroutines.runBlocking
 import org.example.project.MockData
-import org.example.project.core.data.CustomRunCatching
 import org.example.project.core.data.HandleDomainError
+import org.example.project.core.data.RunCatchingSuspend
 import org.example.project.core.data.cloud.FakeGithubApi
 import org.example.project.core.domain.DomainException
 import org.example.project.core.domain.ServiceUnavailableException
@@ -22,6 +22,7 @@ class MainRepositoryTest {
     private lateinit var mainRepository: MainRepository
     private lateinit var fakeGithubApi: FakeGithubApi
     private lateinit var fakeDao: FakeDao
+
     @BeforeTest
     fun setUp() {
         fakeDao = FakeDao()
@@ -29,7 +30,7 @@ class MainRepositoryTest {
         val repoCacheToDomain: RepoCache.Mapper<UserRepository> = RepoCacheToDomain()
         val repoDataToCache: RepoData.Mapper<RepoCache> = RepoDataToCache()
         val repoDataToDomain: RepoData.Mapper<UserRepository> = RepoDataToDomain()
-        val customRunCatching = CustomRunCatching.Base(handleDomainError = HandleDomainError.Base())
+        val customRunCatching = RunCatchingSuspend(handleDomainError = HandleDomainError.Base())
         mainRepository =
             MainRepositoryImpl(
                 githubApi = fakeGithubApi,
@@ -54,7 +55,7 @@ class MainRepositoryTest {
 
     @Test
     fun `success user repositories then cache`() = runBlocking {
-        fakeGithubApi.setException(null)
+        fakeGithubApi.isMainPageFailure(isFailure = false)
         val actualResult = mainRepository.userRepo()
         val expectedResult = Result.success(MockData.mockedUserDataRepositories.toDomainRepos())
 
@@ -64,7 +65,10 @@ class MainRepositoryTest {
 
     @Test
     fun `failure query`() = runBlocking {
-        fakeGithubApi.setException(IllegalStateException(FAKE_EXCEPTION_MESSAGE))
+        fakeGithubApi.isMainPageFailure(
+            isFailure = true,
+            exception = IllegalStateException(FAKE_EXCEPTION_MESSAGE)
+        )
 
         val actualResult = mainRepository.searchByQuery(FAKE_QUERY, 1)
         actualResult
@@ -77,7 +81,10 @@ class MainRepositoryTest {
 
     @Test
     fun `failure user repositories no cache`() = runBlocking { //user repo trigger refresh
-        fakeGithubApi.setException(IllegalStateException(FAKE_EXCEPTION_MESSAGE))
+        fakeGithubApi.isMainPageFailure(
+            isFailure = true,
+            exception = IllegalStateException(FAKE_EXCEPTION_MESSAGE)
+        )
 
         mainRepository.userRepo()
             .onFailure {
@@ -89,7 +96,7 @@ class MainRepositoryTest {
 
     @Test
     fun `success refresh`() = runBlocking {
-        fakeGithubApi.setException(null)
+        fakeGithubApi.isMainPageFailure(false)
 
         val actualResult = mainRepository.refresh()
         val expectedResult = Result.success(MockData.mockedUserDataRepositories.toDomainRepos())
@@ -101,7 +108,10 @@ class MainRepositoryTest {
     @Test
     fun `failure but cache contain`() = runBlocking {
         fakeDao.addUserRepos(expectedListUserRepos)
-        fakeGithubApi.setException(IllegalStateException(FAKE_EXCEPTION_MESSAGE))
+        fakeGithubApi.isMainPageFailure(
+            true,
+            exception = IllegalStateException(FAKE_EXCEPTION_MESSAGE)
+        )
 
         val actualResult = mainRepository.userRepo()
         val expectedResult = Result.success(expectedListUserRepos.toDomain())

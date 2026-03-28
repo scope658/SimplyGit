@@ -3,9 +3,9 @@ package org.example.project.login.data
 import io.ktor.client.network.sockets.SocketTimeoutException
 import kotlinx.coroutines.runBlocking
 import org.example.project.FakeAuthWrapper
-import org.example.project.core.data.CustomRunCatching
 import org.example.project.core.FakeManageResource
 import org.example.project.core.data.HandleDomainError
+import org.example.project.core.data.RunCatchingSuspend
 import org.example.project.core.data.cache.DataStoreManager
 import org.example.project.core.domain.DomainException
 import org.example.project.login.domain.LoginRepository
@@ -28,7 +28,7 @@ class LoginRepositoryTest {
         loginRepository =
             LoginRepositoryImpl(
                 authWrapper = authWrapper, dataStoreManager = fakeDataStoreManager,
-                customRunCatching = CustomRunCatching.Base(handleDomainError = HandleDomainError.Base())
+                customRunCatching = RunCatchingSuspend(handleDomainError = HandleDomainError.Base())
             )
     }
 
@@ -47,7 +47,7 @@ class LoginRepositoryTest {
     @Test
     fun `failure types`() = runBlocking {
         val expectedException = IllegalStateException(FAKE_ERROR_MESSAGE)
-        authWrapper.setException(expectedException)
+        authWrapper.setException(true, expectedException)
 
         var actualResult = loginRepository.userToken()
             .onFailure {
@@ -57,7 +57,7 @@ class LoginRepositoryTest {
             }
         assertTrue(actualResult.isFailure)
 
-        authWrapper.setException(SocketTimeoutException(""))
+        authWrapper.setException(true, SocketTimeoutException(""))
 
 
         actualResult = loginRepository.userToken()

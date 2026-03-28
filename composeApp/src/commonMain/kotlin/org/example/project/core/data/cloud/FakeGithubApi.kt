@@ -8,7 +8,8 @@ import org.example.project.profile.data.cloud.ProfileGithubApi
 
 class FakeGithubApi : GithubApi, ProfileGithubApi {
 
-    private var exception: Exception? = null
+    private var isFailure = false
+    private lateinit var exception: Exception
     private var mockedSearchResult = MockData.mockedSearchDataRepositories
     private var mockedUserRepoResult = MockData.mockedUserDataRepositories
     private var profileIsFailureFlag = false
@@ -16,20 +17,23 @@ class FakeGithubApi : GithubApi, ProfileGithubApi {
         userQuery: String,
         page: Int,
     ): List<RepoData> {
-        exception?.let {
-            throw it
+        if (isFailure) {
+            throw exception
+        } else {
+            return mockedSearchResult
         }
-        return mockedSearchResult
     }
 
     override suspend fun userRepositories(): List<RepoData> {
-        exception?.let {
-            throw it
+        if (isFailure) {
+            throw exception
+        } else {
+            return mockedUserRepoResult
         }
-        return mockedUserRepoResult
     }
 
-    fun setException(exception: Exception?) {
+    fun isMainPageFailure(isFailure: Boolean, exception: Exception = IllegalStateException()) {
+        this.isFailure = isFailure
         this.exception = exception
     }
 

@@ -2,6 +2,7 @@ package org.example.project.core.data
 
 import io.ktor.client.network.sockets.SocketTimeoutException
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import kotlinx.coroutines.CancellationException
 import org.example.project.PlatformNetworkException
 import org.example.project.core.domain.DomainException
 import org.example.project.core.domain.NoConnectionException
@@ -13,6 +14,7 @@ interface HandleDomainError {
     class Base : HandleDomainError {
         override fun handle(e: Exception): Exception {
             return when (e) {
+                is CancellationException -> throw e
                 is DomainException -> e
                 is PlatformNetworkException,
                 is SocketTimeoutException,

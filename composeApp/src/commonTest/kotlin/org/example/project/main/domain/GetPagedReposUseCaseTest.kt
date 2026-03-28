@@ -7,27 +7,24 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+
 class GetPagedReposUseCaseTest {
 
     private lateinit var getPagedReposUseCase: GetPagedReposUseCase
     private lateinit var mainRepository: FakeMainRepository
-    private lateinit var handleMainRequest: HandleMainRequest
     private lateinit var handleUserRepoRequest: HandleUserRepoRequest
 
     @BeforeTest
     fun setUp() {
-        handleUserRepoRequest = HandleUserRepoRequest.Base(
-            manageResource = FakeManageResource()
-        )
-        handleMainRequest = HandleMainRequest.Base(
+        handleUserRepoRequest = HandleUserRepoRequest(
             manageResource = FakeManageResource()
         )
         mainRepository = FakeMainRepository()
         getPagedReposUseCase =
-            GetPagedReposUseCase.Base(
+            GetPagedReposUseCaseImpl(
                 repository = mainRepository,
-                handleMainRequest = handleMainRequest,
-                handleUserRepoRequest = handleUserRepoRequest
+                handleUserRepoRequest = handleUserRepoRequest,
+                manageResource = FakeManageResource(),
             )
     }
 

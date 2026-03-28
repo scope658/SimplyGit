@@ -15,7 +15,7 @@ import pages.LoginPage
 import pages.MainPage
 import pages.ProfilePage
 import ui.AbstractTest
-import java.net.UnknownHostException
+import java.net.SocketTimeoutException
 
 
 @RunWith(value = AndroidJUnit4::class)
@@ -32,8 +32,8 @@ class ScenarioTest : AbstractTest() {
 
     @After
     fun tearDown() {
-        authWrapper.setException(null)
-        githubApi.setException(null)
+        authWrapper.setException(false)
+        githubApi.isMainPageFailure(false)
 
     }
 
@@ -91,7 +91,7 @@ class ScenarioTest : AbstractTest() {
 
     @Test
     fun failureLoginInThenSuccess() {
-        authWrapper.setException(IllegalStateException())
+        authWrapper.setException(true)
 
         val onboardingPage = OnboardingPage(composeTestRule)
         onboardingPage.clickSkipButton()
@@ -104,7 +104,7 @@ class ScenarioTest : AbstractTest() {
         composeTestRule.activityRule.assertBeforeAndAfterRecreate {
             loginPage.checkLoginErrorMessage("Service is temporarily unavailable")
         }
-        authWrapper.setException(null)
+        authWrapper.setException(false)
         loginPage.clickSignInButton()
 
         loginPage.waitUntilLoadingDoesNotExist()
@@ -117,14 +117,15 @@ class ScenarioTest : AbstractTest() {
 
     @Test
     fun failureThenRetryFirstRunAfterLogin() {
-        githubApi.setException(UnknownHostException())
+        githubApi.isMainPageFailure(true, SocketTimeoutException())
+
         skipOnboardingAndLogin(composeTestRule)
 
         val mainPage = MainPage(composeTestRule)
 
         mainPage.waitUntilLoadingDoesNotExist()
         mainPage.checkFailureState(errorMessage = "No internet connection")
-        githubApi.setException(null)
+        githubApi.isMainPageFailure(false)
 
         mainPage.clickRetryButton()
 
@@ -154,6 +155,8 @@ class ScenarioTest : AbstractTest() {
         )
         mainPage.inputQuery(query = "qweqwqweewqewqqweqwe")
         mainPage.checkQueryText("qweqwqweewqewqqweqwe")
+
+
         mainPage.checkEmptyResultStateVisible()
 
         composeTestRule.activityRule.assertBeforeAndAfterRecreate {
@@ -172,7 +175,7 @@ class ScenarioTest : AbstractTest() {
 
     @Test
     fun failureThenSuccessSearchQueryResult() {
-        githubApi.setException(IllegalStateException())
+        githubApi.isMainPageFailure(true)
         skipOnboardingAndLogin(composeTestRule)
 
         val mainPage = MainPage(composeTestRule)
@@ -185,7 +188,7 @@ class ScenarioTest : AbstractTest() {
             mainPage.checkFailureState(errorMessage = "Service is temporarily unavailable")
         }
 
-        githubApi.setException(null)
+        githubApi.isMainPageFailure(false)
         mainPage.clearInputText()
         mainPage.inputQuery("new input query")
         mainPage.checkQueryText("new input query")
@@ -201,7 +204,7 @@ class ScenarioTest : AbstractTest() {
 
     @Test
     fun retryFailureSearchResult() {
-        githubApi.setException(IllegalStateException())
+        githubApi.isMainPageFailure(true)
         skipOnboardingAndLogin(composeTestRule)
 
         val mainPage = MainPage(composeTestRule)
@@ -211,7 +214,7 @@ class ScenarioTest : AbstractTest() {
         mainPage.waitUntilLoadingDoesNotExist()
 
         mainPage.checkFailureState(errorMessage = "Service is temporarily unavailable")
-        githubApi.setException(null)
+        githubApi.isMainPageFailure(false)
         mainPage.clickRetryButton()
 
         mainPage.waitUntilLoadingDoesNotExist()
