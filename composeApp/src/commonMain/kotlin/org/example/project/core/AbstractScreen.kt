@@ -22,6 +22,41 @@ import org.jetbrains.compose.resources.stringResource
 import theme.fontSizeS
 import theme.progressIndicatorLarge
 
+@Composable
+fun GeneralLoadingIndicator() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(progressIndicatorLarge)
+                .testTag(tag = stringResource(Res.string.abstract_loading_indicator_test_tag))
+        )
+    }
+}
+
+@Composable
+fun GeneralFailureScreen(message: String, retryAction: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(
+            message,
+            fontSize = fontSizeS,
+            fontStyle = FontStyle.Italic,
+            modifier = Modifier.testTag(stringResource(Res.string.abstract_error_message_test_tag))
+        )
+        Button(
+            onClick = retryAction,
+            modifier = Modifier.testTag(stringResource(Res.string.abstract_retry_button_test_tag))
+        ) {
+            Text(stringResource(Res.string.retry))
+        }
+    }
+}
+
 abstract class AbstractScreen {
 
     @Composable

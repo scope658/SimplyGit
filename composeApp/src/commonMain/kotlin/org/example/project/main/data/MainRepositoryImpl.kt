@@ -2,11 +2,10 @@ package org.example.project.main.data
 
 import io.ktor.utils.io.CancellationException
 import org.example.project.core.cache.DataStoreManager
-import org.example.project.core.customRunCatching
+import org.example.project.core.runCatchingSuspend
 import org.example.project.main.data.cache.RepoCache
 import org.example.project.main.data.cache.UserRepoDao
 import org.example.project.main.data.cloud.GithubApi
-import org.example.project.main.data.cloud.RepoData
 import org.example.project.main.domain.MainRepository
 import org.example.project.main.domain.UserRepository
 
@@ -27,23 +26,21 @@ class MainRepositoryImpl(
 
     override suspend fun searchByQuery(userQuery: String, page: Int): Result<List<UserRepository>> {
         val userToken = dataStoreManager.userToken() ?: ""
-        return customRunCatching {
+        return runCatchingSuspend {
             githubApi.fetchByQuery(userQuery, page, userToken).toDomainRepos()
         }
     }
 
     override suspend fun refresh(): Result<List<UserRepository>> {
         val userToken = dataStoreManager.userToken() ?: ""
-        return runCatchingSuspend {
-            githubApi.fetchByQuery(userQuery, page, userToken).toDomain()
-            try {
-                val repos = githubApi.userRepositories(userToken)
-                dao.addUserRepos(repos.toCache())
-                return Result.success(repos.toDomainRepos())
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                val userRepos = dao.readUserRepos()
+        try {
+            val repos = githubApi.userRepositories(userToken)
+            dao.addUserRepos(repos.toCache())
+            return Result.success(repos.toDomainRepos())
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            val userRepos = dao.readUserRepos()
             if (userRepos.isNotEmpty()) {
                 return Result.success(userRepos.toDomain())
             } else {

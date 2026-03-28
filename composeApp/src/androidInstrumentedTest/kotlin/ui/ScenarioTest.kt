@@ -16,6 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import pages.LoginPage
 import pages.MainPage
+import pages.ProfilePage
 
 
 @RunWith(value = AndroidJUnit4::class)

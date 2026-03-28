@@ -22,12 +22,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.github.aakira.napier.Napier
 import ktshwnumbertwo.composeapp.generated.resources.Res
 import ktshwnumbertwo.composeapp.generated.resources.search
 import ktshwnumbertwo.composeapp.generated.resources.search_text_field_label_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.search_text_field_test_tag
 import org.example.project.MockData
+import org.example.project.core.GeneralFailureScreen
+import org.example.project.main.presentation.screens.MainEmptyResultScreen
+import org.example.project.main.presentation.screens.MainLoadingScreen
+import org.example.project.main.presentation.screens.MainSuccessScreen
 import org.jetbrains.compose.resources.stringResource
 import theme.searchTextFieldShape
 import theme.spacingL
@@ -74,21 +77,21 @@ fun MainUi(
             isRefreshing = isRefreshing,
             onRefresh = {
                 mainActions.refresh()
-            }{
-                when (val state = mainUiState) {
-                    is MainUiState.Loading -> MainLoadingScreen()
-                    is MainUiState.EmptyResult -> MainEmptyResultScreen()
-                    is MainUiState.Failure -> MainFailureScreen(
-                        message = state.message,
-                        onRetryClick = { mainActions.retry() }
-                    )
+            }) {
+            when (val state = mainUiState) {
+                is MainUiState.Loading -> MainLoadingScreen()
+                is MainUiState.EmptyResult -> MainEmptyResultScreen()
+                is MainUiState.Failure -> GeneralFailureScreen(
+                    message = state.message,
+                    retryAction = { mainActions.retry() }
+                )
 
-                    is MainUiState.Success -> MainSuccessScreen(
-                        state,
-                        actions = mainActions,
-                    )
-                }
-            })
+                is MainUiState.Success -> MainSuccessScreen(
+                    state,
+                    actions = mainActions,
+                )
+            }
+        }
     }
 }
 
@@ -96,8 +99,6 @@ fun MainUi(
 @Preview(showBackground = true, showSystemUi = true)
 private fun MainUiPreview() {
     val mainActions = object : MainActions {
-        override fun loadUserRepo() = Unit
-
 
         override fun query(userQuery: String) = Unit
 

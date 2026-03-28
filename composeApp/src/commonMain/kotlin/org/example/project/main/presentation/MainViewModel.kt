@@ -2,6 +2,7 @@ package org.example.project.main.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.serialization.saved
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.update
 import org.example.project.core.RunAsync
 import org.example.project.main.domain.GetPagedReposUseCase
 import org.example.project.main.domain.PagedResult
@@ -27,7 +29,8 @@ class MainViewModel(
         key = MAIN_UI_STATE_KEY,
         init = { MainUiState.Loading })
 
-    private val _mainUiState: MutableStateFlow<MainUiState> = MutableStateFlow(savedState)
+    private val _mainUiState: MutableStateFlow<MainScreenState> =
+        MutableStateFlow(MainScreenState(isRefreshing = false, mainUiState = savedState))
     val mainUiState = _mainUiState.asStateFlow()
 
     private val _searchText =

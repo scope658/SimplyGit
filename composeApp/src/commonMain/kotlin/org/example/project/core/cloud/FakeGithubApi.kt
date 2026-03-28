@@ -1,8 +1,9 @@
 package org.example.project.core.cloud
 
 import org.example.project.MockData
+import org.example.project.main.data.RepoData
 import org.example.project.main.data.cloud.GithubApi
-import org.example.project.main.data.cloud.RepoData
+
 import org.example.project.profile.data.ProfileData
 import org.example.project.profile.data.cloud.ProfileGithubApi
 
@@ -15,7 +16,7 @@ class FakeGithubApi : GithubApi, ProfileGithubApi {
     override suspend fun fetchByQuery(
         userQuery: String,
         page: Int,
-        userToken: String
+        token: String
     ): List<RepoData> {
         exception?.let {
             throw it
@@ -23,7 +24,7 @@ class FakeGithubApi : GithubApi, ProfileGithubApi {
         return mockedSearchResult
     }
 
-    override suspend fun userRepositories(userToken: String): List<RepoData> {
+    override suspend fun userRepositories(token: String): List<RepoData> {
         exception?.let {
             throw it
         }

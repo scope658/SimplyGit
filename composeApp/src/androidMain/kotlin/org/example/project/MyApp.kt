@@ -11,7 +11,9 @@ import org.example.project.main.di.mainModule
 import org.example.project.onboarding.di.onboardingModule
 import org.example.project.profile.di.profileModule
 import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
+import org.koin.core.logger.Level
 
 class MyApp : Application() {
 
@@ -19,6 +21,7 @@ class MyApp : Application() {
         super.onCreate()
         Napier.base(DebugAntilog())
         startKoin {
+            androidLogger(Level.DEBUG)
             androidContext(this@MyApp)
             modules(
                 onboardingModule,

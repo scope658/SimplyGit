@@ -63,8 +63,9 @@ private val mainPreviewActions = object : MainActions {
     override fun query(userQuery: String) = Unit
     override fun retry() = Unit
     override fun loadMore(
-        isLoadMore: Boolean,
         currentRepoList: List<UserRepositoryUi>,
         page: Int
     ) = Unit
+
+    override fun refresh() = Unit
 }
