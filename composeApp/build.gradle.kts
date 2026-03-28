@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -38,6 +39,11 @@ kotlin {
             implementation(libs.coil.network.okhttp)
 
             implementation(libs.koin.android)
+
+            implementation(libs.appauth)
+
+            implementation(libs.ktor.client.android)
+
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -60,23 +66,28 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
 
             implementation(libs.material.icons.extended.v173)
+
+            implementation(libs.napier)
+
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+
         }
         iosMain.dependencies {
             implementation(libs.coil.network.ktor)
+            implementation(libs.ktor.client.darwin)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
-
-        iosMain.dependencies {
-            implementation(libs.coil.network.ktor)
-        }
-
         androidInstrumentedTest.dependencies {
             implementation(libs.androidx.testExt.junit)
             implementation(libs.androidx.espresso.core)
             implementation(libs.compose.ui.test.junit4)
 
+            implementation(libs.koin.test)
+            implementation(libs.koin.test.junit4)
         }
     }
 }
@@ -85,13 +96,25 @@ android {
     namespace = "org.example.project"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
+    buildFeatures {
+        buildConfig = true
+    }
+    
     defaultConfig {
+        manifestPlaceholders["appAuthRedirectScheme"] = "simplygit"
         applicationId = "org.example.project"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use { localProperties.load(it) }
+        }
+        val secret = localProperties.getProperty("CLIENT_SECRET") ?: ""
+        buildConfigField("String", "CLIENT_SECRET", "\"$secret\"")
     }
     packaging {
         resources {
@@ -101,6 +124,12 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            val localProperties = Properties()
+            buildConfigField(
+                "String",
+                "CLIENT_SECRET",
+                "\"${localProperties.getProperty("CLIENT_SECRET")}\""
+            )
         }
     }
     compileOptions {

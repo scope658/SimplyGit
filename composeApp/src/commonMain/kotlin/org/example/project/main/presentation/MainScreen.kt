@@ -7,6 +7,12 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MainScreen(mainViewModel: MainViewModel = koinViewModel()) {
-    val repositoriesUi by mainViewModel.userRepositoriesUi.collectAsStateWithLifecycle()
-    MainUi(repositoriesUi)
+    val mainUiState by mainViewModel.mainUiState.collectAsStateWithLifecycle()
+    val searchText by mainViewModel.searchText.collectAsStateWithLifecycle()
+
+    MainUi(
+        mainUiState = mainUiState,
+        searchText = searchText,
+        mainActions = mainViewModel,
+    )
 }

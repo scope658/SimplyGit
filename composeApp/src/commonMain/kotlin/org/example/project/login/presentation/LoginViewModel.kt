@@ -2,119 +2,60 @@ package org.example.project.login.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.serialization.saved
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import org.example.project.CommonParcelable
-import org.example.project.CommonParcelize
 import org.example.project.core.RunAsync
 import org.example.project.login.domain.LoginRepository
-import org.example.project.login.presentation.components.ErrorState
-import org.example.project.login.presentation.components.TrailingIconState
-import org.example.project.login.presentation.components.VisibilityIconState
-import org.example.project.login.presentation.components.VisualTransformationState
 
 class LoginViewModel(
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val loginRepository: LoginRepository,
     private val runAsync: RunAsync,
 ) : ViewModel(), LoginActions {
-    private val _loginUiState: MutableStateFlow<LoginUiState> =
-        savedStateHandle.getMutableStateFlow(
-            LOGIN_UI_STATE_KEY,
-            initialValue = LoginUiState.INITIAL
-        )
+    private var savedState: LoginUiState by savedStateHandle.saved(
+        key = LOGIN_UI_STATE_KEY,
+        init = { LoginUiState.Initial(errorState = ErrorState.Empty) }
+    )
+    private val _loginUiState = MutableStateFlow(value = savedState)
     val loginUiState = _loginUiState.asStateFlow()
 
-    private val _loginUiEvent: MutableSharedFlow<LoginUiEvent> = MutableSharedFlow(replay = 1)
+    private val _loginUiEvent: MutableSharedFlow<LoginUiEvent> = MutableSharedFlow()
     val loginUiEvent = _loginUiEvent.asSharedFlow()
 
-    override fun onUsernameChanged(userName: String) {
-        val trimmedUserName = userName.trim()
-        _loginUiState.update {
-            it.copy(
-                login = trimmedUserName,
-                isLoginButtonActive = validate(trimmedUserName, password = it.password)
-            )
-        }
-    }
+    override fun loginIn() {
 
-    override fun onPasswordChanged(password: String) {
-        val trimmedPassword = password.trim()
-        _loginUiState.update {
-            it.copy(
-                password = trimmedPassword,
-                isLoginButtonActive = validate(it.login, password = trimmedPassword)
-            )
-        }
-    }
+        savedState = LoginUiState.Loading
+        _loginUiState.value = savedState
+        runAsync.runAsync(
+            scope = viewModelScope,
+            {
+                loginRepository.userToken()
+            },
+            { result ->
+                result.onSuccess { userToken ->
+                    loginRepository.saveUserToken(token = userToken)
+                    _loginUiEvent.emit(LoginUiEvent.LoginSuccessEvent)
 
-    override fun login() {
-        val loginUiState = _loginUiState.value
-        val login = loginUiState.login
-        val password = loginUiState.password
-        loginRepository.login(login = login, password = password)
-            .onSuccess {
-                runAsync.runSharedFlow(
-                    scope = viewModelScope,
-                    action = { _loginUiEvent.emit(LoginUiEvent.LoginSuccessEvent) }
-                )
-            }
-            .onFailure {
-                _loginUiState.update {
-                    it.copy(error = ErrorState.Error)
+                }.onFailure {
+
+                savedState =
+                        LoginUiState.Initial(
+                            errorState = ErrorState.Error(
+                                message = it.message ?: HARDCODED_FAILURE
+                            )
+                        )
+                    _loginUiState.value = savedState
                 }
             }
-    }
-
-    override fun changePasswordVisibility() {
-        val currentState = _loginUiState.value
-        if (currentState.visualTransformationState is VisualTransformationState.Hide) {
-            _loginUiState.update {
-                it.copy(
-                    visualTransformationState = VisualTransformationState.Show,
-                    trailingIconState = TrailingIconState.Password(visibilityIconState = VisibilityIconState.Hide)
-                )
-            }
-        } else {
-            _loginUiState.update {
-                it.copy(
-                    visualTransformationState = VisualTransformationState.Hide,
-                    trailingIconState = TrailingIconState.Password(visibilityIconState = VisibilityIconState.Show)
-                )
-            }
-        }
+        )
     }
 
     companion object {
         private const val LOGIN_UI_STATE_KEY = "LOGIN_UI_STATE_KEY"
-    }
-
-    private fun validate(userName: String, password: String): Boolean {
-        return userName.isNotBlank() && password.isNotBlank()
-    }
-}
-
-@CommonParcelize
-data class LoginUiState(
-    val login: String,
-    val password: String,
-    val isLoginButtonActive: Boolean,
-    val error: ErrorState,
-    val trailingIconState: TrailingIconState,
-    val visualTransformationState: VisualTransformationState,
-) : CommonParcelable {
-    companion object {
-        val INITIAL = LoginUiState(
-            login = "",
-            "",
-            false,
-            ErrorState.Empty,
-            trailingIconState = TrailingIconState.Password(visibilityIconState = VisibilityIconState.Show),
-            visualTransformationState = VisualTransformationState.Hide,
-        )
+        private const val HARDCODED_FAILURE = "something went wrong"
     }
 }

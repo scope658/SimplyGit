@@ -35,8 +35,26 @@ fun App() {
                 startDestination = Routes.Onboarding,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                composable<Routes.Onboarding> { OnboardingScreen(navController) }
-                composable<Routes.Login> { LoginScreen(navController) }
+                composable<Routes.Onboarding> {
+                    OnboardingScreen(onOnboardingFinished = {
+                        navController.navigate(Routes.Login) {
+                            popUpTo(Routes.Onboarding) {
+                                inclusive = true
+                            }
+                        }
+                    })
+                }
+
+                composable<Routes.Login> {
+                    LoginScreen(onLoginSuccess = {
+                        navController.navigate(Routes.Main) {
+                            popUpTo(Routes.Login) {
+                                inclusive = true
+                            }
+                        }
+                    })
+                }
+
                 composable<Routes.Main> { MainScreen() }
             }
         }

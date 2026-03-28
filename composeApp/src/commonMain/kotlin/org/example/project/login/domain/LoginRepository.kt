@@ -1,5 +1,6 @@
 package org.example.project.login.domain
 
 interface LoginRepository {
-    fun login(login: String, password: String): Result<Unit>
+     suspend fun userToken(): Result<String>
+     suspend fun saveUserToken(token: String)
 }

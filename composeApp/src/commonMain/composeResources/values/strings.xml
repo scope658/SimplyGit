@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">KtsHwNumberTwo</string>
+    <string name="app_name">SimplyGit</string>
     <string name="onboarding_description">Explore thousands of cat photos from around the world. Find your favorite feline friends!</string>
     <string name="get_started">Get Started</string>
-    <string name="sign_in">Sign in</string>
+    <string name="sign_in">Sign in with GitHub</string>
     <string name="login_label">Login</string>
     <string name="password_label">Password</string>
 
@@ -21,4 +21,9 @@
     <string name="invalid_login_or_password">Invalid login or password</string>
     <string name="hide_password">Hide password</string>
     <string name="show_password">Show password</string>
+
+    <string name="nothing_to_see_here">Nothing to see here</string>
+    <string name="retry">Retry</string>
+    <string name="search">Search</string>
+
 </resources>

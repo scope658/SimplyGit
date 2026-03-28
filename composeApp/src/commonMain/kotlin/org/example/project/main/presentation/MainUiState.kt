@@ -1,0 +1,26 @@
+package org.example.project.main.presentation
+
+import kotlinx.serialization.Serializable
+
+
+@Serializable
+sealed interface MainUiState {
+
+    @Serializable
+    data class Success(
+        val page: Int,
+        val isLoadMore: Boolean,
+        val pagingUiState: PagingUiState,
+        val result: List<UserRepositoryUi>
+    ) : MainUiState
+
+    @Serializable
+    object Loading : MainUiState
+
+    @Serializable
+    object EmptyResult : MainUiState
+
+    @Serializable
+    data class Failure(val message: String) : MainUiState
+
+}

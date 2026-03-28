@@ -2,6 +2,7 @@ package org.example.project.onboarding.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.serialization.saved
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,16 +20,19 @@ class OnboardingViewModel(
     private val runAsync: RunAsync,
     onboardingStepState: OnboardingStepState,
 ) : ViewModel(), OnboardingActions {
-
+    private var savedState: OnboardingStepState by savedStateHandle.saved(
+        key = ONBOARDING_STEP_KEY,
+        init = { onboardingStepState }
+    )
     private val _onboardingStepStateFlow: MutableStateFlow<OnboardingStepState> =
-        savedStateHandle.getMutableStateFlow(ONBOARDING_STEP_KEY, onboardingStepState)
+        MutableStateFlow(value = savedState)
     val onboardingStepStateFlow = _onboardingStepStateFlow.asStateFlow()
 
     private val _onboardingPageFlow: MutableStateFlow<OnboardingPage> =
-        MutableStateFlow(value = onboardingStepState.currentState())
+        MutableStateFlow(value = onboardingStepState.currentState()) //TODO ADD ONE ONBOARDING UI STATE FLOW
     val onboardingPageFlow = _onboardingPageFlow.asStateFlow()
 
-    private val _onboardingEvent: MutableSharedFlow<OnboardingEvent> = MutableSharedFlow(replay = 1)
+    private val _onboardingEvent: MutableSharedFlow<OnboardingEvent> = MutableSharedFlow()
     val onboardingEvent = _onboardingEvent.asSharedFlow()
 
     init {
@@ -45,7 +49,8 @@ class OnboardingViewModel(
     override fun nextPage() {
         val next = onboardingStepStateFlow.value.nextPage
         if (next != null) {
-            _onboardingStepStateFlow.value = next
+            savedState = next
+            _onboardingStepStateFlow.value = savedState
         } else {
             skipOnboarding()
         }
@@ -53,9 +58,10 @@ class OnboardingViewModel(
 
     override fun skipOnboarding() {
 
-        runAsync.runSharedFlow(
+        runAsync.runAsync(
             viewModelScope,
-            action = { _onboardingEvent.emit(OnboardingEvent.Finished) }
+            background = { },
+            ui = { _onboardingEvent.emit(OnboardingEvent.Finished) }
         )
 
     }

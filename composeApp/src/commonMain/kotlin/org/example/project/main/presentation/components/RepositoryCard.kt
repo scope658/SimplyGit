@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,6 +36,7 @@ import org.example.project.MockData
 import org.example.project.main.presentation.UserRepositoryUi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import theme.avatarShape
 import theme.avatarSizeMedium
 import theme.fontSizeS
 import theme.indicatorSize
@@ -67,6 +69,7 @@ fun RepositoryCard(userRepositoryUi: UserRepositoryUi) {
                     placeholder = painterResource(Res.drawable.compose_multiplatform),
                     error = painterResource(Res.drawable.compose_multiplatform),
                     modifier = Modifier.size(avatarSizeMedium).testTag(photoTag)
+                        .clip(shape = avatarShape)
                 )
                 Spacer(modifier = Modifier.width(spacingS))
                 Text(text = userRepositoryUi.userName, modifier = Modifier.testTag(nameTag))

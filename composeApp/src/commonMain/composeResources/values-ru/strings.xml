@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">KtsHwNumberTwo</string>
+    <string name="app_name">SimplyGit</string>
     <string name="onboarding_description">Исследуйте тысячи фотографий котов со всего мира. Найдите своих любимых пушистых друзей!</string>
     <string name="get_started">Начать</string>
-    <string name="sign_in">Войти</string>
+    <string name="sign_in">Войти через GitHub</string>
     <string name="login_label">Логин</string>
     <string name="password_label">Пароль</string>
 
@@ -21,4 +21,8 @@
     <string name="invalid_login_or_password">Неверный логин или пароль</string>
     <string name="hide_password">Скрыть пароль</string>
     <string name="show_password">Показать пароль</string>
+
+    <string name="nothing_to_see_here">Здесь ничего нет</string>
+    <string name="retry">Повторить</string>
+    <string name="search">Поиск</string>
 </resources>

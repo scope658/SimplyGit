@@ -1,5 +1,8 @@
 package org.example.project.main.presentation
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class UserRepositoryUi(
     val id: Int,
     val userPhotoImageUrl: String,

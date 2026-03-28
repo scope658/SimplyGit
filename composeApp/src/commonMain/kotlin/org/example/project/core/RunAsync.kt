@@ -13,23 +13,20 @@ interface RunAsync {
     fun <T : Any> runAsync(
         scope: CoroutineScope,
         background: suspend () -> T,
-        ui: (T) -> Unit,
+        ui: suspend (T) -> Unit,
     )
 
     fun <T : Any> runFlow(
         scope: CoroutineScope,
         flow: Flow<T>,
-        onEach: (T) -> Unit,
+        onEach: suspend (T) -> Unit,
     )
-    fun runSharedFlow(
-        scope: CoroutineScope,
-        action: suspend () -> Unit,
-    )
+
     class Base : RunAsync {
         override fun <T : Any> runAsync(
             scope: CoroutineScope,
             background: suspend () -> T,
-            ui: (T) -> Unit
+            ui: suspend (T) -> Unit
         ) {
             scope.launch(Dispatchers.IO) {
                 val data = background.invoke()
@@ -42,18 +39,9 @@ interface RunAsync {
         override fun <T : Any> runFlow(
             scope: CoroutineScope,
             flow: Flow<T>,
-            onEach: (T) -> Unit
+            onEach: suspend (T) -> Unit
         ) {
             flow.onEach(onEach).launchIn(scope)
-        }
-
-        override fun runSharedFlow(
-            scope: CoroutineScope,
-            action: suspend () -> Unit
-        ) {
-            scope.launch {
-                action()
-            }
         }
     }
 }
