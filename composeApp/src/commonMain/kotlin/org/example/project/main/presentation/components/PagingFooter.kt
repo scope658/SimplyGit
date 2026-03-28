@@ -50,7 +50,6 @@ private fun PagingFooter(
     when (val state = pagingUiState) {
         is PagingUiState.Loading -> PagingLoading {
             mainActions.loadMore(
-                isLoadMore = mainUiState.isLoadMore,
                 currentRepoList = mainUiState.result,
                 page = mainUiState.page
             )
@@ -62,7 +61,6 @@ private fun PagingFooter(
             failureMessage = state.message,
             onScrolledToEnd = {
                 mainActions.loadMore(
-                    isLoadMore = mainUiState.isLoadMore,
                     currentRepoList = mainUiState.result,
                     page = mainUiState.page
                 )

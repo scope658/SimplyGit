@@ -13,10 +13,8 @@ data class RepoDto(
     val id: Int,
     val name: String,
     val owner: OwnerDto,
-
     @SerialName("stargazers_count")
     val stars: Int,
-
     val language: String?
 )
 

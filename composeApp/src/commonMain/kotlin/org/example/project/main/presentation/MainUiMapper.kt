@@ -3,7 +3,7 @@ package org.example.project.main.presentation
 import org.example.project.main.domain.PagedResult
 import org.example.project.main.domain.UserRepository
 
-class MainUiMapper : PagedResult.Mapper {
+class MainUiMapper : PagedResult.Mapper<MainUiState> {
 
     override fun mapSuccess(
         page: Int,

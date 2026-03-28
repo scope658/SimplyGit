@@ -15,7 +15,7 @@ class HandleMainRequest {
                     PagedResult.EmptyResult
                 } else {
                     PagedResult.Success(
-                        page = page,
+                        page = page + 1,
                         isPagingException = false,
                         isLoadMore = isLoadMore,
                         repos = totalRepos
@@ -44,3 +44,4 @@ class HandleMainRequest {
         private const val HARDCODED_FAILURE = "something went wrong"
     }
 }
+

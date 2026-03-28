@@ -1,21 +1,19 @@
 package org.example.project.main.domain
 
-import org.example.project.main.presentation.MainUiState
-
 interface PagedResult {
 
-    fun map(mapper: Mapper): MainUiState
+    fun <T : Any> map(mapper: Mapper<T>): T
 
-    interface Mapper {
+    interface Mapper<T> {
         fun mapSuccess(
             page: Int,
             isPagingException: Boolean,
             isLoadMore: Boolean,
             repos: List<UserRepository>
-        ): MainUiState
+        ): T
 
-        fun mapFailure(message: String): MainUiState
-        fun emptyResult(): MainUiState
+        fun mapFailure(message: String): T
+        fun emptyResult(): T
     }
 
 
@@ -25,7 +23,7 @@ interface PagedResult {
         val isLoadMore: Boolean,
         val repos: List<UserRepository>,
     ) : PagedResult {
-        override fun map(mapper: Mapper): MainUiState {
+        override fun <T : Any> map(mapper: Mapper<T>): T {
             return mapper.mapSuccess(page = page, isPagingException, isLoadMore, repos)
         }
     }
@@ -33,13 +31,13 @@ interface PagedResult {
     data class Failure(
         val message: String,
     ) : PagedResult {
-        override fun map(mapper: Mapper): MainUiState {
+        override fun <T : Any> map(mapper: Mapper<T>): T {
             return mapper.mapFailure(message)
         }
     }
 
     object EmptyResult : PagedResult {
-        override fun map(mapper: Mapper): MainUiState {
+        override fun <T : Any> map(mapper: Mapper<T>): T {
             return mapper.emptyResult()
         }
     }

@@ -1,9 +1,8 @@
-package org.example.project.login
+package org.example.project.login.data
 
 import kotlinx.coroutines.runBlocking
 import org.example.project.FakeAuthWrapper
-import org.example.project.TokenStorage
-import org.example.project.login.data.LoginRepositoryImpl
+import org.example.project.core.cache.DataStoreManager
 import org.example.project.login.domain.LoginRepository
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -13,25 +12,26 @@ import kotlin.test.assertTrue
 class LoginRepositoryTest {
     private lateinit var loginRepository: LoginRepository
     private lateinit var authWrapper: FakeAuthWrapper
+    private lateinit var fakeDataStoreManager: FakeDataStoreManager
 
     @BeforeTest
     fun setUp() {
+        fakeDataStoreManager = FakeDataStoreManager()
         authWrapper = FakeAuthWrapper()
-        loginRepository = LoginRepositoryImpl(authWrapper = authWrapper)
+        loginRepository =
+            LoginRepositoryImpl(authWrapper = authWrapper, dataStoreManager = fakeDataStoreManager)
     }
 
     @Test
     fun success() = runBlocking {
         val actualResult = loginRepository.userToken()
         val expectedResult = Result.success(FAKE_TOKEN)
+
         assertEquals(expectedResult, actualResult)
 
-        val currentToken = TokenStorage.token
-        assertEquals("", currentToken)
-
         loginRepository.saveUserToken(FAKE_TOKEN)
-        val actualSavedToken = TokenStorage.token
-        assertEquals(FAKE_TOKEN, actualSavedToken)
+
+        fakeDataStoreManager.checkSaveCalled(expectedSavedToken = "fakeToken", 1)
     }
 
     @Test
@@ -51,3 +51,20 @@ class LoginRepositoryTest {
     }
 }
 
+private class FakeDataStoreManager : DataStoreManager.SaveToken {
+
+    private lateinit var savedToken: String
+    private var actualCalledTimes = 0
+
+    override suspend fun saveUserToken(token: String) {
+        actualCalledTimes++
+        savedToken = token
+
+    }
+
+    fun checkSaveCalled(expectedSavedToken: String, expectedCalledTimes: Int) {
+        assertEquals(expectedSavedToken, savedToken)
+        assertEquals(expectedCalledTimes, actualCalledTimes)
+    }
+
+}

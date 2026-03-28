@@ -1,4 +1,4 @@
-package org.example.project.login
+package org.example.project.login.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.Dispatchers
@@ -11,10 +11,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import org.example.project.core.ControlledFakeRunAsync
 import org.example.project.login.domain.LoginRepository
-import org.example.project.login.presentation.ErrorState
-import org.example.project.login.presentation.LoginUiEvent
-import org.example.project.login.presentation.LoginUiState
-import org.example.project.login.presentation.LoginViewModel
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

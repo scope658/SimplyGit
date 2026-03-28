@@ -26,4 +26,7 @@
     <string name="retry">Retry</string>
     <string name="search">Search</string>
 
+    <string name="profile_stats_followers">followers</string>
+    <string name="profile_stats_repositories">repositories</string>
+    <string name="profile_logout_button">Sign Out</string>
 </resources>

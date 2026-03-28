@@ -4,16 +4,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.Serializable
+import org.example.project.app.presentation.AppScreen
 import org.example.project.login.presentation.LoginScreen
 import org.example.project.main.presentation.MainScreen
 import org.example.project.onboarding.presentation.OnboardingScreen
+import org.example.project.profile.presentation.ProfileScreen
 import theme.CatAppTheme
 
 sealed interface Routes {
+
+    @Serializable
+    object App : Routes
 
     @Serializable
     object Onboarding : Routes
@@ -23,6 +29,9 @@ sealed interface Routes {
 
     @Serializable
     object Main : Routes
+
+    @Serializable
+    object Profile : Routes
 }
 
 @Composable
@@ -32,9 +41,21 @@ fun App() {
         Scaffold { innerPadding ->
             NavHost(
                 navController = navController,
-                startDestination = Routes.Onboarding,
+                startDestination = Routes.App,
                 modifier = Modifier.padding(innerPadding)
             ) {
+                composable<Routes.App> {
+                    AppScreen(
+                        onLoginIn = { firstRunNavigate(route = Routes.Login, navController) },
+                        onOnboarding = {
+                            firstRunNavigate(
+                                route = Routes.Onboarding,
+                                navController
+                            )
+                        },
+                        onMain = { firstRunNavigate(route = Routes.Main, navController) },
+                    )
+                }
                 composable<Routes.Onboarding> {
                     OnboardingScreen(onOnboardingFinished = {
                         navController.navigate(Routes.Login) {
@@ -55,8 +76,29 @@ fun App() {
                     })
                 }
 
-                composable<Routes.Main> { MainScreen() }
+                composable<Routes.Main> {
+                    MainScreen(onProfileClick = {
+                        navController.navigate(Routes.Profile)
+                    })
+                }
+                composable<Routes.Profile> {
+                    ProfileScreen(onLogout = {
+                        navController.navigate(Routes.Login) {
+                            popUpTo(Routes.Profile) {
+                                inclusive = true
+                            }
+                        }
+                    })
+                }
             }
+        }
+    }
+}
+
+private fun firstRunNavigate(route: Routes, navController: NavController) {
+    navController.navigate(route) {
+        popUpTo<Routes.App>() {
+            inclusive = true
         }
     }
 }

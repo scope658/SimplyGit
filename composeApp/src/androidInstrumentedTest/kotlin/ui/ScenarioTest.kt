@@ -1,70 +1,42 @@
-import androidx.compose.ui.test.junit4.ComposeTestRule
+package ui
+
+import OnboardingPage
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ktshwnumbertwo.composeapp.generated.resources.Res
 import ktshwnumbertwo.composeapp.generated.resources.first_onboarding_image
 import ktshwnumbertwo.composeapp.generated.resources.second_onboarding_image
 import ktshwnumbertwo.composeapp.generated.resources.third_onboarding_image
-import org.example.project.AuthWrapper
-import org.example.project.FakeAuthWrapper
 import org.example.project.MainActivity
 import org.example.project.MockData
-import org.example.project.login.di.loginModule
-import org.example.project.main.data.cloud.FakeGithubApi
-import org.example.project.main.data.cloud.GithubApi
-import org.example.project.main.di.mainModule
-import org.example.project.onboarding.di.onboardingModule
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.android.ext.koin.androidContext
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.dsl.module
-import org.koin.test.KoinTest
 import pages.LoginPage
 import pages.MainPage
+import pages.ProfilePage
 
 
 @RunWith(value = AndroidJUnit4::class)
-class ScenarioTest : AbstractTest(), KoinTest {
+class ScenarioTest : AbstractTest() {
 
-    private lateinit var authWrapper: FakeAuthWrapper
-    private lateinit var githubApi: FakeGithubApi
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     @Before
     fun setUp() {
-        authWrapper = FakeAuthWrapper()
-        githubApi = FakeGithubApi()
-
-        stopKoin()
-        startKoin {
-            androidContext(ApplicationProvider.getApplicationContext())
-            modules(
-                onboardingModule,
-                loginModule,
-                mainModule,
-                module {
-                    single<AuthWrapper> { authWrapper }
-                    single<GithubApi> { githubApi }
-                }
-            )
-        }
+        abstractSetUp()
     }
 
     @After
     fun tearDown() {
         authWrapper.setException(null)
         githubApi.setException(null)
-    }
 
+    }
     @Test
     fun fullOnboardingScreen() {
         val onboardingPage = OnboardingPage(composeTestRule)
@@ -84,7 +56,7 @@ class ScenarioTest : AbstractTest(), KoinTest {
 
         onboardingPage.clickContinueButton()
 
-        composeTestRule.activityRule.assertAfterAndBeforeRecreate(
+        composeTestRule.activityRule.assertBeforeAndAfterRecreate(
             block = {
                 onboardingPage.checkVisibleNow(
                     imageRes = Res.drawable.third_onboarding_image,
@@ -127,16 +99,19 @@ class ScenarioTest : AbstractTest(), KoinTest {
         val loginPage = LoginPage(composeTestRule)
 
         loginPage.clickSignInButton()
-        loginPage.checkErrorMessageIsVisible("User cancelled")
+        loginPage.waitUntilLoadingDoesNotExist()
 
-        composeTestRule.activityRule.assertAfterAndBeforeRecreate {
-            loginPage.checkErrorMessageIsVisible("User cancelled")
+        composeTestRule.activityRule.assertBeforeAndAfterRecreate {
+            loginPage.checkLoginErrorMessage("User cancelled")
         }
         authWrapper.setException(null)
         loginPage.clickSignInButton()
 
+        loginPage.waitUntilLoadingDoesNotExist()
         val mainPage = MainPage(composeTestRule)
         mainPage.checkVisibleNow()
+        mainPage.waitUntilLoadingDoesNotExist()
+
         mainPage.checkUserRepositories(userRepositories = MockData.mockedUserRepositoriesUi)
     }
 
@@ -146,10 +121,14 @@ class ScenarioTest : AbstractTest(), KoinTest {
         skipOnboardingAndLogin(composeTestRule)
 
         val mainPage = MainPage(composeTestRule)
+
+        mainPage.waitUntilLoadingDoesNotExist()
         mainPage.checkFailureState(errorMessage = "something went wrong")
         githubApi.setException(null)
 
         mainPage.clickRetryButton()
+
+        mainPage.waitUntilLoadingDoesNotExist()
         mainPage.checkUserRepositories(MockData.mockedUserRepositoriesUi)
     }
 
@@ -177,7 +156,7 @@ class ScenarioTest : AbstractTest(), KoinTest {
         mainPage.checkQueryText("qweqwqweewqewqqweqwe")
         mainPage.checkEmptyResultStateVisible()
 
-        composeTestRule.activityRule.assertAfterAndBeforeRecreate {
+        composeTestRule.activityRule.assertBeforeAndAfterRecreate {
             mainPage.checkEmptyResultStateVisible()
         }
     }
@@ -199,9 +178,10 @@ class ScenarioTest : AbstractTest(), KoinTest {
         val mainPage = MainPage(composeTestRule)
         mainPage.inputQuery("search github repository")
         mainPage.checkQueryText("search github repository")
-        mainPage.checkFailureState(errorMessage = "something went wrong")
 
-        composeTestRule.activityRule.assertAfterAndBeforeRecreate {
+        mainPage.waitUntilLoadingDoesNotExist()
+
+        composeTestRule.activityRule.assertBeforeAndAfterRecreate {
             mainPage.checkFailureState(errorMessage = "something went wrong")
         }
 
@@ -210,9 +190,11 @@ class ScenarioTest : AbstractTest(), KoinTest {
         mainPage.inputQuery("new input query")
         mainPage.checkQueryText("new input query")
 
+        mainPage.waitUntilLoadingDoesNotExist()
+
         mainPage.checkUserRepositories(userRepositories = MockData.mockedSearchRepositoriesUi)
 
-        composeTestRule.activityRule.assertAfterAndBeforeRecreate {
+        composeTestRule.activityRule.assertBeforeAndAfterRecreate {
             mainPage.checkUserRepositories(userRepositories = MockData.mockedSearchRepositoriesUi)
         }
     }
@@ -226,33 +208,53 @@ class ScenarioTest : AbstractTest(), KoinTest {
         mainPage.inputQuery("input")
         mainPage.checkQueryText("input")
 
+        mainPage.waitUntilLoadingDoesNotExist()
+
         mainPage.checkFailureState(errorMessage = "something went wrong")
         githubApi.setException(null)
         mainPage.clickRetryButton()
 
+        mainPage.waitUntilLoadingDoesNotExist()
         mainPage.checkUserRepositories(userRepositories = MockData.mockedSearchRepositoriesUi)
 
     }
-}
+
+    @Test
+    fun failureThenSuccessLoadUserProfile() {
+        skipOnboardingAndLogin(composeTestRule)
+        val mainPage = MainPage(composeTestRule)
+        mainPage.checkVisibleNow()
+
+        mainPage.clickProfileIcon()
+
+        githubApi.isUserProfileIsFailure(true)
+        val profilePage = ProfilePage(composeTestRule)
 
 
-abstract class AbstractTest {
+        profilePage.waitUntilLoadingDoesNotExist()
 
-    protected fun ActivityScenarioRule<*>.assertAfterAndBeforeRecreate(
-        block: () -> Unit,
-    ) {
-        block()
-        this.scenario.recreate()
-        block()
-    }
+        composeTestRule.activityRule.assertBeforeAndAfterRecreate {
+            profilePage.checkErrorMessageIsVisible("something went wrong")
+        }
 
-    protected fun skipOnboardingAndLogin(composeTestRule: ComposeTestRule) {
-        val onboardingPage = OnboardingPage(composeTestRule = composeTestRule)
-        onboardingPage.clickSkipButton()
+        githubApi.isUserProfileIsFailure(false)
+        profilePage.clickRetryButton()
+
+        profilePage.waitUntilLoadingDoesNotExist()
+
+        composeTestRule.activityRule.assertBeforeAndAfterRecreate {
+            profilePage.checkVisibleNow(
+                userName = "scope",
+                bio = "fake bio",
+                repoCount = "12",
+                subscribersCount = "23"
+            )
+        }
+
+        profilePage.clickLogoutButton()
+
         val loginPage = LoginPage(composeTestRule)
-        loginPage.clickSignInButton()
+        loginPage.checkVisibleNow()
     }
 }
-
-
 
