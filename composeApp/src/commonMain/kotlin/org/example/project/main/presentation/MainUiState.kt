@@ -6,11 +6,6 @@ data class MainScreenState(
     val isRefreshing: Boolean,
     val mainUiState: MainUiState,
 )
-
-data class MainScreenState(
-    val isRefreshing: Boolean,
-    val mainUiState: MainUiState,
-)
 @Serializable
 sealed interface MainUiState {
 

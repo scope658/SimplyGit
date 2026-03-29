@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:composeApp/src/commonMain/kotlin/org/example/project/core/cloud/CloudModule.kt
-package org.example.project.core.cloud
-========
-package org.example.project.core.data .cloud
->>>>>>>> hw6:composeApp/src/commonMain/kotlin/org/example/project/core/data /cloud/CloudModule.kt
+package org.example.project.core.data.cloud
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpSend
@@ -34,7 +30,7 @@ val cloudModule = module {
         }
         customHttClient.plugin(HttpSend).intercept { request ->
             val dataStore: DataStoreManager.ReadToken = get()
-            val token = dataStore.userToken().orEmpty()
+            val token = dataStore.userToken()
 
             if (token.isNotEmpty()) {
                 request.header("Authorization", "Bearer $token")

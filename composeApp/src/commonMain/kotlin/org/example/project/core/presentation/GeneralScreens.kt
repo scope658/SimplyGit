@@ -1,8 +1,5 @@
-<<<<<<<< HEAD:composeApp/src/commonMain/kotlin/org/example/project/core/AbstractScreen.kt
-package org.example.project.core
-========
 package org.example.project.core.presentation
->>>>>>>> hw6:composeApp/src/commonMain/kotlin/org/example/project/core/presentation/GeneralScreens.kt
+
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
