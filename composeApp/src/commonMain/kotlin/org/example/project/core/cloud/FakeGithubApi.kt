@@ -16,7 +16,6 @@ class FakeGithubApi : GithubApi, ProfileGithubApi {
     override suspend fun fetchByQuery(
         userQuery: String,
         page: Int,
-        token: String
     ): List<RepoData> {
         exception?.let {
             throw it
@@ -24,7 +23,7 @@ class FakeGithubApi : GithubApi, ProfileGithubApi {
         return mockedSearchResult
     }
 
-    override suspend fun userRepositories(token: String): List<RepoData> {
+    override suspend fun userRepositories(): List<RepoData> {
         exception?.let {
             throw it
         }
@@ -44,7 +43,7 @@ class FakeGithubApi : GithubApi, ProfileGithubApi {
     }
 
 
-    override suspend fun userProfile(userToken: String): ProfileData {
+    override suspend fun userProfile(): ProfileData {
         if (profileIsFailureFlag) {
             throw IllegalStateException("something went wrong")
         } else {
