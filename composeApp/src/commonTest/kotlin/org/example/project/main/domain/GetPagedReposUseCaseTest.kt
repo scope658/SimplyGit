@@ -2,27 +2,29 @@ package org.example.project.main.domain
 
 import kotlinx.coroutines.runBlocking
 import org.example.project.MockData
+import org.example.project.core.domain.FakeManageResource
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+
 
 class GetPagedReposUseCaseTest {
 
     private lateinit var getPagedReposUseCase: GetPagedReposUseCase
     private lateinit var mainRepository: FakeMainRepository
-    private lateinit var handleMainRequest: HandleMainRequest
     private lateinit var handleUserRepoRequest: HandleUserRepoRequest
 
     @BeforeTest
     fun setUp() {
-        handleUserRepoRequest = HandleUserRepoRequest.Base()
-        handleMainRequest = HandleMainRequest.Base()
+        handleUserRepoRequest = HandleUserRepoRequest(
+            manageResource = FakeManageResource()
+        )
         mainRepository = FakeMainRepository()
         getPagedReposUseCase =
-            GetPagedReposUseCase.Base(
+            GetPagedReposUseCaseImpl(
                 repository = mainRepository,
-                handleMainRequest = handleMainRequest,
-                handleUserRepoRequest = handleUserRepoRequest
+                handleUserRepoRequest = handleUserRepoRequest,
+                manageResource = FakeManageResource(),
             )
     }
 
@@ -36,8 +38,7 @@ class GetPagedReposUseCaseTest {
         val actualResult = getPagedReposUseCase.allUserRepos()
         val expectedResult = PagedResult.Success(
             page = 0,
-            isPagingException = false,
-            isLoadMore = false,
+            paginationResult = PaginationResult.ReachedBottom,
             repos = firstExpectedRepoList,
         )
         assertEquals(expectedResult, actualResult)
@@ -48,7 +49,7 @@ class GetPagedReposUseCaseTest {
         mainRepository.mockFailure(true)
 
         val actualResuslt = getPagedReposUseCase.allUserRepos()
-        val expectedResult = PagedResult.Failure("something went wrong")
+        val expectedResult = PagedResult.Failure("service unavailable")
 
         assertEquals(actualResuslt, expectedResult)
     }
@@ -62,8 +63,7 @@ class GetPagedReposUseCaseTest {
         var actualResult = getPagedReposUseCase.refresh()
         var expectedResult = PagedResult.Success(
             page = 0,
-            isPagingException = false,
-            isLoadMore = false,
+            paginationResult = PaginationResult.ReachedBottom,
             repos = firstExpectedRepoList,
         )
         val secondExpectedRepoList = firstExpectedRepoList + MockData.mockedRepositories
@@ -72,8 +72,7 @@ class GetPagedReposUseCaseTest {
         actualResult = getPagedReposUseCase.refresh()
         expectedResult = PagedResult.Success(
             page = 0,
-            isPagingException = false,
-            isLoadMore = false,
+            paginationResult = PaginationResult.ReachedBottom,
             repos = secondExpectedRepoList,
         )
         assertEquals(expectedResult, actualResult)
@@ -93,8 +92,7 @@ class GetPagedReposUseCaseTest {
         )
         var expectedResult = PagedResult.Success(
             page = SECOND_PAGE,
-            isPagingException = false,
-            isLoadMore = true,
+            paginationResult = PaginationResult.ReadyForNext,
             repos = firstExpectedRepoList,
         )
         assertEquals(expectedResult, actualResult)
@@ -107,8 +105,7 @@ class GetPagedReposUseCaseTest {
             getPagedReposUseCase.searchByQuery(firstExpectedRepoList, QUERY_EXAMPLE, page = 2)
         expectedResult = PagedResult.Success(
             page = THIRD_PAGE,
-            isPagingException = false,
-            isLoadMore = false,
+            paginationResult = PaginationResult.ReachedBottom,
             repos = secondExpectedRepoList,
         )
         assertEquals(expectedResult, actualResult)

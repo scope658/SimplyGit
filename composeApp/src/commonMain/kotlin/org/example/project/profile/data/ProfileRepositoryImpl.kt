@@ -1,7 +1,8 @@
 package org.example.project.profile.data
 
 import kotlinx.coroutines.CancellationException
-import org.example.project.core.cache.DataStoreManager
+import org.example.project.core.data.HandleDomainError
+import org.example.project.core.data.cache.DataStoreManager
 import org.example.project.main.data.cache.UserRepoDao
 import org.example.project.profile.data.cache.ProfileCache
 import org.example.project.profile.data.cache.ProfileDao
@@ -12,23 +13,27 @@ import org.example.project.profile.domain.ProfileRepository
 class ProfileRepositoryImpl(
     private val profileDao: ProfileDao,
     private val githubApi: ProfileGithubApi,
-    private val dataStoreManager: DataStoreManager.TokenOperations,
-    private val userReposDao: UserRepoDao.ClearAll
+    private val dataStoreManager: DataStoreManager.SaveToken,
+    private val userReposDao: UserRepoDao.ClearAll,
+    private val profileDataToDomain: ProfileData.Mapper<Profile>,
+    private val profileDataToCache: ProfileData.Mapper<ProfileCache>,
+    private val profileCacheToDomain: ProfileCache.Mapper<Profile>,
+    private val handleDomainError: HandleDomainError,
 ) : ProfileRepository {
     override suspend fun refreshUserProfile(): Result<Profile> {
         try {
-            val userToken = dataStoreManager.userToken()
-            val profileData = githubApi.userProfile(userToken ?: "")
-            profileDao.saveUserProfile(profileCache = profileData.toCache())
-            return Result.success(profileData.toDomain())
+            val profileData = githubApi.userProfile()
+            profileDao.saveUserProfile(profileCache = profileData.map(profileDataToCache))
+            return Result.success(profileData.map(profileDataToDomain))
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             val profileCache = profileDao.readUserProfile()
             return if (profileCache != null) {
-                Result.success(profileCache.toDomain())
+                Result.success(profileCache.map(mapper = profileCacheToDomain))
             } else {
-                Result.failure(e)
+                val handledException = handleDomainError.handle(e)
+                Result.failure(handledException)
             }
         }
     }
@@ -42,34 +47,9 @@ class ProfileRepositoryImpl(
     override suspend fun loadUserProfile(): Result<Profile> {
         val profileCache = profileDao.readUserProfile()
         if (profileCache != null) {
-            return Result.success(profileCache.toDomain())
+            return Result.success(profileCache.map(mapper = profileCacheToDomain))
         } else {
             return refreshUserProfile()
         }
     }
 }
-
-fun ProfileCache.toDomain() = Profile(
-    avatar = this.avatar,
-    userName = this.userName,
-    bio = this.bio,
-    repoCount = this.repoCount,
-    subscribersCount = this.subscribersCount
-)
-
-fun ProfileData.toDomain() = Profile(
-    avatar = this.avatar,
-    userName = this.userName,
-    bio = this.bio,
-    repoCount = this.repoCount,
-    subscribersCount = this.subscribersCount
-)
-
-fun ProfileData.toCache() = ProfileCache(
-    userId = this.userId,
-    userName = this.userName,
-    avatar = this.avatar,
-    bio = this.bio,
-    repoCount = this.repoCount,
-    subscribersCount = this.subscribersCount
-)

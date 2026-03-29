@@ -8,13 +8,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import org.example.project.core.cache.DataStoreManager
+import org.example.project.core.data.cache.DataStoreManager
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlin.test.assertNull
 
 
 @RunWith(AndroidJUnit4::class)
@@ -30,8 +29,8 @@ class DataStoreManagerTest {
 
     @Test
     fun userTokenScenario() = runBlocking {
-        val emptyToken: String? = dataStoreManager.userToken()
-        assertNull(emptyToken)
+        val emptyToken: String = dataStoreManager.userToken()
+        assertEquals("", emptyToken)
 
         dataStoreManager.saveUserToken(token = FAKE_TOKEN)
 

@@ -12,12 +12,17 @@ import ktshwnumbertwo.composeapp.generated.resources.onboarding_third_title
 import ktshwnumbertwo.composeapp.generated.resources.second_onboarding_image
 import ktshwnumbertwo.composeapp.generated.resources.third_onboarding_image
 
+
+data class OnboardingScreenState(
+    val onboardingStepState: OnboardingStepState,
+    val onboardingUiState: OnboardingPage,
+)
+
 @Serializable
 sealed interface OnboardingStepState {
 
     val nextPage: OnboardingStepState?
     fun currentState(): OnboardingPage
-
 
     @Serializable
     object FirstPage : OnboardingStepState {

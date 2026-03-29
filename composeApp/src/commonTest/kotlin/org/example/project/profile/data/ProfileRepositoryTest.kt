@@ -1,11 +1,17 @@
 package org.example.project.profile.data
 
 import kotlinx.coroutines.runBlocking
-import org.example.project.core.cache.DataStoreManager
+import org.example.project.core.data.HandleDomainError
+import org.example.project.core.data.cache.DataStoreManager
+import org.example.project.core.domain.DomainException
+import org.example.project.core.domain.ServiceUnavailableException
 import org.example.project.main.data.cache.UserRepoDao
 import org.example.project.profile.data.cache.ProfileCache
+import org.example.project.profile.data.cache.ProfileCacheToDomain
 import org.example.project.profile.data.cache.ProfileDao
 import org.example.project.profile.data.cloud.ProfileGithubApi
+import org.example.project.profile.data.mappers.ProfileDataToCache
+import org.example.project.profile.data.mappers.ProfileDataToDomain
 import org.example.project.profile.domain.Profile
 import org.example.project.profile.domain.ProfileRepository
 import kotlin.test.BeforeTest
@@ -23,6 +29,9 @@ class ProfileRepositoryTest {
 
     @BeforeTest
     fun setUp() {
+        val profileDataToDomain: ProfileData.Mapper<Profile> = ProfileDataToDomain()
+        val profileDataToCache: ProfileData.Mapper<ProfileCache> = ProfileDataToCache()
+        val profileCacheToDomain: ProfileCache.Mapper<Profile> = ProfileCacheToDomain()
         fakeRepoDao = FakeRepoDao()
         dataStoreManager = FakeDataStoreManager()
         profileDao = FakeProfileDao()
@@ -32,7 +41,10 @@ class ProfileRepositoryTest {
             githubApi = profileGithubApi,
             dataStoreManager = dataStoreManager,
             userReposDao = fakeRepoDao,
-
+            profileDataToDomain = profileDataToDomain,
+            profileDataToCache = profileDataToCache,
+            profileCacheToDomain = profileCacheToDomain,
+            handleDomainError = HandleDomainError.Base(),
         )
     }
 
@@ -92,8 +104,11 @@ class ProfileRepositoryTest {
         val actualResult = profileRepository.refreshUserProfile()
         assertTrue(actualResult.isFailure)
 
-        val exception = actualResult.exceptionOrNull()!!
-        assertEquals(FAKE_MESSAGE, exception.message)
+        actualResult.onFailure {
+            val error = it as DomainException
+            assertEquals(ServiceUnavailableException, error)
+        }
+        Unit
     }
 
     @Test
@@ -138,7 +153,7 @@ private class FakeProfileGithubApi : ProfileGithubApi {
 
     private var isFailure = false
 
-    override suspend fun userProfile(userToken: String): ProfileData {
+    override suspend fun userProfile(): ProfileData {
 
         return if (isFailure) {
             throw IllegalStateException("fake message")
@@ -153,7 +168,7 @@ private class FakeProfileGithubApi : ProfileGithubApi {
     }
 }
 
-private class FakeDataStoreManager : DataStoreManager.TokenOperations {
+private class FakeDataStoreManager : DataStoreManager.SaveToken {
 
     private var savedToken: String? = "mockSavedToken"
 
@@ -163,10 +178,6 @@ private class FakeDataStoreManager : DataStoreManager.TokenOperations {
 
     fun checkSaveIsCalled(expected: String) {
         assertEquals(expected, savedToken)
-    }
-
-    override suspend fun userToken(): String? {
-        return savedToken
     }
 }
 

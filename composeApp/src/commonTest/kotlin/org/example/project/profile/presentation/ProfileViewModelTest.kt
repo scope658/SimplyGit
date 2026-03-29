@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.example.project.core.ControlledFakeRunAsync
+import org.example.project.core.domain.FakeManageResource
 import org.example.project.profile.domain.Profile
 import org.example.project.profile.domain.ProfileRepository
 import kotlin.test.BeforeTest
@@ -14,17 +15,24 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ProfileViewModelTest {
+
     private lateinit var profileViewModel: ProfileViewModel
     private lateinit var profileRepository: FakeProfileRepository
     private lateinit var runAsync: ControlledFakeRunAsync
+    private lateinit var profileUiMapper: Profile.Mapper<ProfileUiState>
+    private lateinit var fakeManageResource: FakeManageResource
 
     @BeforeTest
     fun setUp() {
+        fakeManageResource = FakeManageResource()
+        profileUiMapper = ProfileUiMapper()
         runAsync = ControlledFakeRunAsync()
         profileRepository = FakeProfileRepository()
         profileViewModel = ProfileViewModel(
             runAsync,
             profileRepository,
+            profileUiMapper,
+            manageResource = fakeManageResource
         )
     }
 
@@ -36,6 +44,8 @@ class ProfileViewModelTest {
         profileViewModel = ProfileViewModel(
             runAsync,
             profileRepository,
+            profileUiMapper,
+            manageResource = fakeManageResource,
         )
 
         val profileUiState: StateFlow<ProfileScreenState> = profileViewModel.profileUiState
@@ -147,7 +157,7 @@ private val successUiResult = ProfileScreenState(
 val failureUiResult = ProfileScreenState(
     isRefreshing = false,
     ProfileUiState.Failure(
-        message = "fake message"
+        message = "service unavailable"
     )
 
 )

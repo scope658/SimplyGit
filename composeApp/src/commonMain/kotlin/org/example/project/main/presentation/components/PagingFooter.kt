@@ -50,6 +50,7 @@ private fun PagingFooter(
     when (val state = pagingUiState) {
         is PagingUiState.Loading -> PagingLoading {
             mainActions.loadMore(
+
                 currentRepoList = mainUiState.result,
                 page = mainUiState.page
             )

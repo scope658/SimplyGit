@@ -7,13 +7,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import ktshwnumbertwo.composeapp.generated.resources.Res
-import ktshwnumbertwo.composeapp.generated.resources.mock_onboarding_image
+import ktshwnumbertwo.composeapp.generated.resources.first_onboarding_image
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_first_desc
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_first_title
+import ktshwnumbertwo.composeapp.generated.resources.onboarding_second_desc
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_second_title
+import ktshwnumbertwo.composeapp.generated.resources.onboarding_third_desc
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_third_title
-import org.example.project.CommonParcelable
-import org.example.project.CommonParcelize
+import ktshwnumbertwo.composeapp.generated.resources.second_onboarding_image
+import ktshwnumbertwo.composeapp.generated.resources.third_onboarding_image
 import org.example.project.core.FakeRunAsync
 import org.example.project.onboarding.domain.OnboardingRepository
 import kotlin.test.BeforeTest
@@ -37,74 +39,70 @@ class OnboardingViewModelTest {
             savedStateHandle = savedStateHandle,
             onboardingRepository = fakeOnboardingRepository,
             runAsync = fakeOnboardingRunAsync,
-            onboardingStepState = FakeOnboardingStepState.FakeFirstPage
         )
     }
 
     @Test
     fun `navigating to next pages`() {
-        val stepState: StateFlow<OnboardingStepState> = onboardingViewModel.onboardingStepStateFlow
-        val pageState: StateFlow<OnboardingPage> = onboardingViewModel.onboardingPageFlow
+        val onboardingScreenState: StateFlow<OnboardingScreenState> =
+            onboardingViewModel.onboardingScreenState
 
-        assertEquals(FakeOnboardingStepState.FakeFirstPage, stepState.value)
-        assertEquals(expectedFirstPage, pageState.value)
-
-        onboardingViewModel.nextPage()
-        assertEquals(FakeOnboardingStepState.FakeSecondPage, stepState.value)
-        assertEquals(expectedSecondPage, pageState.value)
+        assertEquals(OnboardingStepState.FirstPage, onboardingScreenState.value.onboardingStepState)
+        assertEquals(expectedFirstPage, onboardingScreenState.value.onboardingUiState)
 
         onboardingViewModel.nextPage()
-        assertEquals(FakeOnboardingStepState.FakeThirdPage, stepState.value)
-        assertEquals(expectedThirdPage, pageState.value)
-
-        //process death
-        onboardingViewModel = OnboardingViewModel(
-            savedStateHandle = savedStateHandle,
-            onboardingRepository = fakeOnboardingRepository,
-            runAsync = fakeOnboardingRunAsync,
-            onboardingStepState = FakeOnboardingStepState.FakeFirstPage
+        assertEquals(
+            OnboardingStepState.SecondPage,
+            onboardingScreenState.value.onboardingStepState
         )
+        assertEquals(expectedSecondPage, onboardingScreenState.value.onboardingUiState)
 
-        val newStepState = onboardingViewModel.onboardingStepStateFlow.value
-        val newPageState = onboardingViewModel.onboardingPageFlow.value
-
-        assertEquals(FakeOnboardingStepState.FakeThirdPage, newStepState)
-        assertEquals(expectedThirdPage, newPageState)
+        onboardingViewModel.nextPage()
+        assertEquals(OnboardingStepState.ThirdPage, onboardingScreenState.value.onboardingStepState)
+        assertEquals(expectedThirdPage, onboardingScreenState.value.onboardingUiState)
     }
 
     @Test
     fun `finishing onboarding after third page`() = runBlocking {
-        savedStateHandle["ONBOARDING_STEP_KEY"] = FakeOnboardingStepState.FakeThirdPage
+        val emitedValues = mutableListOf<OnboardingEvent>()
+        val onboardingScreenState: StateFlow<OnboardingScreenState> =
+            onboardingViewModel.onboardingScreenState
 
-        val stepState: StateFlow<OnboardingStepState> = onboardingViewModel.onboardingStepStateFlow
-        val pageState: StateFlow<OnboardingPage> = onboardingViewModel.onboardingPageFlow
-
-        assertEquals(FakeOnboardingStepState.FakeThirdPage, stepState.value)
-        assertEquals(expectedThirdPage, pageState.value)
+        assertEquals(OnboardingStepState.FirstPage, onboardingScreenState.value.onboardingStepState)
+        assertEquals(expectedFirstPage, onboardingScreenState.value.onboardingUiState)
 
         val onboardingEventSharedFlow: SharedFlow<OnboardingEvent> =
             onboardingViewModel.onboardingEvent
         val job = launch(Dispatchers.Unconfined) {
             onboardingEventSharedFlow
                 .collect {
-                    println("value is emited $it")
-                    assertEquals(OnboardingEvent.Finished, it)
+                    emitedValues.add(it)
                 }
         }
         onboardingViewModel.nextPage()
+        onboardingViewModel.nextPage()
+        onboardingViewModel.nextPage()
 
-        assertEquals(FakeOnboardingStepState.FakeThirdPage, stepState.value)
-        assertEquals(expectedThirdPage, pageState.value)
+        assertEquals(1, emitedValues.size)
+        emitedValues.forEach { onboardingEvent ->
+            assertEquals(OnboardingEvent.Finished, onboardingEvent)
+        }
+
         job.cancel()
     }
 
     @Test
     fun `assert no event`() = runBlocking {
         val emitedEvents = mutableListOf<OnboardingEvent>()
-        assertEquals(
-            FakeOnboardingStepState.FakeFirstPage,
-            onboardingViewModel.onboardingStepStateFlow.value
-        )
+        val onboardingScreenState: StateFlow<OnboardingScreenState> =
+            onboardingViewModel.onboardingScreenState
+
+        assertEquals(OnboardingStepState.FirstPage, onboardingScreenState.value.onboardingStepState)
+        assertEquals(expectedFirstPage, onboardingScreenState.value.onboardingUiState)
+
+
+        onboardingViewModel.nextPage()
+
         val onboardingEventSharedFlow: SharedFlow<OnboardingEvent> =
             onboardingViewModel.onboardingEvent
         val job = launch(Dispatchers.Unconfined) {
@@ -128,6 +126,9 @@ class OnboardingViewModelTest {
 
     @Test
     fun `trigger skip onboarding`() = runBlocking {
+        val onboardingScreenState: StateFlow<OnboardingScreenState> =
+            onboardingViewModel.onboardingScreenState
+
         val onboardingEventSharedFlow: SharedFlow<OnboardingEvent> =
             onboardingViewModel.onboardingEvent
         val job = launch(Dispatchers.Unconfined) {
@@ -138,62 +139,30 @@ class OnboardingViewModelTest {
         }
         onboardingViewModel.skipOnboarding()
 
-        assertEquals(
-            FakeOnboardingStepState.FakeFirstPage,
-            onboardingViewModel.onboardingStepStateFlow.value
-        )
-        assertEquals(expectedFirstPage, onboardingViewModel.onboardingPageFlow.value)
+
+        assertEquals(OnboardingStepState.FirstPage, onboardingScreenState.value.onboardingStepState)
+        assertEquals(expectedFirstPage, onboardingScreenState.value.onboardingUiState)
+
         job.cancel()
     }
 
 }
 
-private interface FakeOnboardingStepState : OnboardingStepState {
-
-    @CommonParcelize
-    object FakeFirstPage : FakeOnboardingStepState, CommonParcelable {
-
-        override val nextPage: FakeOnboardingStepState? = FakeSecondPage
-
-        override fun currentState(): OnboardingPage {
-
-            return expectedFirstPage
-        }
-    }
-
-    @CommonParcelize
-    object FakeSecondPage : FakeOnboardingStepState, CommonParcelable {
-
-        override val nextPage: FakeOnboardingStepState? = FakeThirdPage
-
-        override fun currentState(): OnboardingPage {
-
-            return expectedSecondPage
-        }
-    }
-
-    @CommonParcelize
-    object FakeThirdPage : FakeOnboardingStepState, CommonParcelable {
-
-        override val nextPage: FakeOnboardingStepState? = null
-
-        override fun currentState(): OnboardingPage {
-
-            return expectedThirdPage
-        }
-    }
-}
 
 private val expectedFirstPage = OnboardingPage(
     title = Res.string.onboarding_first_title,
     description = Res.string.onboarding_first_desc,
-    image = Res.drawable.mock_onboarding_image,
+    image = Res.drawable.first_onboarding_image,
 )
-private val expectedSecondPage = expectedFirstPage.copy(
+private val expectedSecondPage = OnboardingPage(
     title = Res.string.onboarding_second_title,
+    description = Res.string.onboarding_second_desc,
+    image = Res.drawable.second_onboarding_image,
 )
 private val expectedThirdPage = expectedFirstPage.copy(
     title = Res.string.onboarding_third_title,
+    description = Res.string.onboarding_third_desc,
+    image = Res.drawable.third_onboarding_image,
 )
 
 

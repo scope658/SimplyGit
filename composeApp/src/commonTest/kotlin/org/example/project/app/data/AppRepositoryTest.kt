@@ -2,7 +2,7 @@ package org.example.project.app.data
 
 
 import kotlinx.coroutines.runBlocking
-import org.example.project.core.cache.DataStoreManager
+import org.example.project.core.data.cache.DataStoreManager
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -45,8 +45,8 @@ private class FakeDataStoreManager :
         this.onboardingFlag = flag
     }
 
-    override suspend fun userToken(): String? {
-        return token
+    override suspend fun userToken(): String {
+        return token ?: ""
     }
 
     override suspend fun isOnboarded(): Boolean {

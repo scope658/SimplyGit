@@ -5,14 +5,16 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import org.example.project.core.cache.CommonDataStore
-import org.example.project.core.cache.db.AppDatabase
+import org.example.project.core.data.HandleDomainError
+import org.example.project.core.data.cache.CommonDataStore
+import org.example.project.core.data.cache.db.AppDatabase
 import org.koin.dsl.module
 
 val androidModule = module {
     single<AuthWrapper> { AndroidAuthWrapperImpl(context = get()) }
     single<DataStore<Preferences>> { provideDataStore(get()) }
     single<RoomDatabase.Builder<AppDatabase>> { getDatabaseBuilder(get()) }
+    factory<HandleDomainError> { HandleAuthDomainErrorImpl(get()) }
 }
 
 fun provideDataStore(ctx: Context) = CommonDataStore.createDataStore(

@@ -10,4 +10,18 @@ data class UserRepositoryUi(
     val repositoryName: String,
     val programmingLanguage: String,
     val stars: Int,
-)
+) {
+    interface Mapper<T> {
+        fun map(
+            userRepositoryUi: UserRepositoryUi
+        ): T
+    }
+
+    fun <T : Any> map(mapper: Mapper<T>): T {
+        return mapper.map(
+            this
+        )
+    }
+}
+
+

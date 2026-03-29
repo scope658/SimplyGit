@@ -4,12 +4,13 @@ import org.example.project.app.data.AppRepositoryImpl
 import org.example.project.app.domain.AppRepository
 import org.example.project.app.presentation.AppViewModel
 import org.example.project.core.cache.DataStoreManager
+import org.example.project.core.data.cache.DataStoreManager
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
-    single<AppRepository> { AppRepositoryImpl(get()) }
-    single<DataStoreManager.Read> { DataStoreManager.Base(dataStore = (get())) }
+    factory<AppRepository> { AppRepositoryImpl(get()) }
+    factory<DataStoreManager.Read> { DataStoreManager.Base(dataStore = (get())) }
     viewModel {
         AppViewModel(
             runAsync = get(),

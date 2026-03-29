@@ -7,14 +7,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import org.example.project.core.RunAsync
+import org.example.project.core.domain.DomainException
+import org.example.project.core.domain.ManageResource
+import org.example.project.core.domain.ServiceUnavailableException
+import org.example.project.core.presentation.RunAsync
 import org.example.project.profile.domain.Profile
 import org.example.project.profile.domain.ProfileRepository
 
 
 class ProfileViewModel(
     private val runAsync: RunAsync,
-    private val profileRepository: ProfileRepository
+    private val profileRepository: ProfileRepository,
+    private val profileUiMapper: Profile.Mapper<ProfileUiState>,
+    private val manageResource: ManageResource,
 ) : ViewModel(), ProfileActions {
 
     private val _profileUiState: MutableStateFlow<ProfileScreenState> =
@@ -72,31 +77,20 @@ class ProfileViewModel(
                 result
                     .onSuccess { userProfile ->
                         _profileUiState.value = profileUiState.copy(
-                            profileUiState = userProfile.successToUi(),
+                            profileUiState = userProfile.mapSuccess(mapper = profileUiMapper),
                             isRefreshing = false,
                         )
                     }
                     .onFailure {
+                        val error = it as? DomainException ?: ServiceUnavailableException
                         _profileUiState.value = profileUiState.copy(
                             isRefreshing = false,
                             profileUiState = ProfileUiState.Failure(
-                                message = it.message ?: HARDCODED_FAILURE
+                                message = error.exceptionString(manageResource = manageResource)
                             )
                         )
                     }
             },
         )
     }
-
-    companion object {
-        private const val HARDCODED_FAILURE = "something went wrong"
-    }
 }
-
-fun Profile.successToUi() = ProfileUiState.Success(
-    avatar = this.avatar,
-    userName = this.userName,
-    bio = this.bio,
-    repoCount = this.repoCount.toString(),
-    subscribersCount = this.subscribersCount.toString(),
-)

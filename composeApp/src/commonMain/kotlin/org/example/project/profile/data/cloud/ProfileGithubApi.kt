@@ -9,12 +9,11 @@ import kotlinx.serialization.Serializable
 import org.example.project.profile.data.ProfileData
 
 interface ProfileGithubApi {
-    suspend fun userProfile(userToken: String): ProfileData
+    suspend fun userProfile(): ProfileData
 
     class Base(private val httpClient: HttpClient) : ProfileGithubApi {
-        override suspend fun userProfile(userToken: String): ProfileData {
+        override suspend fun userProfile(): ProfileData {
             val response = httpClient.get("user") {
-                header("Authorization", "Bearer $userToken")
                 header("Accept", "application/vnd.github+json")
             }.body<GitHubUserDto>()
 

@@ -2,11 +2,18 @@ package org.example.project.main.data
 
 import kotlinx.coroutines.runBlocking
 import org.example.project.MockData
-import org.example.project.core.cache.DataStoreManager
-import org.example.project.core.cloud.FakeGithubApi
+import org.example.project.core.data.HandleDomainError
+import org.example.project.core.data.RunCatchingSuspend
+import org.example.project.core.data.cloud.FakeGithubApi
+import org.example.project.core.domain.DomainException
+import org.example.project.core.domain.ServiceUnavailableException
 import org.example.project.main.data.cache.RepoCache
+import org.example.project.main.data.cache.RepoCacheToDomain
 import org.example.project.main.data.cache.UserRepoDao
+import org.example.project.main.data.mappers.RepoDataToCache
+import org.example.project.main.data.mappers.RepoDataToDomain
 import org.example.project.main.domain.MainRepository
+import org.example.project.main.domain.UserRepository
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -14,19 +21,25 @@ import kotlin.test.assertEquals
 class MainRepositoryTest {
     private lateinit var mainRepository: MainRepository
     private lateinit var fakeGithubApi: FakeGithubApi
-    private lateinit var dataStoreManager: FakeDataStoreManager
     private lateinit var fakeDao: FakeDao
 
     @BeforeTest
     fun setUp() {
         fakeDao = FakeDao()
-        dataStoreManager = FakeDataStoreManager()
         fakeGithubApi = FakeGithubApi()
+        val repoCacheToDomain: RepoCache.Mapper<UserRepository> = RepoCacheToDomain()
+        val repoDataToCache: RepoData.Mapper<RepoCache> = RepoDataToCache()
+        val repoDataToDomain: RepoData.Mapper<UserRepository> = RepoDataToDomain()
+        val customRunCatching = RunCatchingSuspend(handleDomainError = HandleDomainError.Base())
         mainRepository =
             MainRepositoryImpl(
                 githubApi = fakeGithubApi,
-                dataStoreManager = dataStoreManager,
-                dao = fakeDao
+                dao = fakeDao,
+                repoCacheToDomain = repoCacheToDomain,
+                repoDataToCache = repoDataToCache,
+                repoDataToDomain = repoDataToDomain,
+                customRunCatching = customRunCatching,
+                handleDomainError = HandleDomainError.Base(),
             )
     }
 
@@ -37,57 +50,68 @@ class MainRepositoryTest {
         val actualResult = mainRepository.searchByQuery(FAKE_QUERY, 1)
 
         assertEquals(expectedResult, actualResult)
-        dataStoreManager.checkCalledTimes(1)
 
     }
 
     @Test
     fun `success user repositories then cache`() = runBlocking {
-        fakeGithubApi.setException(null)
+        fakeGithubApi.isMainPageFailure(isFailure = false)
         val actualResult = mainRepository.userRepo()
         val expectedResult = Result.success(MockData.mockedUserDataRepositories.toDomainRepos())
 
         assertEquals(expectedResult, actualResult)
-        dataStoreManager.checkCalledTimes(1)
         fakeDao.checkAddIsCalled(MockData.mockedUserDataRepositories.toCache())
     }
 
     @Test
     fun `failure query`() = runBlocking {
-        fakeGithubApi.setException(IllegalStateException(FAKE_EXCEPTION_MESSAGE))
+        fakeGithubApi.isMainPageFailure(
+            isFailure = true,
+            exception = IllegalStateException(FAKE_EXCEPTION_MESSAGE)
+        )
 
         val actualResult = mainRepository.searchByQuery(FAKE_QUERY, 1)
-        val actualException = actualResult.exceptionOrNull()!!
-        assertEquals(FAKE_EXCEPTION_MESSAGE, actualException.message)
-        dataStoreManager.checkCalledTimes(1)
+        actualResult
+            .onFailure {
+                val error = it as DomainException
+                assertEquals(ServiceUnavailableException, error)
+            }
+        Unit
     }
 
     @Test
     fun `failure user repositories no cache`() = runBlocking { //user repo trigger refresh
-        fakeGithubApi.setException(IllegalStateException(FAKE_EXCEPTION_MESSAGE))
+        fakeGithubApi.isMainPageFailure(
+            isFailure = true,
+            exception = IllegalStateException(FAKE_EXCEPTION_MESSAGE)
+        )
 
-        val actualResult = mainRepository.userRepo()
-        val actualException = actualResult.exceptionOrNull()!!
-        assertEquals(FAKE_EXCEPTION_MESSAGE, actualException.message)
-        dataStoreManager.checkCalledTimes(1)
+        mainRepository.userRepo()
+            .onFailure {
+                val error = it as DomainException
+                assertEquals(ServiceUnavailableException, error)
+            }
+        Unit
     }
 
     @Test
     fun `success refresh`() = runBlocking {
-        fakeGithubApi.setException(null)
+        fakeGithubApi.isMainPageFailure(false)
 
         val actualResult = mainRepository.refresh()
         val expectedResult = Result.success(MockData.mockedUserDataRepositories.toDomainRepos())
 
         assertEquals(actualResult, expectedResult)
-        dataStoreManager.checkCalledTimes(1)
         fakeDao.checkAddIsCalled(MockData.mockedUserDataRepositories.toCache())
     }
 
     @Test
     fun `failure but cache contain`() = runBlocking {
         fakeDao.addUserRepos(expectedListUserRepos)
-        fakeGithubApi.setException(IllegalStateException(FAKE_EXCEPTION_MESSAGE))
+        fakeGithubApi.isMainPageFailure(
+            true,
+            exception = IllegalStateException(FAKE_EXCEPTION_MESSAGE)
+        )
 
         val actualResult = mainRepository.userRepo()
         val expectedResult = Result.success(expectedListUserRepos.toDomain())
@@ -137,16 +161,36 @@ private class FakeDao : UserRepoDao {
     }
 }
 
-private class FakeDataStoreManager : DataStoreManager.ReadToken {
-
-    private var actualCalledTimes = 0
-    override suspend fun userToken(): String? {
-        actualCalledTimes++
-        return "fakeToken"
-    }
-
-
-    fun checkCalledTimes(expectedCalledTimes: Int) {
-        assertEquals(expectedCalledTimes, actualCalledTimes)
-    }
+fun List<RepoData>.toCache() = this.map {
+    RepoCache(
+        id = it.id.toLong(),
+        userPhotoUrl = it.userPhotoImageUrl,
+        userName = it.userName,
+        repoName = it.repositoryName,
+        programmingLanguage = it.programmingLanguage,
+        stars = it.stars
+    )
 }
+
+fun List<RepoCache>.toDomain() = this.map {
+    UserRepository(
+        id = it.id.toInt(),
+        userPhotoImageUrl = it.userPhotoUrl,
+        userName = it.userName,
+        repositoryName = it.repoName,
+        programmingLanguage = it.programmingLanguage,
+        stars = it.stars
+    )
+}
+
+fun List<RepoData>.toDomainRepos() = this.map {
+    UserRepository(
+        id = it.id,
+        userPhotoImageUrl = it.userPhotoImageUrl,
+        userName = it.userName,
+        repositoryName = it.repositoryName,
+        programmingLanguage = it.programmingLanguage,
+        stars = it.stars
+    )
+}
+

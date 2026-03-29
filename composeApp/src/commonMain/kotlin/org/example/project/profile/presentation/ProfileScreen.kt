@@ -6,8 +6,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
-import org.example.project.core.GeneralFailureScreen
-import org.example.project.core.GeneralLoadingIndicator
+import org.example.project.core.presentation.GeneralFailureScreen
+import org.example.project.core.presentation.GeneralLoadingIndicator
 import org.example.project.profile.presentation.screens.ProfileSuccessScreen
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -32,12 +32,12 @@ fun ProfileScreen(
     ) {
         when (val state = uiState.profileUiState) {
             is ProfileUiState.Failure -> GeneralFailureScreen(
-                message = state.message,
+                state.message,
                 retryAction = { profileViewModel.retry() })
 
             is ProfileUiState.Loading -> GeneralLoadingIndicator()
             is ProfileUiState.Success -> ProfileSuccessScreen(
-                profileUiState = state,
+                state,
                 profileViewModel
             )
         }

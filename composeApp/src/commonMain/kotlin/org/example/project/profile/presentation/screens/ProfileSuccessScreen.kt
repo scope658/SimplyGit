@@ -57,139 +57,140 @@ import theme.tinyAvatarBorder
 import theme.tinyThicknessDivider
 
 @Composable
-fun ProfileSuccessScreen(profileUiState: ProfileUiState.Success, profileActions: ProfileActions) {
-    val scrollState = rememberScrollState()
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(spacingL)
-            .verticalScroll(scrollState)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            AsyncImage(
-                model = profileUiState.avatar,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(avatarSizeHuge)
-                    .clip(CircleShape)
-                    .border(tinyAvatarBorder, Color.LightGray, CircleShape)
-                    .testTag(stringResource(Res.string.user_avatar_test_tag)),
-                contentScale = ContentScale.Crop,
-
-                )
-
-            Spacer(modifier = Modifier.width(spacingL))
-
-            Text(
-                text = profileUiState.userName,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.testTag(stringResource(Res.string.user_name_test_tag))
-            )
-        }
-
-        Spacer(modifier = Modifier.height(spacingML))
-
-        Text(
-            text = profileUiState.bio,
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.Black,
-            lineHeight = smallLineHeight,
-            modifier = Modifier.testTag(stringResource(Res.string.user_bio_test_tag))
-        )
-
-        Spacer(modifier = Modifier.height(spacingL))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = null,
-                modifier = Modifier.size(iconSizeTiny),
-                tint = Color.Gray
-            )
-            Spacer(modifier = Modifier.width(spacingXS))
-
-            Text(
-                text = profileUiState.subscribersCount,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.testTag(stringResource(Res.string.subscribers_count_test_tag))
-            )
-            Spacer(modifier = Modifier.width(spacingXS))
-            Text(
-                text = stringResource(Res.string.profile_stats_followers),
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray,
-            )
-            Spacer(modifier = Modifier.width(spacingL))
-
-            Icon(
-                imageVector = Icons.Default.Star,
-                contentDescription = null,
-                modifier = Modifier.size(iconSizeTiny),
-                tint = Color.Gray
-            )
-            Spacer(modifier = Modifier.width(spacingXS))
-
-            Text(
-                text = profileUiState.repoCount,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.testTag(stringResource(Res.string.repo_count_test_tag))
-            )
-            Spacer(modifier = Modifier.width(spacingXS))
-            Text(
-                text = stringResource(Res.string.profile_stats_repositories),
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
-            )
-        }
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = spacingXL),
-            thickness = tinyThicknessDivider,
-            color = Color.LightGray
-        )
-        Spacer(modifier = Modifier.weight(1f))
-
-        TextButton(
-            onClick = profileActions::logout,
+fun ProfileSuccessScreen(profileUiState: ProfileUiState.Success, profileActions: ProfileActions) =
+    with(profileUiState) {
+        val scrollState = rememberScrollState()
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .testTag(stringResource(Res.string.logout_button_test_tag)),
-            colors = ButtonDefaults.textButtonColors(
-                contentColor = Color.Red.copy(alpha = 0.8f)
-            )
+                .fillMaxSize()
+                .background(Color.White)
+                .padding(spacingL)
+                .verticalScroll(scrollState)
         ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                AsyncImage(
+                    model = avatar,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(avatarSizeHuge)
+                        .clip(CircleShape)
+                        .border(tinyAvatarBorder, Color.LightGray, CircleShape)
+                        .testTag(stringResource(Res.string.user_avatar_test_tag)),
+                    contentScale = ContentScale.Crop,
+
+                    )
+
+                Spacer(modifier = Modifier.width(spacingL))
+
+                Text(
+                    text = userName,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.testTag(stringResource(Res.string.user_name_test_tag))
+                )
+            }
+
+            Spacer(modifier = Modifier.height(spacingML))
+
             Text(
-                text = stringResource(Res.string.profile_logout_button),
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium
+                text = bio,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Black,
+                lineHeight = smallLineHeight,
+                modifier = Modifier.testTag(stringResource(Res.string.user_bio_test_tag))
             )
+
+            Spacer(modifier = Modifier.height(spacingL))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    modifier = Modifier.size(iconSizeTiny),
+                    tint = Color.Gray
+                )
+                Spacer(modifier = Modifier.width(spacingXS))
+
+                Text(
+                    text = subscribersCount,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.testTag(stringResource(Res.string.subscribers_count_test_tag))
+                )
+                Spacer(modifier = Modifier.width(spacingXS))
+                Text(
+                    text = stringResource(Res.string.profile_stats_followers),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray,
+                )
+                Spacer(modifier = Modifier.width(spacingL))
+
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = null,
+                    modifier = Modifier.size(iconSizeTiny),
+                    tint = Color.Gray
+                )
+                Spacer(modifier = Modifier.width(spacingXS))
+
+                Text(
+                    text = repoCount,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.testTag(stringResource(Res.string.repo_count_test_tag))
+                )
+                Spacer(modifier = Modifier.width(spacingXS))
+                Text(
+                    text = stringResource(Res.string.profile_stats_repositories),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+            }
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = spacingXL),
+                thickness = tinyThicknessDivider,
+                color = Color.LightGray
+            )
+            Spacer(modifier = Modifier.weight(1f))
+
+            TextButton(
+                onClick = profileActions::logout,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(stringResource(Res.string.logout_button_test_tag)),
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = Color.Red.copy(alpha = 0.8f)
+                )
+            ) {
+                Text(
+                    text = stringResource(Res.string.profile_logout_button),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
     }
-}
 
-@Preview(showBackground = true, showSystemUi = true)
+
 @Composable
-private fun SuccessPreview() {
+@Preview(showBackground = true, showSystemUi = true)
+fun ProfileSuccessPreview() {
     ProfileSuccessScreen(
-        profileActions = previewProfileActions, profileUiState = ProfileUiState.Success(
-            avatar = "fake",
-            userName = "scope",
-            bio = "fake bio",
-            repoCount = "12",
-            subscribersCount = "23",
-        )
+        profileUiState = ProfileUiState.Success(
+            "avat", "userName", "bio",
+            repoCount = "23",
+            subscribersCount = "23"
+        ),
+        profileActions = previewProfileActions
     )
-
 }
+
 
 private val previewProfileActions = object : ProfileActions {
     override fun logout() = Unit

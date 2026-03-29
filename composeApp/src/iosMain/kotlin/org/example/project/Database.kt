@@ -3,7 +3,7 @@ package org.example.project
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import kotlinx.cinterop.ExperimentalForeignApi
-import org.example.project.core.cache.db.AppDatabase
+import org.example.project.core.data.cache.db.AppDatabase
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask

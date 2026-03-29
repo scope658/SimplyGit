@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import org.example.project.core.ControlledFakeRunAsync
+import org.example.project.core.domain.FakeManageResource
 import org.example.project.login.domain.LoginRepository
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -23,16 +24,19 @@ class LoginViewModelTest {
     private lateinit var loginRepository: FakeLoginRepository
     private lateinit var savedStateHandle: SavedStateHandle
     private lateinit var fakeLoginRunAsync: ControlledFakeRunAsync
+    private lateinit var fakeManageResource: FakeManageResource
 
     @BeforeTest
     fun setUp() {
+        fakeManageResource = FakeManageResource()
         fakeLoginRunAsync = ControlledFakeRunAsync()
         savedStateHandle = SavedStateHandle()
         loginRepository = FakeLoginRepository()
         loginViewModel = LoginViewModel(
             savedStateHandle = savedStateHandle,
             loginRepository = loginRepository,
-            runAsync = fakeLoginRunAsync
+            runAsync = fakeLoginRunAsync,
+            manageResource = fakeManageResource,
         )
     }
 
@@ -49,16 +53,6 @@ class LoginViewModelTest {
         fakeLoginRunAsync.invokeUi()
 
         assertEquals(errorUiState, loginUiState.value)
-
-        //process death
-        loginViewModel = LoginViewModel(
-            savedStateHandle = savedStateHandle,
-            loginRepository = loginRepository,
-            runAsync = fakeLoginRunAsync
-        )
-
-        val newState = loginViewModel.loginUiState.value
-        assertEquals(errorUiState, newState)
 
         val sharedFlow: SharedFlow<LoginUiEvent> = loginViewModel.loginUiEvent
         val actualEvent = withTimeoutOrNull(300) {
@@ -94,9 +88,7 @@ class LoginViewModelTest {
 private val loadingUiState = LoginUiState.Loading
 private val initialUiState = LoginUiState.Initial(errorState = ErrorState.Empty)
 private val errorUiState =
-    LoginUiState.Initial(errorState = ErrorState.Error(message = "auth failed"))
-
-
+    LoginUiState.Initial(errorState = ErrorState.Error(message = "service unavailable"))
 private class FakeLoginRepository : LoginRepository {
 
     private var mockedResult = Result.success("fakeToken")

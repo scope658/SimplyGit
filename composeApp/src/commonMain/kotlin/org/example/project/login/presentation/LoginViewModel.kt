@@ -8,13 +8,17 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import org.example.project.core.RunAsync
+import org.example.project.core.domain.DomainException
+import org.example.project.core.domain.ManageResource
+import org.example.project.core.domain.ServiceUnavailableException
+import org.example.project.core.presentation.RunAsync
 import org.example.project.login.domain.LoginRepository
 
 class LoginViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val loginRepository: LoginRepository,
     private val runAsync: RunAsync,
+    private val manageResource: ManageResource
 ) : ViewModel(), LoginActions {
     private var savedState: LoginUiState by savedStateHandle.saved(
         key = LOGIN_UI_STATE_KEY,
@@ -41,11 +45,12 @@ class LoginViewModel(
                     _loginUiEvent.emit(LoginUiEvent.LoginSuccessEvent)
 
                 }.onFailure {
-
-                savedState =
+                    val exception = it as? DomainException ?: ServiceUnavailableException
+                    val message = exception.exceptionString(manageResource)
+                    savedState =
                         LoginUiState.Initial(
                             errorState = ErrorState.Error(
-                                message = it.message ?: HARDCODED_FAILURE
+                                message = message
                             )
                         )
                     _loginUiState.value = savedState
@@ -56,6 +61,5 @@ class LoginViewModel(
 
     companion object {
         private const val LOGIN_UI_STATE_KEY = "LOGIN_UI_STATE_KEY"
-        private const val HARDCODED_FAILURE = "something went wrong"
     }
 }

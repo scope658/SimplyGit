@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
-import org.example.project.core.RunAsync
+import org.example.project.core.presentation.RunAsync
 import org.example.project.main.domain.GetPagedReposUseCase
 import org.example.project.main.domain.PagedResult
 import org.example.project.main.domain.UserRepository
@@ -21,6 +21,7 @@ import org.example.project.main.domain.UserRepository
 class MainViewModel(
     private val getPagedReposUseCase: GetPagedReposUseCase,
     private val mainUiMapper: PagedResult.Mapper<MainUiState>,
+    private val userRepoUiToDomain: UserRepositoryUi.Mapper<UserRepository>,
     private val runAsync: RunAsync,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel(), MainActions {
@@ -29,8 +30,9 @@ class MainViewModel(
         key = MAIN_UI_STATE_KEY,
         init = { MainUiState.Loading })
 
-    private val _mainUiState: MutableStateFlow<MainScreenState> =
-        MutableStateFlow(MainScreenState(isRefreshing = false, mainUiState = savedState))
+    private val _mainUiState: MutableStateFlow<MainScreenState> = MutableStateFlow(
+        MainScreenState(isRefreshing = false, mainUiState = savedState)
+    )
     val mainUiState = _mainUiState.asStateFlow()
 
     private val _searchText =
@@ -47,10 +49,7 @@ class MainViewModel(
                 .debounce(SEARCH_DEBOUNCE)
                 .filter { it.isNotBlank() }
                 .mapLatest {
-                    savedState = MainUiState.Loading
-                    _mainUiState.update {
-                        it.copy(mainUiState = savedState)
-                    }
+                    updateUiState(MainUiState.Loading)
                     getPagedReposUseCase.searchByQuery(
                         userQuery = it,
                         currentRepoList = emptyList(),
@@ -58,12 +57,7 @@ class MainViewModel(
                     )
                 },
             onEach = { result ->
-                savedState = result.map(mainUiMapper)
-                _mainUiState.update {
-                    it.copy(
-                        mainUiState = savedState
-                    )
-                }
+                updateUiState(result.map(mainUiMapper))
             }
         )
     }
@@ -75,12 +69,7 @@ class MainViewModel(
     private fun loadUserRepo() {
         val mainUiState = _mainUiState.value.mainUiState
         if (searchText.value.isNotBlank() || mainUiState is MainUiState.Success || mainUiState is MainUiState.EmptyResult) return
-        savedState = MainUiState.Loading
-        _mainUiState.update {
-            it.copy(
-                mainUiState = savedState
-            )
-        }
+        updateUiState(MainUiState.Loading)
         launchPagedRequest { firstPage, currentEmptyList ->
             getPagedReposUseCase.allUserRepos()
         }
@@ -94,16 +83,11 @@ class MainViewModel(
     override fun retry() {
 
         if (_searchText.value.isNotBlank()) {
-            savedState = MainUiState.Loading
-            _mainUiState.update {
-                it.copy(
-                    mainUiState = savedState
-                )
-            }
+            updateUiState(MainUiState.Loading)
             launchPagedRequest { firstPage, currentEmptyList ->
                 getPagedReposUseCase.searchByQuery(
                     page = firstPage,
-                    currentRepoList = currentEmptyList.toDomain(),
+                    currentRepoList = currentEmptyList.map { it.map(mapper = userRepoUiToDomain) },
                     userQuery = _searchText.value
                 )
             }
@@ -124,7 +108,7 @@ class MainViewModel(
                 currentRepoList
             ) { currentPage, currentRepoList ->
                 getPagedReposUseCase.searchByQuery(
-                    currentRepoList = currentRepoList.toDomain(),
+                    currentRepoList = currentRepoList.map { it.map(userRepoUiToDomain) },
                     userQuery = currentSearchText,
                     page = currentPage
                 )
@@ -133,13 +117,15 @@ class MainViewModel(
     }
 
     override fun refresh() {
-        _mainUiState.update {
-            it.copy(
-                isRefreshing = true,
-            )
-        }
-        launchPagedRequest { _, _ ->
-            getPagedReposUseCase.refresh()
+        if (_searchText.value.isEmpty()) {
+            _mainUiState.update {
+                it.copy(
+                    isRefreshing = true,
+                )
+            }
+            launchPagedRequest { _, _ ->
+                getPagedReposUseCase.refresh()
+            }
         }
     }
 
@@ -156,14 +142,16 @@ class MainViewModel(
             },
             ui = { pagedResult ->
                 isCurrentlyFetching.value = false
-                savedState = pagedResult.map(mainUiMapper)
-                _mainUiState.update {
-                    it.copy(
-                        isRefreshing = false,
-                        mainUiState = savedState
-                    )
-                }
+                updateUiState(pagedResult.map(mapper = mainUiMapper))
             }
+        )
+    }
+
+    private fun updateUiState(expectedUiState: MainUiState) {
+        savedState = expectedUiState
+        _mainUiState.value = MainScreenState(
+            isRefreshing = false,
+            mainUiState = savedState
         )
     }
 
@@ -173,16 +161,4 @@ class MainViewModel(
         private const val SEARCH_DEBOUNCE = 350L
         private const val CURRENTLY_FETCHING_KEY = "CURRENTLY_FETCHING_KEY"
     }
-}
-
-
-fun List<UserRepositoryUi>.toDomain() = this.map {
-    UserRepository(
-        id = it.id,
-        userPhotoImageUrl = it.userPhotoImageUrl,
-        userName = it.userName,
-        repositoryName = it.repositoryName,
-        programmingLanguage = it.programmingLanguage,
-        stars = it.stars
-    )
 }

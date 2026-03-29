@@ -1,8 +1,13 @@
 package org.example.project.login.data
 
+import io.ktor.client.network.sockets.SocketTimeoutException
 import kotlinx.coroutines.runBlocking
 import org.example.project.FakeAuthWrapper
-import org.example.project.core.cache.DataStoreManager
+import org.example.project.core.data.HandleDomainError
+import org.example.project.core.data.RunCatchingSuspend
+import org.example.project.core.data.cache.DataStoreManager
+import org.example.project.core.domain.DomainException
+import org.example.project.core.domain.FakeManageResource
 import org.example.project.login.domain.LoginRepository
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -13,13 +18,18 @@ class LoginRepositoryTest {
     private lateinit var loginRepository: LoginRepository
     private lateinit var authWrapper: FakeAuthWrapper
     private lateinit var fakeDataStoreManager: FakeDataStoreManager
+    private lateinit var fakeManageResource: FakeManageResource
 
     @BeforeTest
     fun setUp() {
+        fakeManageResource = FakeManageResource()
         fakeDataStoreManager = FakeDataStoreManager()
         authWrapper = FakeAuthWrapper()
         loginRepository =
-            LoginRepositoryImpl(authWrapper = authWrapper, dataStoreManager = fakeDataStoreManager)
+            LoginRepositoryImpl(
+                authWrapper = authWrapper, dataStoreManager = fakeDataStoreManager,
+                customRunCatching = RunCatchingSuspend(handleDomainError = HandleDomainError.Base())
+            )
     }
 
     @Test
@@ -35,14 +45,30 @@ class LoginRepositoryTest {
     }
 
     @Test
-    fun failure() = runBlocking {
+    fun `failure types`() = runBlocking {
         val expectedException = IllegalStateException(FAKE_ERROR_MESSAGE)
-        authWrapper.setException(expectedException)
+        authWrapper.setException(true, expectedException)
 
-        val actualResult = loginRepository.userToken()
+        var actualResult = loginRepository.userToken()
+            .onFailure {
+                val error = it as DomainException
+                val message = error.exceptionString(fakeManageResource)
+                assertEquals(message, "service unavailable")
+            }
         assertTrue(actualResult.isFailure)
-        val error = actualResult.exceptionOrNull()!!
-        assertEquals(expectedException.message, error.message)
+
+        authWrapper.setException(true, SocketTimeoutException(""))
+
+
+        actualResult = loginRepository.userToken()
+            .onFailure {
+                val error = it as DomainException
+                val message = error.exceptionString(fakeManageResource)
+                assertEquals("no connection", message)
+            }
+        assertTrue(actualResult.isFailure)
+
+
     }
 
     companion object {

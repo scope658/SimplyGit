@@ -6,18 +6,19 @@ interface AuthWrapper {
 
 class FakeAuthWrapper : AuthWrapper {
 
-    private var exception: Exception? = null
-
+    private var isFailure: Boolean = false
+    private lateinit var exception: Exception
     override suspend fun userToken(): String {
-        exception?.let {
-            throw it
+        if (isFailure) {
+            throw exception
         }
         return "fakeToken"
 
     }
 
-    fun setException(expectedException: Exception?) {
-        exception = expectedException
+    fun setException(isFailure: Boolean, expectedException: Exception = IllegalStateException()) {
+        this.exception = expectedException
+        this.isFailure = isFailure
     }
 }
 

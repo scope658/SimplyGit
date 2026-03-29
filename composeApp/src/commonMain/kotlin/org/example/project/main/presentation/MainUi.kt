@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -27,8 +28,8 @@ import ktshwnumbertwo.composeapp.generated.resources.search
 import ktshwnumbertwo.composeapp.generated.resources.search_text_field_label_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.search_text_field_test_tag
 import org.example.project.MockData
-import org.example.project.core.GeneralFailureScreen
-import org.example.project.core.GeneralLoadingIndicator
+import org.example.project.core.presentation.GeneralFailureScreen
+import org.example.project.core.presentation.GeneralLoadingIndicator
 import org.example.project.main.presentation.screens.MainEmptyResultScreen
 import org.example.project.main.presentation.screens.MainSuccessScreen
 import org.jetbrains.compose.resources.stringResource
@@ -41,12 +42,13 @@ fun MainUi(
     mainUiState: MainUiState,
     searchText: String,
     mainActions: MainActions,
-    onProfileClick: () -> Unit
+    onProfileClick: () -> Unit,
 ) {
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
         ) {
             OutlinedTextField(
                 value = searchText,
@@ -59,7 +61,8 @@ fun MainUi(
                 onValueChange = mainActions::query,
                 modifier = Modifier
                     .padding(spacingL)
-                    .testTag(stringResource(Res.string.search_text_field_test_tag)),
+                    .testTag(stringResource(Res.string.search_text_field_test_tag))
+                    .weight(1f),
                 shape = searchTextFieldShape,
                 singleLine = true,
             )
@@ -77,7 +80,8 @@ fun MainUi(
             isRefreshing = isRefreshing,
             onRefresh = {
                 mainActions.refresh()
-            }) {
+            }
+        ) {
             when (val state = mainUiState) {
                 is MainUiState.Loading -> GeneralLoadingIndicator()
                 is MainUiState.EmptyResult -> MainEmptyResultScreen()
@@ -99,9 +103,7 @@ fun MainUi(
 @Preview(showBackground = true, showSystemUi = true)
 private fun MainUiPreview() {
     val mainActions = object : MainActions {
-
         override fun query(userQuery: String) = Unit
-
         override fun retry() = Unit
         override fun loadMore(
             currentRepoList: List<UserRepositoryUi>,
@@ -117,7 +119,6 @@ private fun MainUiPreview() {
                 mainUiState = MainUiState.Success(
                     result = MockData.mockedSearchRepositoriesUi,
                     page = 1,
-                    isLoadMore = true,
                     pagingUiState = PagingUiState.Loading,
                 ),
                 searchText = "example search text",

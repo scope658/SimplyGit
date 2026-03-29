@@ -13,3 +13,4 @@ annotation class CommonParcelize
 
 
 expect interface CommonParcelable
+expect class PlatformNetworkException : Exception

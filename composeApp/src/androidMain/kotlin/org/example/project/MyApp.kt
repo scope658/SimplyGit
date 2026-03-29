@@ -4,16 +4,15 @@ import android.app.Application
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import org.example.project.app.di.appModule
-import org.example.project.core.cache.cacheModule
-import org.example.project.core.cloud.cloudModule
+import org.example.project.core.data.cache.cacheModule
+import org.example.project.core.data.cloud.cloudModule
+import org.example.project.core.di.coreModule
 import org.example.project.login.di.loginModule
 import org.example.project.main.di.mainModule
 import org.example.project.onboarding.di.onboardingModule
 import org.example.project.profile.di.profileModule
 import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
-import org.koin.core.logger.Level
 
 class MyApp : Application() {
 
@@ -21,7 +20,6 @@ class MyApp : Application() {
         super.onCreate()
         Napier.base(DebugAntilog())
         startKoin {
-            androidLogger(Level.DEBUG)
             androidContext(this@MyApp)
             modules(
                 onboardingModule,
@@ -32,6 +30,7 @@ class MyApp : Application() {
                 appModule,
                 cacheModule,
                 profileModule,
+                coreModule,
             )
         }
     }

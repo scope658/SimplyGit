@@ -30,4 +30,7 @@
     <string name="profile_stats_followers">подписчиков</string>
     <string name="profile_stats_repositories">репозиториев</string>
     <string name="profile_logout_button">Выйти</string>
+
+    <string name="serviceUnavailable">Сервис временно недоступен</string>
+    <string name="noConnection">Нет подключения к интернету</string>
 </resources>

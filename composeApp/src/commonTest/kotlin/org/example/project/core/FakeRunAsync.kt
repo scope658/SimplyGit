@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.example.project.core.presentation.RunAsync
 
 class FakeRunAsync : RunAsync {
 
@@ -21,7 +22,7 @@ class FakeRunAsync : RunAsync {
     override fun <T : Any> runFlow(
         scope: CoroutineScope,
         flow: Flow<T>,
-        onEach: (T) -> Unit,
+        onEach: suspend (T) -> Unit,
     ) {
 
         scope.launch(Dispatchers.Unconfined) {
