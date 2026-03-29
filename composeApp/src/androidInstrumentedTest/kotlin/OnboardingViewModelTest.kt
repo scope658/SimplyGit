@@ -19,7 +19,7 @@ import kotlin.test.assertEquals
 
 
 @RunWith(AndroidJUnit4::class)
-class OnboardingViewModelTest {
+class OnboardingViewModelTest : AbstractViewModelTest() {
 
 
     @Test
@@ -45,23 +45,16 @@ class OnboardingViewModelTest {
             )
             vm.nextPage()
 
-            assertEquals(
-                OnboardingScreenState(
-                    onboardingStepState = OnboardingStepState.SecondPage,
-                    onboardingUiState = expectedSecondPage
-                ),
-                vm.onboardingScreenState.value,
-            )
+            scenario.assertBeforeAndAfterProcessDeath {
+                assertEquals(
+                    OnboardingScreenState(
+                        onboardingStepState = OnboardingStepState.SecondPage,
+                        onboardingUiState = expectedSecondPage
+                    ),
+                    vm.onboardingScreenState.value,
+                )
 
-            scenario.recreate()
-
-            assertEquals(
-                OnboardingScreenState(
-                    onboardingStepState = OnboardingStepState.SecondPage,
-                    onboardingUiState = expectedSecondPage
-                ),
-                vm.onboardingScreenState.value,
-            )
+            }
         }
     }
 }

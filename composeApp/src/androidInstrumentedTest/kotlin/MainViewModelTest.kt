@@ -1,5 +1,6 @@
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewmodel.testing.ViewModelScenario
 import androidx.lifecycle.viewmodel.testing.viewModelScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.CoroutineScope
@@ -27,8 +28,16 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.test.assertEquals
 
+abstract class AbstractViewModelTest {
+    protected fun ViewModelScenario<*>.assertBeforeAndAfterProcessDeath(block: () -> Unit) {
+        block.invoke()
+        this.recreate()
+        block.invoke()
+    }
+}
+
 @RunWith(AndroidJUnit4::class)
-class MainViewModelTest {
+class MainViewModelTest : AbstractViewModelTest() {
 
     private lateinit var fakeRunAsync: FakeRunAsync
     private lateinit var savedStateHandle: SavedStateHandle
@@ -53,8 +62,8 @@ class MainViewModelTest {
     }
 
     @Test
-    fun loadUserRepoProcessDeath() {
-        getPagedReposUseCase.mockAllUserReposPagedResult(successUserRepoPagedResult)
+    fun loadUserRepoProcessDeath() = runBlocking {
+        getPagedReposUseCase.mockAllUserReposPagedResult(failurePagedResult)
         viewModelScenario {
             MainViewModel(
                 getPagedReposUseCase = getPagedReposUseCase,
@@ -64,23 +73,30 @@ class MainViewModelTest {
                 userRepoUiToDomain = userRepoUiToDomain,
             )
         }.use { scenario ->
-            val uiValue: StateFlow<MainScreenState> = scenario.viewModel.mainUiState
-            val searchText: StateFlow<String> = scenario.viewModel.searchText
+            val vm = scenario.viewModel
+            val uiValue: StateFlow<MainScreenState> = vm.mainUiState
+            val searchText: StateFlow<String> = vm.searchText
 
-            assertEquals(
-                successUserRepoScreenState, uiValue.value
-            )
-            assertEquals("", searchText.value)
+            scenario.assertBeforeAndAfterProcessDeath {
+                assertEquals(
+                    successUserRepoScreenState.copy(
+                        mainUiState = MainUiState.Failure("something went wrong")
+                    ), uiValue.value
+                )
+                assertEquals("", searchText.value)
 
-            getPagedReposUseCase.checkAllUserRepoCalled(1)
+                getPagedReposUseCase.checkAllUserRepoCalled(1)
+            }
+            getPagedReposUseCase.mockAllUserReposPagedResult(successUserRepoPagedResult)
 
-            scenario.recreate() //process death
+            scenario.viewModel.retry()
 
+            scenario.assertBeforeAndAfterProcessDeath {
+                assertEquals(successUserRepoScreenState, scenario.viewModel.mainUiState.value)
+                assertEquals("", scenario.viewModel.searchText.value)
 
-            assertEquals(successUserRepoScreenState, scenario.viewModel.mainUiState.value)
-            assertEquals("", scenario.viewModel.searchText.value)
-
-            getPagedReposUseCase.checkAllUserRepoCalled(1)
+                getPagedReposUseCase.checkAllUserRepoCalled(2)
+            }
         }
     }
 
@@ -88,7 +104,7 @@ class MainViewModelTest {
     @Test
     fun userQueryProcessDeath() {
         getPagedReposUseCase.mockAllUserReposPagedResult(PagedResult.EmptyResult)
-        getPagedReposUseCase.mockUserQueryPagedResult(successSearchPagedResult)
+        getPagedReposUseCase.mockUserQueryPagedResult(failurePagedResult)
 
         viewModelScenario {
             MainViewModel(
@@ -101,25 +117,34 @@ class MainViewModelTest {
         }.use { scenario ->
             val viewModelUiState = scenario.viewModel.mainUiState
             val queryText = scenario.viewModel.searchText
-            assertEquals("", queryText.value)
-            assertEquals(
-                MainScreenState(isRefreshing = false, MainUiState.EmptyResult),
-                viewModelUiState.value
-            )
+
             getPagedReposUseCase.checkAllUserRepoCalled(1)
+
+            assertEquals("", queryText.value)
 
             scenario.viewModel.query("query")
 
-            assertEquals("query", queryText.value)
-            assertEquals(successSearchMainScreenState, viewModelUiState.value)
-            getPagedReposUseCase.checkUserQueryCalled(1)
+            scenario.assertBeforeAndAfterProcessDeath {
+                assertEquals("query", queryText.value)
+                assertEquals(
+                    MainScreenState(
+                        isRefreshing = false,
+                        MainUiState.Failure("something went wrong")
+                    ),
+                    viewModelUiState.value
+                )
+                getPagedReposUseCase.checkUserQueryCalled(1)
+            }
 
+            getPagedReposUseCase.mockUserQueryPagedResult(successSearchPagedResult)
 
-            scenario.recreate() // process death
+            scenario.viewModel.retry()
 
-            assertEquals("query", scenario.viewModel.searchText.value)
-            assertEquals(successSearchMainScreenState, scenario.viewModel.mainUiState.value)
-            getPagedReposUseCase.checkUserQueryCalled(1)
+            scenario.assertBeforeAndAfterProcessDeath {
+                assertEquals("query", scenario.viewModel.searchText.value)
+                assertEquals(successSearchMainScreenState, scenario.viewModel.mainUiState.value)
+                getPagedReposUseCase.checkUserQueryCalled(2)
+            }
         }
     }
 }
@@ -169,6 +194,7 @@ private class FakeGetPagedReposUseCase : GetPagedReposUseCase {
     }
 }
 
+
 private val successUserRepoResultUi = MainUiState.Success(
     page = 0,
 
@@ -193,6 +219,9 @@ private val successUserRepoScreenState = MainScreenState(
     isRefreshing = false,
     mainUiState = successUserRepoResultUi
 )
+private val failureResult = MainUiState.Failure(
+    message = "something went wrong"
+)
 
 private val successSearchPagedResult =
     PagedResult.Success(
@@ -207,6 +236,8 @@ private val successUserRepoPagedResult =
         repos = MockData.mockedRepositories,
         page = 0,
     )
+
+private val failurePagedResult = PagedResult.Failure("something went wrong")
 
 class FakeRunAsync : RunAsync {
 
