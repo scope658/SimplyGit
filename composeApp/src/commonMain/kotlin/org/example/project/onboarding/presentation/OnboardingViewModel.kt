@@ -8,49 +8,47 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import org.example.project.core.presentation.RunAsync
 import org.example.project.onboarding.domain.OnboardingRepository
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 
 class OnboardingViewModel(
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val onboardingRepository: OnboardingRepository,
     private val runAsync: RunAsync,
-    onboardingStepState: OnboardingStepState,
 ) : ViewModel(), OnboardingActions {
+
     private var savedState: OnboardingStepState by savedStateHandle.saved(
         key = ONBOARDING_STEP_KEY,
-        init = { onboardingStepState }
+        init = {
+            OnboardingStepState.FirstPage
+        }
     )
-    private val _onboardingStepStateFlow: MutableStateFlow<OnboardingStepState> =
-        MutableStateFlow(value = savedState)
-    val onboardingStepStateFlow = _onboardingStepStateFlow.asStateFlow()
 
-    private val _onboardingPageFlow: MutableStateFlow<OnboardingPage> =
-        MutableStateFlow(value = onboardingStepState.currentState()) //TODO ADD ONE ONBOARDING UI STATE FLOW
-    val onboardingPageFlow = _onboardingPageFlow.asStateFlow()
+    private val _onboardingScreenState = MutableStateFlow(
+        value = OnboardingScreenState(
+            onboardingStepState = savedState,
+            onboardingUiState = savedState.currentState(),
+        )
+    )
+    val onboardingScreenState = _onboardingScreenState.asStateFlow()
+
 
     private val _onboardingEvent: MutableSharedFlow<OnboardingEvent> = MutableSharedFlow()
     val onboardingEvent = _onboardingEvent.asSharedFlow()
 
-    init {
-        runAsync.runFlow(
-            scope = viewModelScope,
-            flow = _onboardingStepStateFlow
-                .map { it.currentState() },
-            onEach = { onboardingPage ->
-                _onboardingPageFlow.value = onboardingPage
-            },
-        )
-    }
-
     override fun nextPage() {
-        val next = onboardingStepStateFlow.value.nextPage
+        val next = savedState.nextPage
         if (next != null) {
             savedState = next
-            _onboardingStepStateFlow.value = savedState
+            _onboardingScreenState.update { onboardingScreenState ->
+                onboardingScreenState.copy(
+                    onboardingStepState = savedState,
+                    onboardingUiState = savedState.currentState(),
+                )
+            }
         } else {
             skipOnboarding()
         }
@@ -78,6 +76,7 @@ class OnboardingViewModel(
         private const val ONBOARDING_STEP_KEY = "ONBOARDING_STEP_KEY"
     }
 }
+
 
 data class OnboardingPage(
     val title: StringResource,

@@ -21,7 +21,6 @@ val onboardingModule = module {
             savedStateHandle = get(),
             onboardingRepository = get(),
             runAsync = get(),
-            onboardingStepState = get(),
         )
     }
 }

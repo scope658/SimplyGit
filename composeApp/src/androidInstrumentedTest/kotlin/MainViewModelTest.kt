@@ -3,7 +3,6 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.testing.viewModelScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -54,7 +53,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun loadUserRepoProcessDeathTest() {
+    fun loadUserRepoProcessDeath() {
         getPagedReposUseCase.mockAllUserReposPagedResult(successUserRepoPagedResult)
         viewModelScenario {
             MainViewModel(
@@ -85,9 +84,9 @@ class MainViewModelTest {
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+
     @Test
-    fun userQueryProcessDeathTest() {
+    fun userQueryProcessDeath() {
         getPagedReposUseCase.mockAllUserReposPagedResult(PagedResult.EmptyResult)
         getPagedReposUseCase.mockUserQueryPagedResult(successSearchPagedResult)
 

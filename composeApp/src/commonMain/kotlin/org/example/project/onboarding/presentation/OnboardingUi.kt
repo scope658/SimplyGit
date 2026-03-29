@@ -23,7 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import ktshwnumbertwo.composeapp.generated.resources.Res
+import ktshwnumbertwo.composeapp.generated.resources.first_onboarding_image
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_button_test_tag
+import ktshwnumbertwo.composeapp.generated.resources.onboarding_first_desc
+import ktshwnumbertwo.composeapp.generated.resources.onboarding_first_title
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_image_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_next
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_skip
@@ -105,7 +108,11 @@ var SemanticsPropertyReceiver.DrawableRes by DrawableRes
 @Composable
 private fun OnboardingUiPreview() {
     OnboardingUi(
-        onboardingPage = OnboardingStepState.FirstPage.currentState(),
+        onboardingPage = OnboardingPage(
+            Res.string.onboarding_first_title,
+            Res.string.onboarding_first_desc,
+            Res.drawable.first_onboarding_image
+        ),
         onboardingActions = object : OnboardingActions {
 
             override fun nextPage() = Unit

@@ -12,7 +12,7 @@ fun OnboardingScreen(
     viewModel: OnboardingViewModel = koinViewModel(),
     onOnboardingFinished: () -> Unit,
 ) {
-    val onboardingPage by viewModel.onboardingPageFlow.collectAsStateWithLifecycle()
+    val onboardingScreenState by viewModel.onboardingScreenState.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
         viewModel.onboardingEvent.collectLatest { event ->
             when (event) {
@@ -24,7 +24,7 @@ fun OnboardingScreen(
         }
     }
     OnboardingUi(
-        onboardingPage = onboardingPage,
+        onboardingPage = onboardingScreenState.onboardingUiState,
         onboardingActions = viewModel,
     )
 }
