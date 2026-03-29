@@ -22,7 +22,7 @@ class FakeRunAsync : RunAsync {
     override fun <T : Any> runFlow(
         scope: CoroutineScope,
         flow: Flow<T>,
-        onEach: (T) -> Unit,
+        onEach: suspend (T) -> Unit,
     ) {
 
         scope.launch(Dispatchers.Unconfined) {

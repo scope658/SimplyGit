@@ -89,6 +89,8 @@ kotlin {
             implementation(libs.kotlin.test)
         }
         androidInstrumentedTest.dependencies {
+
+            implementation(libs.androidx.lifecycle.viewmodel.testing)
             implementation(libs.androidx.testExt.junit)
             implementation(libs.androidx.espresso.core)
             implementation(libs.compose.ui.test.junit4)

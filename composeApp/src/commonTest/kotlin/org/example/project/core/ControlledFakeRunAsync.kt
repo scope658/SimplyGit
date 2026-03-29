@@ -12,7 +12,7 @@ class ControlledFakeRunAsync : RunAsync {
     private lateinit var cachedUiAction: suspend (Any) -> Unit
 
     private lateinit var flowResult: Any
-    private lateinit var cachedOnEach: (Any) -> Unit
+    private lateinit var cachedOnEach: suspend (Any) -> Unit
 
     override fun <T : Any> runAsync(
         scope: CoroutineScope,
@@ -28,11 +28,11 @@ class ControlledFakeRunAsync : RunAsync {
     override fun <T : Any> runFlow(
         scope: CoroutineScope,
         flow: Flow<T>,
-        onEach: (T) -> Unit
+        onEach: suspend (T) -> Unit
     ) {
         runBlocking {
             flowResult = flow.first()
-            cachedOnEach = onEach as (Any) -> Unit
+            cachedOnEach = onEach as suspend (Any) -> Unit
         }
     }
 
@@ -40,7 +40,7 @@ class ControlledFakeRunAsync : RunAsync {
         cachedUiAction.invoke(backgroundResult)
     }
 
-    fun returnFlowResult() {
+    fun returnFlowResult() = runBlocking {
         cachedOnEach.invoke(flowResult)
     }
 }
