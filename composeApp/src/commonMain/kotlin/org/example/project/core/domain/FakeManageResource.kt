@@ -1,6 +1,4 @@
-package org.example.project.core
-
-import org.example.project.core.domain.ManageResource
+package org.example.project.core.domain
 
 class FakeManageResource : ManageResource {
     override suspend fun serviceUnavailable(): String {

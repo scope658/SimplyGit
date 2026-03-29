@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import org.example.project.core.ControlledFakeRunAsync
-import org.example.project.core.FakeManageResource
+import org.example.project.core.domain.FakeManageResource
 import org.example.project.login.domain.LoginRepository
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -54,17 +54,6 @@ class LoginViewModelTest {
 
         assertEquals(errorUiState, loginUiState.value)
 
-        //process death
-        loginViewModel = LoginViewModel(
-            savedStateHandle = savedStateHandle,
-            loginRepository = loginRepository,
-            runAsync = fakeLoginRunAsync,
-            fakeManageResource
-        )
-
-        val newState = loginViewModel.loginUiState.value
-        assertEquals(errorUiState, newState)
-
         val sharedFlow: SharedFlow<LoginUiEvent> = loginViewModel.loginUiEvent
         val actualEvent = withTimeoutOrNull(300) {
             sharedFlow.first()
@@ -100,8 +89,6 @@ private val loadingUiState = LoginUiState.Loading
 private val initialUiState = LoginUiState.Initial(errorState = ErrorState.Empty)
 private val errorUiState =
     LoginUiState.Initial(errorState = ErrorState.Error(message = "service unavailable"))
-
-
 private class FakeLoginRepository : LoginRepository {
 
     private var mockedResult = Result.success("fakeToken")

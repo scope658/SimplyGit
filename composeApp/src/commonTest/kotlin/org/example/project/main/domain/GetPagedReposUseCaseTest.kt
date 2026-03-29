@@ -2,7 +2,7 @@ package org.example.project.main.domain
 
 import kotlinx.coroutines.runBlocking
 import org.example.project.MockData
-import org.example.project.core.FakeManageResource
+import org.example.project.core.domain.FakeManageResource
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

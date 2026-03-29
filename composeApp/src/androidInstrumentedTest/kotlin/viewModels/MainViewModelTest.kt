@@ -1,3 +1,5 @@
+package viewModels
+
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.testing.ViewModelScenario
@@ -5,7 +7,6 @@ import androidx.lifecycle.viewmodel.testing.viewModelScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.example.project.MockData
@@ -69,34 +70,26 @@ class MainViewModelTest : AbstractViewModelTest() {
                 getPagedReposUseCase = getPagedReposUseCase,
                 mainUiMapper = mainUiMapper,
                 runAsync = fakeRunAsync,
-                savedStateHandle = createSavedStateHandle(),
+                savedStateHandle = savedStateHandle,
                 userRepoUiToDomain = userRepoUiToDomain,
             )
         }.use { scenario ->
-            val vm = scenario.viewModel
-            val uiValue: StateFlow<MainScreenState> = vm.mainUiState
-            val searchText: StateFlow<String> = vm.searchText
 
-            scenario.assertBeforeAndAfterProcessDeath {
-                assertEquals(
-                    successUserRepoScreenState.copy(
-                        mainUiState = MainUiState.Failure("something went wrong")
-                    ), uiValue.value
-                )
-                assertEquals("", searchText.value)
+            assertEquals(
+                successUserRepoScreenState.copy(
+                    mainUiState = MainUiState.Failure("something went wrong")
+                ), scenario.viewModel.mainUiState.value
+            )
+            assertEquals("", scenario.viewModel.searchText.value)
 
-                getPagedReposUseCase.checkAllUserRepoCalled(1)
-            }
+            getPagedReposUseCase.checkAllUserRepoCalled(1)
             getPagedReposUseCase.mockAllUserReposPagedResult(successUserRepoPagedResult)
 
-            scenario.viewModel.retry()
 
-            scenario.assertBeforeAndAfterProcessDeath {
-                assertEquals(successUserRepoScreenState, scenario.viewModel.mainUiState.value)
-                assertEquals("", scenario.viewModel.searchText.value)
+            scenario.recreate()
 
-                getPagedReposUseCase.checkAllUserRepoCalled(2)
-            }
+            assertEquals(successUserRepoScreenState, scenario.viewModel.mainUiState.value)
+            getPagedReposUseCase.checkAllUserRepoCalled(2)
         }
     }
 

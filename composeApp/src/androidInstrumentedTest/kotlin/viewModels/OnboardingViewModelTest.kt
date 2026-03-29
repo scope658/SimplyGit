@@ -1,4 +1,6 @@
-import androidx.lifecycle.SavedStateHandle
+package viewModels
+
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.testing.viewModelScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ktshwnumbertwo.composeapp.generated.resources.Res
@@ -26,24 +28,23 @@ class OnboardingViewModelTest : AbstractViewModelTest() {
     fun onboardingProcessDeath() {
         val fakeOnboardingRepository = FakeOnboardingRepository()
         val fakeOnboardingRunAsync = FakeRunAsync()
-        val savedStateHandle = SavedStateHandle()
 
         viewModelScenario {
             OnboardingViewModel(
-                savedStateHandle = savedStateHandle,
+                savedStateHandle = createSavedStateHandle(),
                 onboardingRepository = fakeOnboardingRepository,
                 runAsync = fakeOnboardingRunAsync,
             )
         }.use { scenario ->
-            val vm = scenario.viewModel
             assertEquals(
                 OnboardingScreenState(
                     onboardingStepState = OnboardingStepState.FirstPage,
                     onboardingUiState = expectedFirstPage
                 ),
-                vm.onboardingScreenState.value,
+                scenario.viewModel.onboardingScreenState.value,
             )
-            vm.nextPage()
+
+            scenario.viewModel.nextPage()
 
             scenario.assertBeforeAndAfterProcessDeath {
                 assertEquals(
@@ -51,7 +52,7 @@ class OnboardingViewModelTest : AbstractViewModelTest() {
                         onboardingStepState = OnboardingStepState.SecondPage,
                         onboardingUiState = expectedSecondPage
                     ),
-                    vm.onboardingScreenState.value,
+                    scenario.viewModel.onboardingScreenState.value,
                 )
 
             }
