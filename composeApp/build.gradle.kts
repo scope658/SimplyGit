@@ -24,7 +24,7 @@ kotlin {
             )
         }
     }
-    
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -34,7 +34,7 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
@@ -86,6 +86,8 @@ kotlin {
             implementation(project.dependencies.platform(libs.firebase.bom))
             implementation(libs.firebase.crashlytics)
             implementation(libs.firebase.analytics)
+
+            implementation(libs.leakcanary.android)
         }
         iosMain.dependencies {
             implementation(libs.coil.network.ktor)
