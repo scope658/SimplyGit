@@ -1,5 +1,6 @@
 package org.example.project.main.data
 
+import io.github.aakira.napier.Napier
 import io.ktor.utils.io.CancellationException
 import org.example.project.core.data.HandleDomainError
 import org.example.project.core.data.RunCatchingSuspend
@@ -43,6 +44,10 @@ class MainRepositoryImpl(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            Napier.e(
+                throwable = e,
+                tag = "MainRepository"
+            ) { "Refresh in MainRepository is failed" }
             val domainException = handleDomainError.handle(e)
             val userRepos = dao.readUserRepos()
             if (userRepos.isNotEmpty()) {

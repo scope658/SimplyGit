@@ -1,5 +1,6 @@
 package org.example.project.profile.data
 
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CancellationException
 import org.example.project.core.data.HandleDomainError
 import org.example.project.core.data.cache.DataStoreManager
@@ -28,6 +29,10 @@ class ProfileRepositoryImpl(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            Napier.e(
+                throwable = e,
+                tag = "ProfileRepository"
+            ) { "Refresh in ProfileRepository is failed" }
             val profileCache = profileDao.readUserProfile()
             return if (profileCache != null) {
                 Result.success(profileCache.map(mapper = profileCacheToDomain))
