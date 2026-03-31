@@ -31,7 +31,7 @@ firebaseBom = "33.9.0"
 googleServices = "4.4.2"
 crashlyticsPlugin = "3.0.3"
 leakcanary = "2.14"
-
+detekt = "1.23.5"
 
 [libraries]
 androidx-lifecycle-viewmodel-testing = { module = "androidx.lifecycle:lifecycle-viewmodel-testing", version.ref = "lifecycleViewmodelTesting" }
@@ -113,3 +113,5 @@ androidx-room = { id = "androidx.room", version.ref = "room" }
 
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlyticsPlugin" }
+
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.androidx.room)
     alias(libs.plugins.google.services)
     alias(libs.plugins.crashlytics)
+    alias(libs.plugins.detekt)
 }
 
 kotlin {
@@ -167,6 +168,12 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
+    lint {
+        warningsAsErrors = false
+        abortOnError = false
+        htmlReport = true
+        htmlOutput = file("build/reports/lint-report.html")
+    }
 }
 room {
     schemaDirectory("$projectDir/schemas")
@@ -177,3 +184,12 @@ dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
 }
 
+detekt {
+    toolVersion = libs.versions.detekt.get()
+    source.setFrom(files("src/commonMain/kotlin", "src/androidMain/kotlin"))
+    buildUponDefaultConfig = true
+    allRules = false
+    reports {
+        html.required.set(true)
+    }
+}
