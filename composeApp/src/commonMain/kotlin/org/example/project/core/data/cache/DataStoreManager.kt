@@ -18,15 +18,16 @@ interface DataStoreManager {
         suspend fun userToken(): String
     }
 
-    interface ReadOnboarding {
-        suspend fun isOnboarded(): Boolean
-    }
+
+    suspend fun isOnboarded(): Boolean
+
 
     interface FinishOnboarding {
         suspend fun finishOnboarding()
     }
 
-    interface Read : ReadToken, ReadOnboarding
+    interface Read : ReadToken, DataStoreManager
+
     interface All : Read, SaveToken, FinishOnboarding
 
     class Base(private val dataStore: DataStore<Preferences>) : All {
