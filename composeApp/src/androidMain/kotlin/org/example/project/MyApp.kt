@@ -1,10 +1,7 @@
 package org.example.project
 
 import android.app.Application
-import com.google.firebase.crashlytics.FirebaseCrashlytics
-import io.github.aakira.napier.Antilog
 import io.github.aakira.napier.DebugAntilog
-import io.github.aakira.napier.LogLevel
 import io.github.aakira.napier.Napier
 import org.example.project.app.di.appModule
 import org.example.project.core.data.cache.cacheModule
@@ -43,23 +40,3 @@ class MyApp : Application() {
     }
 }
 
-class CrashReportingAntilog : Antilog() {
-    override fun performLog(
-        priority: LogLevel,
-        tag: String?,
-        throwable: Throwable?,
-        message: String?
-    ) {
-        val crashlytics = FirebaseCrashlytics.getInstance()
-
-        crashlytics.log("${priority.name}: [${tag ?: "NoTag"}] $message")
-
-
-        if (throwable != null) {
-            crashlytics.recordException(throwable)
-        } else if (priority == LogLevel.ERROR) {
-            crashlytics.recordException(Exception(message ?: "Unknown Error"))
-        }
-    }
-
-}
