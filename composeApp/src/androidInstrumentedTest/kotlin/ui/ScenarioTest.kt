@@ -1,3 +1,6 @@
+package ui
+
+import OnboardingPage
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ktshwnumbertwo.composeapp.generated.resources.Res
@@ -14,7 +17,6 @@ import org.junit.runner.RunWith
 import pages.LoginPage
 import pages.MainPage
 import pages.ProfilePage
-import ui.AbstractTest
 import java.net.SocketTimeoutException
 
 
