@@ -14,6 +14,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import pages.BottomPage
 import pages.LoginPage
 import pages.MainPage
 import pages.ProfilePage
@@ -260,6 +261,33 @@ class ScenarioTest : AbstractTest() {
 
         val loginPage = LoginPage(composeTestRule)
         loginPage.checkVisibleNow()
+    }
+
+    @Test
+    fun fullBottomNav() {
+        githubApi.isUserProfileIsFailure(false)
+        skipOnboardingAndLogin(composeTestRule)
+        val bottomPage = BottomPage(composeTestRule)
+
+
+        bottomPage.clickProfile()
+
+        val profilePage = ProfilePage(composeTestRule)
+        profilePage.checkVisibleNow(
+            userName = "scope",
+            bio = "fake bio",
+            repoCount = "12",
+            subscribersCount = "23"
+        )
+
+        bottomPage.clickFavourites()
+        //TODO ADD FAVOURITES SCREEN AND CHECK IS VISIBLE
+
+
+        bottomPage.clickSearch()
+
+        val mainPage = MainPage(composeTestRule)
+        mainPage.checkVisibleNow()
     }
 }
 
