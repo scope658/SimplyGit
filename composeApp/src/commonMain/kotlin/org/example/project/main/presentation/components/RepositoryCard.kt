@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,11 +37,11 @@ import org.example.project.MockData
 import org.example.project.main.presentation.UserRepositoryUi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import theme.LanguageColors
 import theme.avatarShape
 import theme.avatarSizeMedium
 import theme.fontSizeS
 import theme.indicatorSize
-import theme.kotlinColor
 import theme.spacingM
 import theme.spacingS
 import theme.spacingXS
@@ -96,7 +97,10 @@ fun RepositoryCard(userRepositoryUi: UserRepositoryUi) {
                 Spacer(modifier = Modifier.width(spacingM))
                 Box(
                     modifier = Modifier.size(indicatorSize)
-                        .background(color = kotlinColor, shape = CircleShape)
+                        .background(
+                            color = handleCorrectColor(language = userRepositoryUi.programmingLanguage),
+                            shape = CircleShape
+                        )
                 )
                 Spacer(modifier = Modifier.width(spacingXXS))
                 Text(
@@ -106,6 +110,30 @@ fun RepositoryCard(userRepositoryUi: UserRepositoryUi) {
             }
         }
     }
+}
+
+fun handleCorrectColor(language: String): Color = when (language.trim().lowercase()) {
+    "javascript" -> LanguageColors.JavaScript
+    "python" -> LanguageColors.Python
+    "java" -> LanguageColors.Java
+    "typescript" -> LanguageColors.TypeScript
+    "kotlin" -> LanguageColors.Kotlin
+    "go" -> LanguageColors.Go
+    "rust" -> LanguageColors.Rust
+    "c++" -> LanguageColors.Cpp
+    "c" -> LanguageColors.C
+    "c#" -> LanguageColors.CSharp
+    "php" -> LanguageColors.Php
+    "swift" -> LanguageColors.Swift
+    "ruby" -> LanguageColors.Ruby
+    "html" -> LanguageColors.Html
+    "css" -> LanguageColors.Css
+    "shell", "bash" -> LanguageColors.Shell
+    "dart" -> LanguageColors.Dart
+    "objective-c" -> LanguageColors.ObjectiveC
+    "r" -> LanguageColors.R
+    "scala" -> LanguageColors.Scala
+    else -> LanguageColors.Unknown
 }
 
 @Preview(showBackground = true)
