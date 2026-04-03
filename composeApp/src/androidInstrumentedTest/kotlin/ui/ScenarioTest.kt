@@ -15,6 +15,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import pages.BottomPage
+import pages.CreateIssuesPage
+import pages.DetailsPage
 import pages.LoginPage
 import pages.MainPage
 import pages.ProfilePage
@@ -290,6 +292,129 @@ class ScenarioTest : AbstractTest() {
 
         val mainPage = MainPage(composeTestRule)
         mainPage.checkVisibleNow()
+    }
+
+    @Test
+    fun successRepoDetailsThenSuccessCreateIssues() {
+        skipOnboardingAndLogin(composeTestRule)
+
+
+        val mainPage = MainPage(composeTestRule)
+        mainPage.waitUntilLoadingDoesNotExist()
+
+        mainPage.checkUserRepositories(MockData.mockedUserRepositoriesUi)
+
+        mainPage.clickRepo(1)
+
+        val detailsPage = DetailsPage(composeTestRule)
+        //TODO ADD MOCK DETAILS
+        detailsPage.checkVisibleNow(
+            repoName = "repo name",
+            repoDesc = "repo desc",
+            forksCount = "0",
+            issuesCount = "0",
+            programmingLanguage = "kotlin",
+            readme = "fake readme text"
+        )
+
+        detailsPage.clickAddButton()
+        detailsPage.checkDropDownItemsIsVisible()
+        detailsPage.clickCreateIssues()
+
+        val createIssuesPage = CreateIssuesPage(composeTestRule)
+        detailsPage.waitUntilLoadingDoesNotExist()
+
+        createIssuesPage.checkVisibleNow()
+        createIssuesPage.typeTitle(title = " ")
+        createIssuesPage.checkButtonIsNotEnabled()
+
+        createIssuesPage.typeDesc(desc = " ")
+        createIssuesPage.checkButtonIsNotEnabled()
+
+        createIssuesPage.typeTitlte(title = "f")
+        createIssuesPage.typeDesc(desc = "a")
+        createIssuesPage.checkButtonIsEnabled()
+
+        createIssuesPage.clickCreateButton()
+
+        detailsPage.checkVisibleNow(
+            repoName = "repo name",
+            repoDesc = "repo desc",
+            forksCount = "0",
+            issuesCount = "1",
+            programmingLanguage = "kotlin",
+            readme = "fake readme text"
+        )
+    }
+
+    fun failureRepoDetailsThenSuccess() {
+        skipOnboardingAndLogin(composeTestRule)
+
+        val mainPage = MainPage(composeTestRule)
+        mainPage.inputQuery("fake query")
+        mainPage.waitUntilLoadingDoesNotExist()
+
+        mainPage.checkUserRepositories(MockData.mockedSearchRepositoriesUi)
+        mainPage.clickRepo(repoId = 101)
+
+        val detailsPage = DetailsPage(composeTestRule)
+        detailsPage.waitUntilLoadingDoesNotExist()
+
+        detailsPage.checkErrorMessageIsVisible(message = "no connection")
+
+        detailsPage.clickRetryButton()
+        detailsPage.waitUntilLoadingDoesNotExist()
+        //TODO ADD MOCK DETAILS
+        detailsPage.checkVisibleNow(
+            repoName = "repo name",
+            repoDesc = "repo desc",
+            forksCount = "0",
+            issuesCount = "1",
+            programmingLanguage = "kotlin",
+            readme = "fake readme text"
+        )
+    }
+
+    @Test
+    fun failureCreateIssuesThenSuccess() {
+        skipOnboardingAndLogin(composeTestRule)
+
+
+        val mainPage = MainPage(composeTestRule)
+        mainPage.waitUntilLoadingDoesNotExist()
+
+        mainPage.clickRepo(1)
+
+
+        val detailsPage = DetailsPage(composeTestRule)
+        detailsPage.waitUntilLoadingDoesNotExist()
+
+        detailsPage.clickAddButton()
+
+        detailsPage.clickCreateIssues()
+
+        //TODO ADD FAILURE ISSUES STATE
+        val createIssuesPage = CreateIssuesPage(composeTestRule)
+        createIssuesPage.checkButtonIsNotEnabled()
+
+        createIssuesPage.typeTitlte(title = "f")
+        createIssuesPage.typeDesc(desc = "a")
+        createIssuesPage.checkButtonIsEnabled()
+
+        createIssuesPage.clickCreateButton()
+        createIssuesPage.checkErrorMessage(message = "no connection")
+
+        //TODO ADD SUCCESS ISSUES STATE
+        createIssuesPage.clickCreateButton()
+
+        detailsPage.checkVisibleNow(
+            repoName = "repo name",
+            repoDesc = "repo desc",
+            forksCount = "0",
+            issuesCount = "1",
+            programmingLanguage = "kotlin",
+            readme = "fake readme text"
+        )
     }
 }
 
