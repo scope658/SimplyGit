@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 
+
 @Composable
 fun MainScreen(mainViewModel: MainViewModel = koinViewModel(), onProfileClick: () -> Unit) {
     val mainUiState by mainViewModel.mainUiState.collectAsStateWithLifecycle()
@@ -18,3 +19,4 @@ fun MainScreen(mainViewModel: MainViewModel = koinViewModel(), onProfileClick: (
         isRefreshing = mainUiState.isRefreshing,
     )
 }
+

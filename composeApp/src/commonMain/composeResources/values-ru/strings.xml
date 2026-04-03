@@ -33,4 +33,8 @@
 
     <string name="serviceUnavailable">Сервис временно недоступен</string>
     <string name="noConnection">Нет подключения к интернету</string>
+
+    <string name="search_label">Поиск</string>
+    <string name="favourites_label">Избранное</string>
+    <string name="profile_label">Профиль</string>
 </resources>

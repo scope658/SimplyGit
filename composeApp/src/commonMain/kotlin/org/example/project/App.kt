@@ -1,19 +1,16 @@
 package org.example.project
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.Serializable
 import org.example.project.app.presentation.AppScreen
+import org.example.project.bottomNav.MainBottomNavContainer
 import org.example.project.login.presentation.LoginScreen
-import org.example.project.main.presentation.MainScreen
 import org.example.project.onboarding.presentation.OnboardingScreen
-import org.example.project.profile.presentation.ProfileScreen
 import theme.CatAppTheme
 
 sealed interface Routes {
@@ -42,7 +39,6 @@ fun App() {
             NavHost(
                 navController = navController,
                 startDestination = Routes.App,
-                modifier = Modifier.padding(innerPadding)
             ) {
                 composable<Routes.App> {
                     AppScreen(
@@ -77,18 +73,7 @@ fun App() {
                 }
 
                 composable<Routes.Main> {
-                    MainScreen(onProfileClick = {
-                        navController.navigate(Routes.Profile)
-                    })
-                }
-                composable<Routes.Profile> {
-                    ProfileScreen(onLogout = {
-                        navController.navigate(Routes.Login) {
-                            popUpTo(Routes.Profile) {
-                                inclusive = true
-                            }
-                        }
-                    })
+                    MainBottomNavContainer(navController)
                 }
             }
         }
