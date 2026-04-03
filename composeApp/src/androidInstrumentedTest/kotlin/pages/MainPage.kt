@@ -8,7 +8,6 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
@@ -26,7 +25,6 @@ class MainPage(private val composeTestRule: ComposeTestRule) : AbstractPage(comp
     private val emptyResultIcon = composeTestRule.onNodeWithTag("empty_icon")
     private val emptyResultText = composeTestRule.onNodeWithTag("empty_result_text")
 
-    private val profileIcon = composeTestRule.onNodeWithTag("profile_icon")
     fun checkVisibleNow() {
 
         searchTextField
@@ -35,9 +33,6 @@ class MainPage(private val composeTestRule: ComposeTestRule) : AbstractPage(comp
         searchTextFieldLabel
             .assertIsDisplayed()
             .assertTextEquals("Search")
-
-        profileIcon
-            .assertIsDisplayed()
     }
 
     fun inputQuery(query: String) {
@@ -102,10 +97,5 @@ class MainPage(private val composeTestRule: ComposeTestRule) : AbstractPage(comp
         emptyResultText
             .assertIsDisplayed()
             .assertTextEquals("Nothing to see here")
-    }
-
-    fun clickProfileIcon() {
-        profileIcon
-            .performClick()
     }
 }

@@ -24,7 +24,7 @@ fun MainBottomNavContainer(outerNavController: NavController) {
             startDestination = "search",
             modifier = Modifier.padding(padding)
         ) {
-            composable("search") { MainScreen(onProfileClick = {}) }
+            composable("search") { MainScreen() }
             composable("favourites") { }
             composable("profile") {
                 ProfileScreen(onLogout = {

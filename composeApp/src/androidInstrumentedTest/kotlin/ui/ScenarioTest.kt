@@ -231,7 +231,9 @@ class ScenarioTest : AbstractTest() {
         val mainPage = MainPage(composeTestRule)
         mainPage.checkVisibleNow()
 
-        mainPage.clickProfileIcon()
+
+        val bottomPage = BottomPage(composeTestRule)
+        bottomPage.clickProfile()
 
         githubApi.isUserProfileIsFailure(true)
         val profilePage = ProfilePage(composeTestRule)

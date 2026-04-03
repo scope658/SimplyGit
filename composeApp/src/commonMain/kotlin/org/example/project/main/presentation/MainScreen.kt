@@ -7,7 +7,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
-fun MainScreen(mainViewModel: MainViewModel = koinViewModel(), onProfileClick: () -> Unit) {
+fun MainScreen(mainViewModel: MainViewModel = koinViewModel()) {
     val mainUiState by mainViewModel.mainUiState.collectAsStateWithLifecycle()
     val searchText by mainViewModel.searchText.collectAsStateWithLifecycle()
 
@@ -15,7 +15,6 @@ fun MainScreen(mainViewModel: MainViewModel = koinViewModel(), onProfileClick: (
         mainUiState = mainUiState.mainUiState,
         searchText = searchText,
         mainActions = mainViewModel,
-        onProfileClick = onProfileClick,
         isRefreshing = mainUiState.isRefreshing,
     )
 }
