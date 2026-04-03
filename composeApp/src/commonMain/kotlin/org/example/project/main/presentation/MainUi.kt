@@ -1,17 +1,11 @@
 package org.example.project.main.presentation
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -19,10 +13,8 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import ktshwnumbertwo.composeapp.generated.resources.Res
 import ktshwnumbertwo.composeapp.generated.resources.search
 import ktshwnumbertwo.composeapp.generated.resources.search_text_field_label_test_tag
@@ -42,7 +34,6 @@ fun MainUi(
     mainUiState: MainUiState,
     searchText: String,
     mainActions: MainActions,
-    onProfileClick: () -> Unit,
 ) {
     Column {
         Row(
@@ -65,15 +56,6 @@ fun MainUi(
                     .weight(1f),
                 shape = searchTextFieldShape,
                 singleLine = true,
-            )
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "profile",
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .clickable { onProfileClick() }
-                    .size(45.dp).testTag("profile_icon")
-
             )
         }
         PullToRefreshBox(
@@ -123,7 +105,6 @@ private fun MainUiPreview() {
                 ),
                 searchText = "example search text",
                 mainActions = mainActions,
-                onProfileClick = {},
                 isRefreshing = false,
             )
         }
