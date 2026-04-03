@@ -331,7 +331,7 @@ class ScenarioTest : AbstractTest() {
         createIssuesPage.typeDesc(desc = " ")
         createIssuesPage.checkButtonIsNotEnabled()
 
-        createIssuesPage.typeTitlte(title = "f")
+        createIssuesPage.typeTitle(title = "f")
         createIssuesPage.typeDesc(desc = "a")
         createIssuesPage.checkButtonIsEnabled()
 
@@ -397,7 +397,7 @@ class ScenarioTest : AbstractTest() {
         val createIssuesPage = CreateIssuesPage(composeTestRule)
         createIssuesPage.checkButtonIsNotEnabled()
 
-        createIssuesPage.typeTitlte(title = "f")
+        createIssuesPage.typeTitle(title = "f")
         createIssuesPage.typeDesc(desc = "a")
         createIssuesPage.checkButtonIsEnabled()
 

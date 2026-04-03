@@ -8,6 +8,7 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
@@ -97,5 +98,16 @@ class MainPage(private val composeTestRule: ComposeTestRule) : AbstractPage(comp
         emptyResultText
             .assertIsDisplayed()
             .assertTextEquals("Nothing to see here")
+    }
+
+    fun clickRepo(
+        repoId: Int
+    ) {
+        val userCardTag = "user_repo_card_${repoId}"
+        userRepositoryLazyColum
+            .performScrollToNode(hasTestTag(userCardTag))
+
+        composeTestRule.onNodeWithTag(userCardTag)
+            .performClick()
     }
 }
