@@ -32,4 +32,8 @@
 
     <string name="serviceUnavailable">Service is temporarily unavailable</string>
     <string name="noConnection">No internet connection</string>
+
+    <string name="search_label">Search</string>
+    <string name="favourites_label">Favourites</string>
+    <string name="profile_label">Profile</string>
 </resources>
