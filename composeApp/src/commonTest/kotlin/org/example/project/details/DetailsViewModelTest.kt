@@ -1,9 +1,23 @@
 package org.example.project.details
 
 import androidx.lifecycle.SavedStateHandle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.example.project.core.ControlledFakeRunAsync
 import org.example.project.core.domain.FakeManageResource
+import org.example.project.details.domain.DetailsRepository
+import org.example.project.details.domain.ReadmeNotFoundException
+import org.example.project.details.domain.RepoDetails
+import org.example.project.details.presentation.DetailsEvent
+import org.example.project.details.presentation.DetailsScreenState
+import org.example.project.details.presentation.DetailsUiMapper
+import org.example.project.details.presentation.DetailsUiState
+import org.example.project.details.presentation.DetailsViewModel
+import org.example.project.details.presentation.ReadmeUiState
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -13,7 +27,7 @@ class DetailsViewModelTest {
     private lateinit var viewModel: DetailsViewModel
     private lateinit var detailsRepository: FakeDetailsRepository
     private lateinit var runAsync: ControlledFakeRunAsync
-    private lateinit var detailsUiMapper: RepoDetails.Mapper<DetailsUIState>
+    private lateinit var detailsUiMapper: RepoDetails.Mapper<DetailsUiState>
     private lateinit var manageResource: FakeManageResource
 
     @BeforeTest
@@ -34,7 +48,7 @@ class DetailsViewModelTest {
             detailsUiMapper = DetailsUiMapper(),
             detailsRepository = detailsRepository,
             runAsync = runAsync,
-            manageResourse = manageResource,
+            manageResource = manageResource,
             savedStateHandle = SavedStateHandle()
         )
         val detailsScreenState: StateFlow<DetailsScreenState> = viewModel.detailsScreenState
@@ -44,7 +58,7 @@ class DetailsViewModelTest {
         runAsync.invokeUi()
 
         assertEquals(
-            successDetailsScreenState.copy(readmeUiState = successReadmeUiState),
+            successDetailsScreenState,
             detailsScreenState.value
         )
     }
@@ -58,12 +72,18 @@ class DetailsViewModelTest {
             detailsUiMapper = DetailsUiMapper(),
             detailsRepository = detailsRepository,
             runAsync = runAsync,
-            manageResourse = manageResource,
+            manageResource = manageResource,
             savedStateHandle = SavedStateHandle()
         )
 
         runAsync.invokeUi()
-        assertEquals(successDetailsScreenState)
+        assertEquals(
+            successDetailsScreenState.copy(
+                detailsUiState = successDetailsUiState.copy(
+                    readme = ReadmeUiState.Success("readme not found")
+                )
+            ), viewModel.detailsScreenState.value
+        )
     }
 
     @Test
@@ -75,7 +95,7 @@ class DetailsViewModelTest {
             detailsUiMapper = DetailsUiMapper(),
             detailsRepository = detailsRepository,
             runAsync = runAsync,
-            manageResourse = manageResource,
+            manageResource = manageResource,
             savedStateHandle = SavedStateHandle()
         )
 
@@ -90,7 +110,7 @@ class DetailsViewModelTest {
         )
 
 
-        detailsRepository.isReadmeFailure(false)
+        detailsRepository.isRepoDetailsFailure(false)
 
         viewModel.retry()
 
@@ -106,7 +126,13 @@ class DetailsViewModelTest {
         runAsync.invokeUi()
 
 
-        assertEquals(successDetailsScreenState, uiState.value)
+        assertEquals(
+            successDetailsScreenState.copy(
+                detailsUiState = successDetailsUiState.copy(
+                    readme = successReadmeUiState
+                )
+            ), uiState.value
+        )
 
     }
 
@@ -119,12 +145,12 @@ class DetailsViewModelTest {
             detailsUiMapper = DetailsUiMapper(),
             detailsRepository = detailsRepository,
             runAsync = runAsync,
-            manageResourse = manageResource,
+            manageResource = manageResource,
             savedStateHandle = SavedStateHandle()
         )
         runAsync.invokeUi()
 
-        val uiState: StateFlow<DetailsScreenState> = viewModel.detailsUiState
+        val uiState: StateFlow<DetailsScreenState> = viewModel.detailsScreenState
         assertEquals(successDetailsScreenState.copy(isRefreshing = false), uiState.value)
 
         viewModel.refresh()
@@ -139,7 +165,80 @@ class DetailsViewModelTest {
         assertEquals(successRefreshScreenState, uiState.value)
     }
 
+    @Test
+    fun `navigate to create issues page`() = runBlocking {
+        val emitedEvents = mutableListOf<DetailsEvent>()
+        viewModel = DetailsViewModel(
+            detailsUiMapper = DetailsUiMapper(),
+            detailsRepository = detailsRepository,
+            runAsync = runAsync,
+            manageResource = manageResource,
+            savedStateHandle = SavedStateHandle()
+        )
+        val detailsEventFlow: SharedFlow<DetailsEvent> = viewModel.detailsEvent
+        val job: Job = launch(Dispatchers.Unconfined) {
+
+            detailsEventFlow.collect {
+                println(it.toString() + "EMITED")
+                emitedEvents.add(it)
+            }
+        }
+
+        viewModel.onCreateIssues(repoOwner = "scope", repoName = "repo name")
+
+        runAsync.invokeUi()
+
+        job.cancel()
+
+        assertEquals(1, emitedEvents.size)
+        assertEquals(
+            emitedEvents[0],
+            DetailsEvent.OnCreateIssues(repoOwner = "scope", repoName = "repo name")
+        )
+        Unit
+    }
+
+    @Test
+    fun `navigate to code page`() = runBlocking {
+        val emitedEvents = mutableListOf<DetailsEvent>()
+        viewModel = DetailsViewModel(
+            detailsUiMapper = DetailsUiMapper(),
+            detailsRepository = detailsRepository,
+            runAsync = runAsync,
+            manageResource = manageResource,
+            savedStateHandle = SavedStateHandle()
+        )
+        val detailEventFlow: SharedFlow<DetailsEvent> = viewModel.detailsEvent
+        val job: Job? = launch {
+            detailEventFlow.collect {
+                emitedEvents.add(it)
+            }
+        }
+
+        viewModel.onCode(repoOwner = "scope", repoName = "repo name")
+
+        runAsync.invokeUi()
+
+        assertEquals(emitedEvents.size, 1)
+        assertEquals(
+            emitedEvents[0],
+            DetailsEvent.OnCode(repoOwner = "scope", repoName = "repo name")
+        )
+
+        job?.cancel()
+        Unit
+    }
 }
+
+private val successDetailsUiState = DetailsUiState.Success(
+    repoOwner = "scope",
+    repoName = "repo name",
+    repoDesc = "repo dsec",
+    forksCount = "1",
+    issuesCount = "1",
+    programmingLanguage = "kotlin",
+    readme = ReadmeUiState.Success("success readme")
+)
 
 private val successRefreshScreenState = DetailsScreenState(
     isRefreshing = false,
@@ -153,17 +252,11 @@ private val initialScreenState = DetailsScreenState(
     isRefreshing = false,
     detailsUiState = DetailsUiState.Loading,
 )
+
+
 private val successDetailsScreenState = DetailsScreenState(
     isRefreshing = false,
     detailsUiState = successDetailsUiState,
-)
-private val successDetailsUiState = DetailsUiState.Success(
-    repoName = "repo name",
-    repoDesc = "repo dsec",
-    forksCount = "1",
-    issuescount = "1",
-    programmingLanguage = "kotlin",
-    readme = ReadmeUiState.Success("readme not found")
 )
 
 private val failureDetailsUiState = DetailsUiState.Failure(
@@ -180,42 +273,48 @@ private class FakeDetailsRepository : DetailsRepository {
 
     private var refreshReadme = 0
     private var refreshDetails = 0
-    override suspend fun repoDetails(): RepoDetails {
+    override suspend fun repoDetails(repoOwner: String, repoName: String): Result<RepoDetails> {
         if (isDetailsFailure) {
-            throw IllegalStateException("")
+            return Result.failure(IllegalStateException(""))
         } else {
-            return RepoDetails(
-                repoName = "repo name",
-                repoDesc = "repo dsec",
-                forksCount = 1,
-                issuescount = 1,
-                programmingLanguage = "kotlin",
+            return Result.success(
+                RepoDetails(
+                    repoOwner = "scope",
+                    repoName = "repo name",
+                    repoDesc = "repo dsec",
+                    forksCount = 1,
+                    issuesCount = 1,
+                    programmingLanguage = "kotlin",
+                )
             )
         }
     }
 
-    override suspend fun readme(): String {
+    override suspend fun readme(repoOwner: String, repoName: String): Result<String> {
 
         if (this.isReadmeFailure) {
-            throw ReadmeNotFoundException
+            return Result.failure<String>(ReadmeNotFoundException)
         } else {
-            return "success readme"
+            return Result.success("success readme")
         }
     }
 
-    override suspend fun refreshReadme(): String {
+    override suspend fun refreshReadme(repoOwner: String, repoName: String): Result<String> {
         refreshReadme++
-        return "success refresh readme"
+        return Result.success("success refresh readme")
     }
 
-    override suspend fun refreshDetails(): RepoDetails {
+    override suspend fun refreshDetails(repoOwner: String, repoName: String): Result<RepoDetails> {
         refreshDetails++
-        return RepoDetails(
-            repoName = "repo name",
-            repoDesc = "repo dsec",
-            forksCount = 150,
-            issuescount = 1,
-            programmingLanguage = "kotlin",
+        return Result.success(
+            RepoDetails(
+                repoOwner = "scope",
+                repoName = "repo name",
+                repoDesc = "repo dsec",
+                forksCount = 150,
+                issuesCount = 1,
+                programmingLanguage = "kotlin",
+            )
         )
     }
 

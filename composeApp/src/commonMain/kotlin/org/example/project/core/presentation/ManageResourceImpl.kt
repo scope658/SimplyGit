@@ -14,4 +14,8 @@ class ManageResourceImpl : ManageResource {
     override suspend fun noConnection(): String {
         return getString(Res.string.noConnection)
     }
+
+    override suspend fun readmeNotFound(): String {
+        return ""//TODO ADD CORRECT STRING
+    }
 }
