@@ -3,26 +3,20 @@ package org.example.project.details.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import org.example.project.core.domain.DomainException
-import org.example.project.core.domain.ManageResource
-import org.example.project.core.domain.ServiceUnavailableException
 import org.example.project.core.presentation.RunAsync
-import org.example.project.details.domain.DetailsRepository
-import org.example.project.details.domain.RepoDetails
+import org.example.project.details.domain.CombinedDetailsResult
+import org.example.project.details.domain.RepoDetailsUseCase
 
 class DetailsViewModel(
-    private val detailsUiMapper: RepoDetails.Mapper<DetailsUiState>,
-    private val detailsRepository: DetailsRepository,
+    private val detailsUiMapper: CombinedDetailsResult.Mapper<DetailsUiState>,
+    private val repoDetailsUseCase: RepoDetailsUseCase,
     private val runAsync: RunAsync,
-    private val manageResource: ManageResource,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel(), DetailsActions {
 
@@ -39,8 +33,7 @@ class DetailsViewModel(
 
     init {
         loadDetails(
-            repoDetails = { detailsRepository.repoDetails("", "") },
-            readme = { detailsRepository.readme("", "") }
+            repoDetails = { repoDetailsUseCase.repoDetails("", "") },
         )
     }
 
@@ -51,8 +44,7 @@ class DetailsViewModel(
             )
         }
         loadDetails(
-            repoDetails = { detailsRepository.repoDetails("", "") },
-            readme = { detailsRepository.readme("", "") }
+            repoDetails = { repoDetailsUseCase.repoDetails("", "") },
         )
     }
 
@@ -64,8 +56,7 @@ class DetailsViewModel(
         }
 
         loadDetails(
-            repoDetails = { detailsRepository.refreshDetails("", "") },
-            readme = { detailsRepository.refreshReadme("", "") }
+            repoDetails = { repoDetailsUseCase.refreshRepoDetails("", "") },
         )
     }
 
@@ -86,52 +77,20 @@ class DetailsViewModel(
     }
 
     private fun loadDetails(
-        repoDetails: suspend () -> Result<RepoDetails>,
-        readme: suspend () -> Result<String>
+        repoDetails: suspend () -> CombinedDetailsResult,
     ) {
         runAsync.runAsync(
             viewModelScope,
             background = {
-                coroutineScope {
-                    val detailsDeferred =
-                        async { repoDetails.invoke() }
-                    val readmeDeferred =
-                        async { readme.invoke() }
-                    detailsDeferred.await() to readmeDeferred.await()
-
-                }
+                repoDetails.invoke()
             },
-            ui = { (repoDetails, readme) ->
-                val readme = readme.fold(
-                    onSuccess = { readme ->
-                        readme
-                    },
-                    onFailure = {
-                        val exception = it as? DomainException ?: ServiceUnavailableException
-                        exception.exceptionString(manageResource)
-                    }
-                )
-                repoDetails.onSuccess { repoDetails ->
-                    _detailsScreenState.update { currentScreenState ->
-                        currentScreenState.copy(
-                            isRefreshing = false,
-                            detailsUiState = repoDetails.mapSuccess(
-                                mapper = detailsUiMapper,
-                                readme
-                            )
-                        )
-                    }
+            ui = { combinedDetailsResult ->
+                _detailsScreenState.update { currentState ->
+                    currentState.copy(
+                        isRefreshing = false,
+                        detailsUiState = combinedDetailsResult.map(mapper = detailsUiMapper)
+                    )
                 }
-                    .onFailure {
-                        val exception = it as? DomainException ?: ServiceUnavailableException
-                        val message = exception.exceptionString(manageResource)
-                        _detailsScreenState.update { currentScreenState ->
-                            currentScreenState.copy(
-                                isRefreshing = false,
-                                detailsUiState = DetailsUiState.Failure(message)
-                            )
-                        }
-                    }
             }
         )
     }
