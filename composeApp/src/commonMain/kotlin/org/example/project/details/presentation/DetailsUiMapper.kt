@@ -1,9 +1,13 @@
 package org.example.project.details.presentation
 
+import org.example.project.details.domain.CombinedDetailsResult
 import org.example.project.details.domain.RepoDetails
 
-class DetailsUiMapper : RepoDetails.Mapper<DetailsUiState> {
-    override fun map(repoDetails: RepoDetails, readme: String): DetailsUiState = with(repoDetails) {
+class DetailsUiMapper : CombinedDetailsResult.Mapper<DetailsUiState> {
+    override fun mapSuccess(
+        repoDetails: RepoDetails,
+        readme: String
+    ): DetailsUiState = with(repoDetails) {
         return DetailsUiState.Success(
             repoOwner = repoOwner,
             repoName = repoName,
@@ -13,5 +17,9 @@ class DetailsUiMapper : RepoDetails.Mapper<DetailsUiState> {
             programmingLanguage = programmingLanguage,
             readme = ReadmeUiState.Success(readme),
         )
+    }
+
+    override fun mapFailure(message: String): DetailsUiState {
+        return DetailsUiState.Failure(message)
     }
 }

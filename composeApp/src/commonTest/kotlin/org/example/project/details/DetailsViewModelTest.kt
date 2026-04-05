@@ -9,9 +9,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.example.project.core.ControlledFakeRunAsync
 import org.example.project.core.domain.FakeManageResource
-import org.example.project.details.domain.DetailsRepository
-import org.example.project.details.domain.ReadmeNotFoundException
+import org.example.project.details.domain.CombinedDetailsResult
 import org.example.project.details.domain.RepoDetails
+import org.example.project.details.domain.RepoDetailsUseCase
 import org.example.project.details.presentation.DetailsEvent
 import org.example.project.details.presentation.DetailsScreenState
 import org.example.project.details.presentation.DetailsUiMapper
@@ -25,30 +25,29 @@ import kotlin.test.assertEquals
 class DetailsViewModelTest {
 
     private lateinit var viewModel: DetailsViewModel
-    private lateinit var detailsRepository: FakeDetailsRepository
+    private lateinit var fakeRepoDetailsUseCase: FakeRepoDetailsUseCase
     private lateinit var runAsync: ControlledFakeRunAsync
-    private lateinit var detailsUiMapper: RepoDetails.Mapper<DetailsUiState>
+    private lateinit var detailsUiMapper: CombinedDetailsResult.Mapper<DetailsUiState>
     private lateinit var manageResource: FakeManageResource
 
     @BeforeTest
     fun setUp() {
         manageResource = FakeManageResource()
         detailsUiMapper = DetailsUiMapper()
-        detailsRepository = FakeDetailsRepository()
+        fakeRepoDetailsUseCase = FakeRepoDetailsUseCase()
         runAsync = ControlledFakeRunAsync()
 
     }
 
     @Test //code will be in init block
     fun `success load details and readme`() {
-        detailsRepository.isRepoDetailsFailure(false)
-        detailsRepository.isReadmeFailure(false)
+        fakeRepoDetailsUseCase.isRepoDetailsFailure(false)
+        fakeRepoDetailsUseCase.isReadmeFailure(false)
 
         viewModel = DetailsViewModel(
             detailsUiMapper = DetailsUiMapper(),
-            detailsRepository = detailsRepository,
+            repoDetailsUseCase = fakeRepoDetailsUseCase,
             runAsync = runAsync,
-            manageResource = manageResource,
             savedStateHandle = SavedStateHandle()
         )
         val detailsScreenState: StateFlow<DetailsScreenState> = viewModel.detailsScreenState
@@ -65,14 +64,13 @@ class DetailsViewModelTest {
 
     @Test
     fun `success load details but readme does not exist`() {
-        detailsRepository.isRepoDetailsFailure(false)
-        detailsRepository.isReadmeFailure(true)
+        fakeRepoDetailsUseCase.isRepoDetailsFailure(false)
+        fakeRepoDetailsUseCase.isReadmeFailure(true)
 
         viewModel = DetailsViewModel(
             detailsUiMapper = DetailsUiMapper(),
-            detailsRepository = detailsRepository,
+            repoDetailsUseCase = fakeRepoDetailsUseCase,
             runAsync = runAsync,
-            manageResource = manageResource,
             savedStateHandle = SavedStateHandle()
         )
 
@@ -88,14 +86,13 @@ class DetailsViewModelTest {
 
     @Test
     fun `failure load details then success`() {
-        detailsRepository.isRepoDetailsFailure(true)
-        detailsRepository.isReadmeFailure(false)
+        fakeRepoDetailsUseCase.isRepoDetailsFailure(true)
+        fakeRepoDetailsUseCase.isReadmeFailure(false)
 
         viewModel = DetailsViewModel(
             detailsUiMapper = DetailsUiMapper(),
-            detailsRepository = detailsRepository,
+            repoDetailsUseCase = fakeRepoDetailsUseCase,
             runAsync = runAsync,
-            manageResource = manageResource,
             savedStateHandle = SavedStateHandle()
         )
 
@@ -110,7 +107,7 @@ class DetailsViewModelTest {
         )
 
 
-        detailsRepository.isRepoDetailsFailure(false)
+        fakeRepoDetailsUseCase.isRepoDetailsFailure(false)
 
         viewModel.retry()
 
@@ -138,14 +135,14 @@ class DetailsViewModelTest {
 
     @Test
     fun `refresh details and readme`() {
-        detailsRepository.isRepoDetailsFailure(false)
-        detailsRepository.isReadmeFailure(false)
+        fakeRepoDetailsUseCase.isRepoDetailsFailure(false)
+        fakeRepoDetailsUseCase.isReadmeFailure(false)
 
         viewModel = DetailsViewModel(
             detailsUiMapper = DetailsUiMapper(),
-            detailsRepository = detailsRepository,
+            repoDetailsUseCase = fakeRepoDetailsUseCase,
             runAsync = runAsync,
-            manageResource = manageResource,
+
             savedStateHandle = SavedStateHandle()
         )
         runAsync.invokeUi()
@@ -155,8 +152,7 @@ class DetailsViewModelTest {
 
         viewModel.refresh()
 
-        detailsRepository.checkRefreshDetailsIsCalled(1)
-        detailsRepository.checkRefreshReadmeIsCalled(1)
+        fakeRepoDetailsUseCase.checkRefreshIsCalled(1)
 
         assertEquals(successDetailsScreenState.copy(isRefreshing = true), uiState.value)
 
@@ -170,9 +166,8 @@ class DetailsViewModelTest {
         val emitedEvents = mutableListOf<DetailsEvent>()
         viewModel = DetailsViewModel(
             detailsUiMapper = DetailsUiMapper(),
-            detailsRepository = detailsRepository,
+            repoDetailsUseCase = fakeRepoDetailsUseCase,
             runAsync = runAsync,
-            manageResource = manageResource,
             savedStateHandle = SavedStateHandle()
         )
         val detailsEventFlow: SharedFlow<DetailsEvent> = viewModel.detailsEvent
@@ -203,9 +198,9 @@ class DetailsViewModelTest {
         val emitedEvents = mutableListOf<DetailsEvent>()
         viewModel = DetailsViewModel(
             detailsUiMapper = DetailsUiMapper(),
-            detailsRepository = detailsRepository,
+            repoDetailsUseCase = fakeRepoDetailsUseCase,
             runAsync = runAsync,
-            manageResource = manageResource,
+
             savedStateHandle = SavedStateHandle()
         )
         val detailEventFlow: SharedFlow<DetailsEvent> = viewModel.detailsEvent
@@ -266,57 +261,12 @@ private val successReadmeUiState = ReadmeUiState.Success(
     readme = "success readme"
 )
 
-private class FakeDetailsRepository : DetailsRepository {
+private class FakeRepoDetailsUseCase : RepoDetailsUseCase {
 
     private var isDetailsFailure = false
     private var isReadmeFailure = false
 
-    private var refreshReadme = 0
-    private var refreshDetails = 0
-    override suspend fun repoDetails(repoOwner: String, repoName: String): Result<RepoDetails> {
-        if (isDetailsFailure) {
-            return Result.failure(IllegalStateException(""))
-        } else {
-            return Result.success(
-                RepoDetails(
-                    repoOwner = "scope",
-                    repoName = "repo name",
-                    repoDesc = "repo dsec",
-                    forksCount = 1,
-                    issuesCount = 1,
-                    programmingLanguage = "kotlin",
-                )
-            )
-        }
-    }
-
-    override suspend fun readme(repoOwner: String, repoName: String): Result<String> {
-
-        if (this.isReadmeFailure) {
-            return Result.failure<String>(ReadmeNotFoundException)
-        } else {
-            return Result.success("success readme")
-        }
-    }
-
-    override suspend fun refreshReadme(repoOwner: String, repoName: String): Result<String> {
-        refreshReadme++
-        return Result.success("success refresh readme")
-    }
-
-    override suspend fun refreshDetails(repoOwner: String, repoName: String): Result<RepoDetails> {
-        refreshDetails++
-        return Result.success(
-            RepoDetails(
-                repoOwner = "scope",
-                repoName = "repo name",
-                repoDesc = "repo dsec",
-                forksCount = 150,
-                issuesCount = 1,
-                programmingLanguage = "kotlin",
-            )
-        )
-    }
+    private var refreshCalledTimes = 0
 
     fun isRepoDetailsFailure(flag: Boolean) {
         isDetailsFailure = flag
@@ -326,11 +276,48 @@ private class FakeDetailsRepository : DetailsRepository {
         this.isReadmeFailure = flag
     }
 
-    fun checkRefreshDetailsIsCalled(expectedTimes: Int) {
-        assertEquals(expectedTimes, refreshDetails)
+    fun checkRefreshIsCalled(expectedTimes: Int) {
+        assertEquals(expectedTimes, refreshCalledTimes)
     }
 
-    fun checkRefreshReadmeIsCalled(expectedTimes: Int) {
-        assertEquals(expectedTimes, refreshReadme)
+    override suspend fun repoDetails(repoOwner: String, repoName: String): CombinedDetailsResult {
+
+        if (isDetailsFailure) {
+            return CombinedDetailsResult.Failure("service unavailable")
+        } else {
+            return CombinedDetailsResult.Success(
+                RepoDetails(
+                    repoOwner = "scope",
+                    repoName = "repo name",
+                    repoDesc = "repo dsec",
+                    forksCount = 1,
+                    issuesCount = 1,
+                    programmingLanguage = "kotlin",
+                ),
+                readme = if (isReadmeFailure) "readme not found" else "success readme",
+            )
+        }
+    }
+
+    override suspend fun refreshRepoDetails(
+        repoOwner: String,
+        repoName: String
+    ): CombinedDetailsResult {
+        refreshCalledTimes++
+        if (isDetailsFailure) {
+            return CombinedDetailsResult.Failure("service unavailable")
+        } else {
+            return CombinedDetailsResult.Success(
+                RepoDetails(
+                    repoOwner = "scope",
+                    repoName = "repo name",
+                    repoDesc = "repo dsec",
+                    forksCount = 150,
+                    issuesCount = 1,
+                    programmingLanguage = "kotlin",
+                ),
+                readme = if (isReadmeFailure) "readme not found" else "success refresh readme",
+            )
+        }
     }
 }

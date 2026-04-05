@@ -7,12 +7,4 @@ data class RepoDetails(
     val forksCount: Int,
     val issuesCount: Int,
     val programmingLanguage: String,
-) {
-    interface Mapper<T> {
-        fun map(repoDetails: RepoDetails, readme: String): T
-    }
-
-    fun <T : Any> mapSuccess(mapper: Mapper<T>, readme: String): T {
-        return mapper.map(this, readme)
-    }
-}
+)
