@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.Serializable
 import org.example.project.app.presentation.AppScreen
 import org.example.project.bottomNav.MainBottomNavContainer
+import org.example.project.details.presentation.DetailsScreen
 import org.example.project.login.presentation.LoginScreen
 import org.example.project.onboarding.presentation.OnboardingScreen
 import theme.CatAppTheme
@@ -29,6 +30,10 @@ sealed interface Routes {
 
     @Serializable
     object Profile : Routes
+
+    @Serializable
+    data class Details(val repoOwner: String, val repoName: String) : Routes
+
 }
 
 @Composable
@@ -75,6 +80,7 @@ fun App() {
                 composable<Routes.Main> {
                     MainBottomNavContainer(navController)
                 }
+                composable<Routes.Details> { DetailsScreen() }
             }
         }
     }

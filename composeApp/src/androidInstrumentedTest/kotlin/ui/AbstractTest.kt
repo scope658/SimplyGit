@@ -16,6 +16,9 @@ import org.example.project.core.data.cache.cacheModule
 import org.example.project.core.data.cache.db.AppDatabase
 import org.example.project.core.data.cloud.FakeGithubApi
 import org.example.project.core.di.coreModule
+import org.example.project.details.data.cloud.DetailsGithubApi
+import org.example.project.details.data.cloud.FakeDetailsGithubApi
+import org.example.project.details.di.detailsModule
 import org.example.project.login.di.loginModule
 import org.example.project.main.data.cloud.GithubApi
 import org.example.project.main.di.mainModule
@@ -35,12 +38,13 @@ abstract class AbstractTest : KoinTest {
     protected lateinit var authWrapper: FakeAuthWrapper
     protected lateinit var githubApi: FakeGithubApi
     protected lateinit var fakeDataStoreManager: FakeGeneralDataStoreManager
-
+    protected lateinit var detailsGithubApi: FakeDetailsGithubApi
     protected fun abstractSetUp() {
 
         fakeDataStoreManager = FakeGeneralDataStoreManager()
         authWrapper = FakeAuthWrapper()
         githubApi = FakeGithubApi()
+        detailsGithubApi = FakeDetailsGithubApi()
 
         stopKoin()
         startKoin {
@@ -53,7 +57,9 @@ abstract class AbstractTest : KoinTest {
                 cacheModule,
                 profileModule,
                 coreModule,
+                detailsModule,
                 module {
+                    single<DetailsGithubApi> { detailsGithubApi }
                     single<AuthWrapper> { authWrapper }
                     single<GithubApi> { githubApi }
                     single<DataStoreManager.Read> { fakeDataStoreManager }
