@@ -24,7 +24,19 @@ fun MainBottomNavContainer(outerNavController: NavController) {
             startDestination = "search",
             modifier = Modifier.padding(padding)
         ) {
-            composable("search") { MainScreen() }
+            composable("search") {
+                MainScreen(
+
+                    onDetails = { repoOwner, repoName ->
+                        outerNavController.navigate(
+                            Routes.Details(
+                                repoOwner,
+                                repoName
+                            )
+                        )
+                    }
+                )
+            }
             composable("favourites") { }
             composable("profile") {
                 ProfileScreen(onLogout = {
