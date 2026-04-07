@@ -12,7 +12,6 @@ class DetailsPage(private val composeTestRule: ComposeTestRule) : AbstractPage(c
     val repoName = composeTestRule.onNodeWithTag("repo_name")
     val repoDesc = composeTestRule.onNodeWithTag("repo_desc")
     val forksTitle = composeTestRule.onNodeWithTag("forks_title")
-    val forksCount = composeTestRule.onNodeWithTag("forks_count")
     val forksIcon = composeTestRule.onNodeWithTag("forks_icon")
     val issuesTitle = composeTestRule.onNodeWithTag("issues_title")
     val issuesIcon = composeTestRule.onNodeWithTag("issues_icon")
@@ -43,11 +42,7 @@ class DetailsPage(private val composeTestRule: ComposeTestRule) : AbstractPage(c
             .assertIsDisplayed()
 
         this.forksTitle
-            .assertTextEquals("forks")
-            .assertIsDisplayed()
-
-        this.forksCount
-            .assertTextEquals(forksCount)
+            .assertTextEquals(" $forksCount forks")
             .assertIsDisplayed()
 
         this.forksIcon
@@ -76,7 +71,7 @@ class DetailsPage(private val composeTestRule: ComposeTestRule) : AbstractPage(c
             .assertHasClickAction()
 
         repFiles
-            .assertTextEquals("code")
+            .assertTextEquals("Code")
 
         addButton
             .assertHasClickAction()
@@ -101,7 +96,7 @@ class DetailsPage(private val composeTestRule: ComposeTestRule) : AbstractPage(c
     fun checkDropDownItemsIsVisible() {
 
         createIssues
-            .assertTextEquals("New Issues")
+            .assertTextEquals("New Issue")
             .assertIsDisplayed()
 
         createPullRequest

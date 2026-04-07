@@ -3,12 +3,14 @@ package org.example.project.details.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import org.example.project.Routes
 import org.example.project.core.presentation.RunAsync
 import org.example.project.details.domain.CombinedDetailsResult
 import org.example.project.details.domain.RepoDetailsUseCase
@@ -28,12 +30,19 @@ class DetailsViewModel(
     )
     val detailsScreenState = _detailsScreenState.asStateFlow()
 
+    private val route: Routes.Details =
+        savedStateHandle.toRoute()
+
+    private val repoOwner = route.repoOwner
+    private val repoName = route.repoName
+
+
     private val _detailsEvent: MutableSharedFlow<DetailsEvent> = MutableSharedFlow()
     val detailsEvent: SharedFlow<DetailsEvent> = _detailsEvent.asSharedFlow()
 
     init {
         loadDetails(
-            repoDetails = { repoDetailsUseCase.repoDetails("", "") },
+            repoDetails = { repoDetailsUseCase.repoDetails(repoOwner, repoName) },
         )
     }
 
@@ -44,7 +53,7 @@ class DetailsViewModel(
             )
         }
         loadDetails(
-            repoDetails = { repoDetailsUseCase.repoDetails("", "") },
+            repoDetails = { repoDetailsUseCase.repoDetails(repoOwner, repoName) },
         )
     }
 
@@ -56,7 +65,7 @@ class DetailsViewModel(
         }
 
         loadDetails(
-            repoDetails = { repoDetailsUseCase.refreshRepoDetails("", "") },
+            repoDetails = { repoDetailsUseCase.refreshRepoDetails(repoOwner, repoName) },
         )
     }
 
