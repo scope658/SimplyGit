@@ -36,4 +36,14 @@
     <string name="search_label">Search</string>
     <string name="favourites_label">Favourites</string>
     <string name="profile_label">Profile</string>
+
+    <string name="error_readme_not_found">README not found</string>
+
+    <string name="label_new_issue">New Issue</string>
+    <string name="label_new_pr">New Pull Request</string>
+    <string name="label_forks">%1$d forks</string>
+    <string name="label_issues">Issues</string>
+    <string name="label_code">Code</string>
+    <string name="label_readme">README</string>
+    <string name="desc_add">Add</string>
 </resources>

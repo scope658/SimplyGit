@@ -89,6 +89,8 @@ kotlin {
             implementation(libs.firebase.analytics)
 
             implementation(libs.leakcanary.android)
+
+            implementation(libs.bundles.markdown)
         }
         iosMain.dependencies {
             implementation(libs.coil.network.ktor)

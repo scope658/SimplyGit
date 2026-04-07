@@ -23,7 +23,7 @@ fun DetailsUi(
         ) {
             when (val state = mainUiState) {
                 is DetailsUiState.Failure -> GeneralFailureScreen(
-                    "no connection",
+                    state.message,
                     { detailsActions.retry() })
 
                 is DetailsUiState.Loading -> GeneralLoadingIndicator()

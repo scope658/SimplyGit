@@ -1,7 +1,5 @@
 package org.example.project.details.domain
 
-import io.github.aakira.napier.Napier
-
 class RepoDetailsUseCaseImpl(
     private val handleDetailsRequest: HandleDetailsRequest,
     private val detailsRepository: DetailsRepository
@@ -11,7 +9,6 @@ class RepoDetailsUseCaseImpl(
         repoName: String
     ): CombinedDetailsResult {
         return handleDetailsRequest.handle(readme = {
-            Napier.d("repo details pinged", tag = "ss221")
             detailsRepository.readme(repoOwner, repoName)
         }, repoDetails = {
             detailsRepository.repoDetails(repoOwner, repoName)
