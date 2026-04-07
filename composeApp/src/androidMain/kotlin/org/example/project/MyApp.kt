@@ -7,6 +7,7 @@ import org.example.project.app.di.appModule
 import org.example.project.core.data.cache.cacheModule
 import org.example.project.core.data.cloud.cloudModule
 import org.example.project.core.di.coreModule
+import org.example.project.details.di.detailsModule
 import org.example.project.login.di.loginModule
 import org.example.project.main.di.mainModule
 import org.example.project.onboarding.di.onboardingModule
@@ -35,6 +36,7 @@ class MyApp : Application() {
                 cacheModule,
                 profileModule,
                 coreModule,
+                detailsModule,
             )
         }
     }

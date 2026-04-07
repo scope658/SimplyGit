@@ -35,4 +35,29 @@
     <string name="repo_count_test_tag">repo_count</string>
     <string name="subscribers_count_test_tag">subscribers_count</string>
     <string name="logout_button_test_tag">logout_button</string>
+
+
+    <string name="repo_owner_test_tag">repo_owner</string>
+    <string name="repo_name_test_tag">repo_name</string>
+    <string name="repo_desc_test_tag">repo_desc</string>
+
+    <string name="forks_title_test_tag">forks_title</string>
+    <string name="forks_count_test_tag">forks_count</string>
+    <string name="forks_icon_test_tag">forks_icon</string>
+
+    <string name="issues_title_test_tag">issues_title</string>
+    <string name="issues_icon_test_tag">issues_icon</string>
+    <string name="issues_count_test_tag">issues_count</string>
+
+    <string name="programming_language_test_tag">programming_language</string>
+    <string name="repo_readme_test_tag">repo_readme</string>
+    <string name="repo_files_test_tag">repo_files</string>
+
+    <string name="add_button_test_tag">add_button</string>
+    <string name="drop_down_menu_test_tag">dropDownMenu</string>
+
+    <string name="create_pr_item_test_tag">create_pr_item</string>
+    <string name="create_issues_item_test_tag">create_issues_item</string>
+
+    <string name="add_fav_button_test_tag">add_fav_button</string>
 </resources>

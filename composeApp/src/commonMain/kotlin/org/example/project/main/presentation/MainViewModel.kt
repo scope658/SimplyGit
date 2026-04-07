@@ -4,9 +4,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.serialization.saved
 import androidx.lifecycle.viewModelScope
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
@@ -42,6 +45,9 @@ class MainViewModel(
     private val isCurrentlyFetching: MutableStateFlow<Boolean> =
         savedStateHandle.getMutableStateFlow(CURRENTLY_FETCHING_KEY, false)
 
+    private val _mainUiEvent: MutableSharedFlow<MainEvent> = MutableSharedFlow()
+    val mainUiEvent = _mainUiEvent.asSharedFlow()
+
     private val initSearch by lazy {
         runAsync.runFlow(
             scope = viewModelScope,
@@ -63,6 +69,7 @@ class MainViewModel(
     }
 
     init {
+        Napier.d("init", tag = "ss221")
         loadUserRepo()
     }
 
@@ -127,6 +134,14 @@ class MainViewModel(
                 getPagedReposUseCase.refresh()
             }
         }
+    }
+
+    override fun onDetails(repoOwner: String, repoName: String) {
+        runAsync.runAsync(
+            viewModelScope,
+            {},
+            { _mainUiEvent.emit(MainEvent.OnDetails(repoOwner, repoName)) }
+        )
     }
 
     private fun launchPagedRequest(

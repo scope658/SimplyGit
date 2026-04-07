@@ -307,7 +307,6 @@ class ScenarioTest : AbstractTest() {
         mainPage.clickRepo(1)
 
         val detailsPage = DetailsPage(composeTestRule)
-        //TODO ADD MOCK DETAILS
         detailsPage.checkVisibleNow(
             repoName = "repo name",
             repoDesc = "repo desc",

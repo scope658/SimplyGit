@@ -25,7 +25,9 @@ fun MainSuccessScreen(
 ) {
     LazyColumn(modifier = Modifier.testTag(stringResource(Res.string.main_lazy_column_test_tag))) {
         items(items = mainUiState.result, key = { it.id }) { userRepositoryUi ->
-            RepositoryCard(userRepositoryUi)
+            RepositoryCard(
+                userRepositoryUi,
+                onCardClick = { repoOwner, repoName -> actions.onDetails(repoOwner, repoName) })
             HorizontalDivider()
         }
         pagingFooter(mainActions = actions, mainUiState = mainUiState)
@@ -68,5 +70,6 @@ private val mainPreviewActions = object : MainActions {
     ) = Unit
 
     override fun refresh() = Unit
+    override fun onDetails(repoOwner: String, repoName: String) = Unit
 
 }

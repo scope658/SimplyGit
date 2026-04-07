@@ -93,6 +93,7 @@ private fun MainUiPreview() {
         ) = Unit
 
         override fun refresh() = Unit
+        override fun onDetails(repoOwner: String, repoName: String) = Unit
 
     }
     Scaffold {

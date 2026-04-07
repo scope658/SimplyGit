@@ -1,6 +1,7 @@
 package org.example.project.main.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,7 +50,10 @@ import theme.spacingXXS
 
 
 @Composable
-fun RepositoryCard(userRepositoryUi: UserRepositoryUi) {
+fun RepositoryCard(
+    userRepositoryUi: UserRepositoryUi,
+    onCardClick: (repoOwner: String, repoName: String) -> Unit
+) = with(userRepositoryUi) {
 
     val id = userRepositoryUi.id
 
@@ -61,11 +65,17 @@ fun RepositoryCard(userRepositoryUi: UserRepositoryUi) {
     val starTextTag = "${stringResource(Res.string.repo_star_tag_prefix)}$id"
     val langTag = "${stringResource(Res.string.programming_lang_tag_prefix)}$id"
 
-    Box(modifier = Modifier.testTag(cardTag).fillMaxWidth()) {
+    Box(
+        modifier = Modifier.testTag(cardTag).fillMaxWidth().clickable {
+            onCardClick(
+                userName,
+                repositoryName
+            )
+        }) {
         Column(modifier = Modifier.padding(spacingM)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AsyncImage(
-                    model = userRepositoryUi.userPhotoImageUrl,
+                    model = userPhotoImageUrl,
                     contentDescription = null,
                     placeholder = painterResource(Res.drawable.compose_multiplatform),
                     error = painterResource(Res.drawable.compose_multiplatform),
@@ -73,11 +83,11 @@ fun RepositoryCard(userRepositoryUi: UserRepositoryUi) {
                         .clip(shape = avatarShape)
                 )
                 Spacer(modifier = Modifier.width(spacingS))
-                Text(text = userRepositoryUi.userName, modifier = Modifier.testTag(nameTag))
+                Text(text = userName, modifier = Modifier.testTag(nameTag))
             }
             Spacer(modifier = Modifier.height(spacingXS))
             Text(
-                text = userRepositoryUi.repositoryName,
+                text = repositoryName,
                 fontSize = fontSizeS,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.testTag(repoNameTag)
@@ -104,7 +114,7 @@ fun RepositoryCard(userRepositoryUi: UserRepositoryUi) {
                 )
                 Spacer(modifier = Modifier.width(spacingXXS))
                 Text(
-                    userRepositoryUi.programmingLanguage,
+                    programmingLanguage,
                     modifier = Modifier.testTag(langTag)
                 )
             }
@@ -139,5 +149,5 @@ fun handleCorrectColor(language: String): Color = when (language.trim().lowercas
 @Preview(showBackground = true)
 @Composable
 private fun RepositoryCardPreview() {
-    RepositoryCard(MockData.mockedUserRepositoriesUi[2])
+    RepositoryCard(MockData.mockedUserRepositoriesUi[2], onCardClick = { _, _ -> })
 }
