@@ -1,5 +1,6 @@
 package org.example.project.details.presentation
 
+import io.github.aakira.napier.Napier
 import org.example.project.details.domain.CombinedDetailsResult
 import org.example.project.details.domain.RepoDetails
 
@@ -8,6 +9,7 @@ class DetailsUiMapper : CombinedDetailsResult.Mapper<DetailsUiState> {
         repoDetails: RepoDetails,
         readme: String
     ): DetailsUiState = with(repoDetails) {
+        Napier.d(repoDetails.toString(), tag = "ss22")
         return DetailsUiState.Success(
             repoOwner = repoOwner,
             repoName = repoName,

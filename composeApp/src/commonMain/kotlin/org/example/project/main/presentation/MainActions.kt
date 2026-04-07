@@ -5,4 +5,6 @@ interface MainActions {
     fun retry()
     fun loadMore(currentRepoList: List<UserRepositoryUi>, page: Int)
     fun refresh()
+    fun onDetails(repoOwner: String, repoName: String)
+
 }
