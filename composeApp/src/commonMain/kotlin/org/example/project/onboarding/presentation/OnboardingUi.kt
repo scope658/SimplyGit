@@ -22,6 +22,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import ktshwnumbertwo.composeapp.generated.resources.Res
 import ktshwnumbertwo.composeapp.generated.resources.first_onboarding_image
 import ktshwnumbertwo.composeapp.generated.resources.onboarding_button_test_tag
@@ -79,7 +80,7 @@ fun OnboardingUi(onboardingPage: OnboardingPage, onboardingActions: OnboardingAc
             fontSize = fontSizeS,
             modifier = Modifier.testTag(
                 stringResource(Res.string.onboarding_text_test_tag)
-            ),
+            ).padding(horizontal = 16.dp),
         )
         Spacer(modifier = Modifier.height(spacingXXL))
         FilledTonalButton(

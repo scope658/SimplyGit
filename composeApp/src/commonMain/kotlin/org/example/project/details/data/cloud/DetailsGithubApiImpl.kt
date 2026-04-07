@@ -6,10 +6,12 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.example.project.details.data.DetailsData
 import org.example.project.details.data.ReadmeData
+import org.example.project.details.domain.ReadmeNotFoundException
 
 class DetailsGithubApiImpl(private val httpClient: HttpClient) : DetailsGithubApi {
     override suspend fun details(
@@ -33,14 +35,16 @@ class DetailsGithubApiImpl(private val httpClient: HttpClient) : DetailsGithubAp
         repoOwner: String,
         repoName: String
     ): ReadmeData {
-        val content = httpClient.get("repos/$repoOwner/$repoName/readme") {
+        val response = httpClient.get("repos/$repoOwner/$repoName/readme") {
             header("Accept", "application/vnd.github.v3.raw")
-        }.bodyAsText()
-
+        }
+        if (response.status == HttpStatusCode.NotFound) {
+            throw ReadmeNotFoundException
+        }
         return ReadmeData(
             repoOwner = repoOwner,
             repoName = repoName,
-            readme = content,
+            readme = response.bodyAsText(),
         )
     }
 }

@@ -19,7 +19,7 @@ class DetailsRepositoryImpl(
     ): Result<RepoDetails> {
         return if (detailsCacheDataSource.isDetailsContains(repoOwner, repoName)) {
             val details = detailsCacheDataSource.details(repoOwner, repoName)
-            return Result.success(details.map(mapper = detailsDataToDomain))
+            Result.success(details.map(mapper = detailsDataToDomain))
         } else {
             refreshDetails(repoOwner, repoName)
         }
@@ -31,7 +31,7 @@ class DetailsRepositoryImpl(
     ): Result<String> {
         return if (detailsCacheDataSource.isReadmeContains(repoOwner, repoName)) {
             val readme = detailsCacheDataSource.readme(repoOwner, repoName)
-            return Result.success(readme.readme)
+            Result.success(readme.readme)
         } else {
             refreshReadme(repoOwner, repoName)
         }

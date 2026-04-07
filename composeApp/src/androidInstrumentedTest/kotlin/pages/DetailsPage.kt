@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 
 class DetailsPage(private val composeTestRule: ComposeTestRule) : AbstractPage(composeTestRule) {
@@ -62,10 +63,12 @@ class DetailsPage(private val composeTestRule: ComposeTestRule) : AbstractPage(c
             .assertTextEquals(programmingLanguage)
             .assertIsDisplayed()
 
-        this.readme
-            .assertTextEquals(readme)
-            .assertIsDisplayed()
-
+        composeTestRule.onNodeWithText(
+            text = readme,
+            substring = true,
+            ignoreCase = true,
+            useUnmergedTree = true
+        ).assertExists()
         this.addFavouritesButton
             .assertIsDisplayed()
             .assertHasClickAction()

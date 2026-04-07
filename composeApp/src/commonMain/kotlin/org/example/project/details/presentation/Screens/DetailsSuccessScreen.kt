@@ -43,11 +43,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mikepenz.markdown.m3.Markdown
 import ktshwnumbertwo.composeapp.generated.resources.Res
 import ktshwnumbertwo.composeapp.generated.resources.add_button_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.add_fav_button_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.create_issues_item_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.create_pr_item_test_tag
+import ktshwnumbertwo.composeapp.generated.resources.desc_add
 import ktshwnumbertwo.composeapp.generated.resources.drop_down_menu_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.forks_icon_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.forks_title_test_tag
@@ -55,6 +57,12 @@ import ktshwnumbertwo.composeapp.generated.resources.github_icon
 import ktshwnumbertwo.composeapp.generated.resources.issues_count_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.issues_icon_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.issues_title_test_tag
+import ktshwnumbertwo.composeapp.generated.resources.label_code
+import ktshwnumbertwo.composeapp.generated.resources.label_forks
+import ktshwnumbertwo.composeapp.generated.resources.label_issues
+import ktshwnumbertwo.composeapp.generated.resources.label_new_issue
+import ktshwnumbertwo.composeapp.generated.resources.label_new_pr
+import ktshwnumbertwo.composeapp.generated.resources.label_readme
 import ktshwnumbertwo.composeapp.generated.resources.programming_language_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.repo_desc_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.repo_files_test_tag
@@ -98,7 +106,10 @@ fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success) = with(detailsU
                         onClick = { isMenuExpanded = true },
                         modifier = Modifier.testTag(stringResource(Res.string.add_button_test_tag))
                     ) {
-                        Icon(Icons.Default.Add, contentDescription = "Add")
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = stringResource(Res.string.desc_add)
+                        )
                     }
 
                     DropdownMenu(
@@ -107,7 +118,7 @@ fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success) = with(detailsU
                         modifier = Modifier.testTag(stringResource(Res.string.drop_down_menu_test_tag))
                     ) {
                         DropdownMenuItem(
-                            text = { Text("New Issue") },
+                            text = { Text(stringResource(Res.string.label_new_issue)) },
                             leadingIcon = { Icon(Icons.Default.BugReport, null) },
                             onClick = {
                                 isMenuExpanded = false
@@ -116,7 +127,7 @@ fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success) = with(detailsU
                             modifier = Modifier.testTag(stringResource(Res.string.create_issues_item_test_tag))
                         )
                         DropdownMenuItem(
-                            text = { Text("New Pull Request") },
+                            text = { Text(stringResource(Res.string.label_new_pr)) },
                             leadingIcon = { Icon(Icons.Default.CallMerge, null) },
                             onClick = {
                                 isMenuExpanded = false
@@ -156,7 +167,7 @@ fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success) = with(detailsU
                         .testTag(stringResource(Res.string.forks_icon_test_tag))
                 )
                 Text(
-                    text = " $forksCount forks",
+                    text = " " + stringResource(Res.string.label_forks, forksCount),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.testTag(stringResource(Res.string.forks_title_test_tag))
                 )
@@ -181,7 +192,7 @@ fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success) = with(detailsU
         Column {
             MenuRow(
                 icon = Icons.Default.Info,
-                label = "Issues",
+                label = stringResource(Res.string.label_issues),
                 value = issuesCount,
                 iconBgColor = Color(0xFF4CAF50),
                 iconTestTag = stringResource(Res.string.issues_icon_test_tag),
@@ -190,7 +201,7 @@ fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success) = with(detailsU
             )
             MenuRow(
                 icon = Icons.Default.FileOpen,
-                label = "Code",
+                label = stringResource(Res.string.label_code),
                 value = "",
                 iconBgColor = Color.Black.copy(0.6f),
                 labelTestTag = stringResource(Res.string.repo_files_test_tag),
@@ -198,13 +209,34 @@ fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success) = with(detailsU
                 valueTestTag = ""
             )
         }
+        HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+
+        Text(
+            text = stringResource(Res.string.label_readme),
+            modifier = Modifier
+                .padding(top = 16.dp, start = 16.dp),
+            style = MaterialTheme.typography.bodyLarge
+        )
         when (val state = readme) {
-            is ReadmeUiState.Success -> Text(
-                text = state.readme,
-                modifier = Modifier.testTag(stringResource(Res.string.repo_readme_test_tag))
-            )
+            is ReadmeUiState.Success -> {
+                ReadmeContent(
+                    readmeUiState = state,
+                    owner = repoOwner,
+                    repo = repoName
+                )
+            }
         }
     }
+}
+
+@Composable
+fun ReadmeContent(readmeUiState: ReadmeUiState.Success, owner: String, repo: String) {
+
+    Markdown(
+        content = readmeUiState.readme,
+        modifier = Modifier.padding(16.dp).testTag(stringResource(Res.string.repo_readme_test_tag)),
+    )
+
 }
 
 @Composable
