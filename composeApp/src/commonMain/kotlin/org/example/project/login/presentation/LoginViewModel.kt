@@ -31,7 +31,6 @@ class LoginViewModel(
     val loginUiEvent = _loginUiEvent.asSharedFlow()
 
     override fun loginIn() {
-
         savedState = LoginUiState.Loading
         _loginUiState.value = savedState
         runAsync.runAsync(
