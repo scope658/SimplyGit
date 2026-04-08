@@ -9,6 +9,7 @@ val spacingS = 7.dp
 val spacingM = 10.dp
 val spacingML = 12.dp
 val spacingL = 16.dp
+val spacing18Dp = 18.dp
 val spacingXL = 20.dp
 val spacingXXXL = 32.dp
 val spacingXXL = 40.dp
@@ -33,3 +34,4 @@ val fontSizeXXL = 25.sp
 val smallLineHeight = 20.sp
 
 val tinyThicknessDivider = 0.5.dp
+

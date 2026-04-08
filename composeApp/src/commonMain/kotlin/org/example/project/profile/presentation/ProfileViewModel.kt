@@ -69,28 +69,34 @@ class ProfileViewModel(
     }
 
     private fun loadProfile(block: suspend () -> Result<Profile>) {
-        val profileUiState = _profileUiState.value
+
         runAsync.runAsync(
             scope = viewModelScope,
             background = block,
             ui = { result ->
                 result
                     .onSuccess { userProfile ->
-                        _profileUiState.value = profileUiState.copy(
-                            profileUiState = userProfile.mapSuccess(mapper = profileUiMapper),
-                            isRefreshing = false,
+                        updateScreenState(
+                            profileUiState = userProfile.mapSuccess(mapper = profileUiMapper)
                         )
                     }
                     .onFailure {
                         val error = it as? DomainException ?: ServiceUnavailableException
-                        _profileUiState.value = profileUiState.copy(
-                            isRefreshing = false,
+
+                        updateScreenState(
                             profileUiState = ProfileUiState.Failure(
                                 message = error.exceptionString(manageResource = manageResource)
                             )
                         )
                     }
             },
+        )
+    }
+
+    private fun updateScreenState(profileUiState: ProfileUiState) {
+        ProfileScreenState(
+            isRefreshing = false,
+            profileUiState = profileUiState,
         )
     }
 }

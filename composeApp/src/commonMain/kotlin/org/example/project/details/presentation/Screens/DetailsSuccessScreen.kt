@@ -42,7 +42,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.mikepenz.markdown.m3.Markdown
 import ktshwnumbertwo.composeapp.generated.resources.Res
 import ktshwnumbertwo.composeapp.generated.resources.add_button_test_tag
@@ -75,6 +74,14 @@ import org.example.project.main.presentation.components.handleCorrectColor
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import theme.indicatorSize
+import theme.spacing18Dp
+import theme.spacingL
+import theme.spacingML
+import theme.spacingS
+import theme.spacingXL
+import theme.spacingXS
+import theme.spacingXXXL
+import theme.tinyThicknessDivider
 
 @Composable
 fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success) = with(detailsUiState) {
@@ -86,9 +93,9 @@ fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success) = with(detailsU
             .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(spacingL)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(spacingS))
                 Text(
                     text = repoOwner,
                     style = MaterialTheme.typography.bodyMedium,
@@ -142,7 +149,7 @@ fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success) = with(detailsU
                 text = repoName,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = spacingS)
                     .testTag(stringResource(Res.string.repo_name_test_tag))
             )
 
@@ -150,20 +157,20 @@ fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success) = with(detailsU
                 Text(
                     text = repoDesc,
                     style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(top = 12.dp)
+                    modifier = Modifier.padding(top = spacingML)
                         .testTag(stringResource(Res.string.repo_desc_test_tag))
                 )
             }
 
             Row(
-                modifier = Modifier.padding(top = 16.dp),
+                modifier = Modifier.padding(top = spacingL),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     painterResource(Res.drawable.github_icon),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(18.dp)
+                        .size(spacing18Dp)
                         .testTag(stringResource(Res.string.forks_icon_test_tag))
                 )
                 Text(
@@ -171,7 +178,7 @@ fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success) = with(detailsU
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.testTag(stringResource(Res.string.forks_title_test_tag))
                 )
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(spacingL))
                 Box(
                     modifier = Modifier.size(indicatorSize)
                         .background(
@@ -179,7 +186,7 @@ fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success) = with(detailsU
                             shape = CircleShape
                         )
                 )
-                Spacer(modifier = Modifier.width(5.dp))
+                Spacer(modifier = Modifier.width(spacingXS))
                 Text(
                     text = programmingLanguage,
                     modifier = Modifier.testTag(stringResource(Res.string.programming_language_test_tag))
@@ -187,7 +194,10 @@ fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success) = with(detailsU
             }
         }
 
-        HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+        HorizontalDivider(
+            thickness = tinyThicknessDivider,
+            color = MaterialTheme.colorScheme.outlineVariant
+        )
 
         Column {
             MenuRow(
@@ -209,12 +219,15 @@ fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success) = with(detailsU
                 valueTestTag = ""
             )
         }
-        HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+        HorizontalDivider(
+            thickness = tinyThicknessDivider,
+            color = MaterialTheme.colorScheme.outlineVariant
+        )
 
         Text(
             text = stringResource(Res.string.label_readme),
             modifier = Modifier
-                .padding(top = 16.dp, start = 16.dp),
+                .padding(top = spacingL, start = spacingL),
             style = MaterialTheme.typography.bodyLarge
         )
         when (val state = readme) {
@@ -234,7 +247,8 @@ fun ReadmeContent(readmeUiState: ReadmeUiState.Success, owner: String, repo: Str
 
     Markdown(
         content = readmeUiState.readme,
-        modifier = Modifier.padding(16.dp).testTag(stringResource(Res.string.repo_readme_test_tag)),
+        modifier = Modifier.padding(spacingL)
+            .testTag(stringResource(Res.string.repo_readme_test_tag)),
     )
 
 }
@@ -252,13 +266,13 @@ private fun MenuRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(spacingL),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .size(32.dp)
-                .clip(RoundedCornerShape(6.dp))
+                .size(spacingXXXL)
+                .clip(RoundedCornerShape(spacingXS))
                 .background(iconBgColor)
                 .testTag(iconTestTag),
             contentAlignment = Alignment.Center
@@ -267,14 +281,14 @@ private fun MenuRow(
                 icon,
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(spacingXL)
             )
         }
 
         Text(
             text = label,
             modifier = Modifier
-                .padding(start = 16.dp)
+                .padding(start = spacingL)
                 .weight(1f)
                 .testTag(labelTestTag),
             style = MaterialTheme.typography.bodyLarge
@@ -286,7 +300,7 @@ private fun MenuRow(
             color = MaterialTheme.colorScheme.outline,
             modifier = Modifier.testTag(valueTestTag)
         )
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(spacingL))
     }
 }
 
