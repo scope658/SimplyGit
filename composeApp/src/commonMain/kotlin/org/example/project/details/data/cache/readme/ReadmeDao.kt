@@ -1,13 +1,13 @@
 package org.example.project.details.data.cache.readme
 
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Upsert
 
 @Dao
 interface ReadmeDao {
 
-    @Insert
+    @Upsert
     suspend fun insert(readmeCache: ReadmeCache)
 
 
