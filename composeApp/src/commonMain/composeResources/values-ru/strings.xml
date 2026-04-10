@@ -56,4 +56,7 @@
 
     <string name="error_body_too_long">Текст содержит %1$d символов, максимум 65536</string>
     <string name="error_title_too_long">Заголовок содержит %1$d символов, максимум 256</string>
+
+    <string name="error_issue_creation_disabled">Создание задач отключено</string>
+    <string name="error_server_validation">Ошибка валидации на сервере</string>
 </resources>

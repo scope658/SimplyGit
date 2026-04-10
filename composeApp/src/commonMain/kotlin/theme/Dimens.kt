@@ -35,3 +35,6 @@ val smallLineHeight = 20.sp
 
 val tinyThicknessDivider = 0.5.dp
 
+val height150 = 150.dp
+val height48 = 48.dp
+val stroke2dp = 2.dp
