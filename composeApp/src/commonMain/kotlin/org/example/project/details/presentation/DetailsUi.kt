@@ -27,7 +27,7 @@ fun DetailsUi(
                     { detailsActions.retry() })
 
                 is DetailsUiState.Loading -> GeneralLoadingIndicator()
-                is DetailsUiState.Success -> DetailsSuccessScreen(mainUiState)
+                is DetailsUiState.Success -> DetailsSuccessScreen(mainUiState, detailsActions)
             }
         }
     }
