@@ -55,4 +55,7 @@
 
     <string name="error_body_too_long">Body is %1$d characters, max is 65536</string>
     <string name="error_title_too_long">Title is %1$d characters, max is 256</string>
+
+    <string name="error_issue_creation_disabled">Issue creation is disabled</string>
+    <string name="error_server_validation">Server validation failed</string>
 </resources>

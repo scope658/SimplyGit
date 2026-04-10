@@ -12,4 +12,12 @@ class FakeManageResource : ManageResource {
     override suspend fun readmeNotFound(): String {
         return "readme not found"
     }
+
+    override suspend fun issuesDisabled(): String {
+        return "fake issues disabled"
+    }
+
+    override suspend fun serverValidation(): String {
+        return "service validation"
+    }
 }

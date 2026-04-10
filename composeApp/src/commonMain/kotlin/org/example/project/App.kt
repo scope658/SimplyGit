@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.Serializable
 import org.example.project.app.presentation.AppScreen
 import org.example.project.bottomNav.MainBottomNavContainer
+import org.example.project.createIssues.presentation.CreateIssuesScreen
 import org.example.project.details.presentation.DetailsScreen
 import org.example.project.login.presentation.LoginScreen
 import org.example.project.onboarding.presentation.OnboardingScreen
@@ -33,6 +34,10 @@ sealed interface Routes {
 
     @Serializable
     data class Details(val repoOwner: String, val repoName: String) : Routes
+
+
+    @Serializable
+    data class CreateIssue(val repoOwner: String, val repoName: String) : Routes
 
 }
 
@@ -80,7 +85,19 @@ fun App() {
                 composable<Routes.Main> {
                     MainBottomNavContainer(navController)
                 }
-                composable<Routes.Details> { DetailsScreen() }
+                composable<Routes.Details> {
+                    DetailsScreen(
+                        onCreateIssues = { repoOwner, repoName ->
+                            navController.navigate(
+                                Routes.CreateIssue(
+                                    repoOwner = repoOwner,
+                                    repoName = repoName
+                                )
+                            )
+                        }
+                    )
+                }
+                composable<Routes.CreateIssue> { CreateIssuesScreen(onSuccess = { navController.popBackStack() }) }
             }
         }
     }
