@@ -9,6 +9,7 @@ import ktshwnumbertwo.composeapp.generated.resources.second_onboarding_image
 import ktshwnumbertwo.composeapp.generated.resources.third_onboarding_image
 import org.example.project.MainActivity
 import org.example.project.MockData
+import org.example.project.core.domain.NoConnectionException
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -334,8 +335,10 @@ class ScenarioTest : AbstractTest() {
         createIssuesPage.typeDesc(desc = "a")
         createIssuesPage.checkButtonIsEnabled()
 
+        fakeIssueGithubApi.isFailure(false)
         createIssuesPage.clickCreateButton()
 
+        detailsPage.pullToRefresh()
         detailsPage.checkVisibleNow(
             repoName = "repo name",
             repoDesc = "repo desc",
@@ -346,6 +349,7 @@ class ScenarioTest : AbstractTest() {
         )
     }
 
+    @Test
     fun failureRepoDetailsThenSuccess() {
         skipOnboardingAndLogin(composeTestRule)
 
@@ -356,19 +360,23 @@ class ScenarioTest : AbstractTest() {
         mainPage.checkUserRepositories(MockData.mockedSearchRepositoriesUi)
         mainPage.clickRepo(repoId = 101)
 
+
+        detailsGithubApi.isDetailsFailure(true, NoConnectionException)
         val detailsPage = DetailsPage(composeTestRule)
         detailsPage.waitUntilLoadingDoesNotExist()
 
-        detailsPage.checkErrorMessageIsVisible(message = "no connection")
+        detailsPage.checkErrorMessageIsVisible(message = "No internet connection")
 
+
+        detailsGithubApi.isDetailsFailure(false, NoConnectionException)
         detailsPage.clickRetryButton()
         detailsPage.waitUntilLoadingDoesNotExist()
-        //TODO ADD MOCK DETAILS
+
         detailsPage.checkVisibleNow(
             repoName = "repo name",
             repoDesc = "repo desc",
             forksCount = "0",
-            issuesCount = "1",
+            issuesCount = "0",
             programmingLanguage = "kotlin",
             readme = "fake readme text"
         )
@@ -392,7 +400,7 @@ class ScenarioTest : AbstractTest() {
 
         detailsPage.clickCreateIssues()
 
-        //TODO ADD FAILURE ISSUES STATE
+        fakeIssueGithubApi.isFailure(true)
         val createIssuesPage = CreateIssuesPage(composeTestRule)
         createIssuesPage.checkButtonIsNotEnabled()
 
@@ -401,10 +409,11 @@ class ScenarioTest : AbstractTest() {
         createIssuesPage.checkButtonIsEnabled()
 
         createIssuesPage.clickCreateButton()
-        createIssuesPage.checkErrorMessage(message = "no connection")
+        createIssuesPage.checkErrorMessage(message = "Issue creation disabled")
 
-        //TODO ADD SUCCESS ISSUES STATE
+        fakeIssueGithubApi.isFailure(false)
         createIssuesPage.clickCreateButton()
+        detailsPage.pullToRefresh()
 
         detailsPage.checkVisibleNow(
             repoName = "repo name",

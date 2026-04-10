@@ -1,9 +1,11 @@
 package pages
 
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -21,8 +23,16 @@ class CreateIssuesPage(private val composeTestRule: ComposeTestRule) {
     private val descTextFieldLabel =
         composeTestRule.onNodeWithTag("issues_desc_text_field_label", true)
 
+    private val cancelButton = composeTestRule.onNodeWithTag("issues_cancel_button")
+
     fun checkVisibleNow() {
+        cancelButton
+            .assertTextEquals("Cancel")
+            .assertIsDisplayed()
+            .assertIsEnabled()
+
         createButton
+            .assertTextEquals("Create")
             .assertIsDisplayed()
             .assertIsNotEnabled()
 
@@ -30,11 +40,11 @@ class CreateIssuesPage(private val composeTestRule: ComposeTestRule) {
             .assertIsDisplayed()
 
         descTextFieldLabel
-            .assertTextEquals("Issues Desc")
+            .assertTextEquals("Description")
             .assertIsDisplayed()
 
         titleTextFieldLabel
-            .assertTextEquals("Issues Title")
+            .assertTextEquals("Title")
 
         titleTextField
             .assertIsDisplayed()
@@ -66,10 +76,14 @@ class CreateIssuesPage(private val composeTestRule: ComposeTestRule) {
             .performClick()
     }
 
+    @OptIn(ExperimentalTestApi::class)
     fun checkErrorMessage(message: String) {
-        composeTestRule.onNodeWithTag("error_issues")
+        composeTestRule.waitUntilDoesNotExist(
+            hasTestTag("issues_loading")
+        )
+
+        createButton
             .assertTextEquals(message)
-            .assertIsDisplayed()
     }
 
 }

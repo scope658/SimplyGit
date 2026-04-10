@@ -9,8 +9,19 @@ interface DetailsGithubApi {
 }
 
 class FakeDetailsGithubApi : DetailsGithubApi {
+
     private var isDetailsFailure = false
     private lateinit var exception: Exception
+
+    private var detailsData = DetailsData(
+        repoOwner = "repo owner",
+        repoName = "repo name",
+        repoDesc = "repo desc",
+        forksCount = 0,
+        issuesCount = 0,
+        programmingLanguage = "kotlin",
+    )
+
     override suspend fun details(
         repoOwner: String,
         repoName: String
@@ -18,14 +29,7 @@ class FakeDetailsGithubApi : DetailsGithubApi {
         if (isDetailsFailure) {
             throw exception
         } else {
-            return DetailsData(
-                repoOwner = "repo owner",
-                repoName = "repo name",
-                repoDesc = "repo desc",
-                forksCount = 0,
-                issuesCount = 0,
-                programmingLanguage = "kotlin",
-            )
+            return detailsData
         }
     }
 
@@ -40,7 +44,14 @@ class FakeDetailsGithubApi : DetailsGithubApi {
         )
     }
 
-    fun isDetailsFailure(flag: Boolean) {
+    fun isDetailsFailure(flag: Boolean, exception: Exception) {
+        this.exception = exception
         isDetailsFailure = flag
+    }
+
+    fun incrementIssueCount() {
+        detailsData = detailsData.copy(
+            issuesCount = detailsData.issuesCount + 1
+        )
     }
 }

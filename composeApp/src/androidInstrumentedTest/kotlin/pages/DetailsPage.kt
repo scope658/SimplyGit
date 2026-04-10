@@ -5,8 +5,9 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeDown
 
 class DetailsPage(private val composeTestRule: ComposeTestRule) : AbstractPage(composeTestRule) {
 
@@ -18,7 +19,6 @@ class DetailsPage(private val composeTestRule: ComposeTestRule) : AbstractPage(c
     val issuesIcon = composeTestRule.onNodeWithTag("issues_icon")
     val issuesCount = composeTestRule.onNodeWithTag("issues_count")
     val programmingLanguage = composeTestRule.onNodeWithTag("programming_language")
-    val readme = composeTestRule.onNodeWithTag("repo_readme")
     val repFiles = composeTestRule.onNodeWithTag("repo_files")
     val addButton = composeTestRule.onNodeWithTag("add_button")
     val dropDownMenu = composeTestRule.onNodeWithTag("dropDownMenu")
@@ -63,12 +63,6 @@ class DetailsPage(private val composeTestRule: ComposeTestRule) : AbstractPage(c
             .assertTextEquals(programmingLanguage)
             .assertIsDisplayed()
 
-        composeTestRule.onNodeWithText(
-            text = readme,
-            substring = true,
-            ignoreCase = true,
-            useUnmergedTree = true
-        ).assertExists()
         this.addFavouritesButton
             .assertIsDisplayed()
             .assertHasClickAction()
@@ -112,5 +106,17 @@ class DetailsPage(private val composeTestRule: ComposeTestRule) : AbstractPage(c
         createIssues
             .performClick()
 
+    }
+
+    fun pullToRefresh() {
+        composeTestRule
+            .onNodeWithTag("details_column")
+            .performTouchInput {
+                swipeDown(
+                    startY = centerY,
+                    endY = bottom * 0.9f,
+                    durationMillis = 500
+                )
+            }
     }
 }

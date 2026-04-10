@@ -16,6 +16,9 @@ import org.example.project.core.data.cache.cacheModule
 import org.example.project.core.data.cache.db.AppDatabase
 import org.example.project.core.data.cloud.FakeGithubApi
 import org.example.project.core.di.coreModule
+import org.example.project.createIssues.data.cloud.FakeIssueGithubApi
+import org.example.project.createIssues.data.cloud.IssueGithubApi
+import org.example.project.createIssues.di.createIssuesModule
 import org.example.project.details.data.cloud.DetailsGithubApi
 import org.example.project.details.data.cloud.FakeDetailsGithubApi
 import org.example.project.details.di.detailsModule
@@ -39,13 +42,15 @@ abstract class AbstractTest : KoinTest {
     protected lateinit var githubApi: FakeGithubApi
     protected lateinit var fakeDataStoreManager: FakeGeneralDataStoreManager
     protected lateinit var detailsGithubApi: FakeDetailsGithubApi
-    protected fun abstractSetUp() {
+    protected lateinit var fakeIssueGithubApi: FakeIssueGithubApi
 
+
+    protected fun abstractSetUp() {
         fakeDataStoreManager = FakeGeneralDataStoreManager()
         authWrapper = FakeAuthWrapper()
         githubApi = FakeGithubApi()
         detailsGithubApi = FakeDetailsGithubApi()
-
+        fakeIssueGithubApi = FakeIssueGithubApi(detailsGithubApi)
         stopKoin()
         startKoin {
             androidContext(ApplicationProvider.getApplicationContext())
@@ -58,7 +63,9 @@ abstract class AbstractTest : KoinTest {
                 profileModule,
                 coreModule,
                 detailsModule,
+                createIssuesModule,
                 module {
+                    single<IssueGithubApi> { fakeIssueGithubApi }
                     single<DetailsGithubApi> { detailsGithubApi }
                     single<AuthWrapper> { authWrapper }
                     single<GithubApi> { githubApi }
