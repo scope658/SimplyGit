@@ -68,6 +68,7 @@ import ktshwnumbertwo.composeapp.generated.resources.repo_files_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.repo_name_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.repo_owner_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.repo_readme_test_tag
+import org.example.project.details.presentation.DetailsActions
 import org.example.project.details.presentation.DetailsUiState
 import org.example.project.details.presentation.ReadmeUiState
 import org.example.project.main.presentation.components.handleCorrectColor
@@ -84,163 +85,164 @@ import theme.spacingXXXL
 import theme.tinyThicknessDivider
 
 @Composable
-fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success) = with(detailsUiState) {
-    var isMenuExpanded by rememberSaveable { mutableStateOf(false) }
+fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success, detailsActions: DetailsActions) =
+    with(detailsUiState) {
+        var isMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
-    ) {
-        Column(modifier = Modifier.padding(spacingL)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Spacer(modifier = Modifier.width(spacingS))
-                Text(
-                    text = repoOwner,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.testTag(stringResource(Res.string.repo_owner_test_tag))
-                )
-                IconButton(
-                    onClick = { /* toggle local favorite */ },
-                    modifier = Modifier.testTag(stringResource(Res.string.add_fav_button_test_tag))
-                ) {
-                    Icon(Icons.Outlined.Favorite, contentDescription = null)
-                }
-                Box {
-                    IconButton(
-                        onClick = { isMenuExpanded = true },
-                        modifier = Modifier.testTag(stringResource(Res.string.add_button_test_tag))
-                    ) {
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = stringResource(Res.string.desc_add)
-                        )
-                    }
-
-                    DropdownMenu(
-                        expanded = isMenuExpanded,
-                        onDismissRequest = { isMenuExpanded = false },
-                        modifier = Modifier.testTag(stringResource(Res.string.drop_down_menu_test_tag))
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.label_new_issue)) },
-                            leadingIcon = { Icon(Icons.Default.BugReport, null) },
-                            onClick = {
-                                isMenuExpanded = false
-                                /* TODO: handle */
-                            },
-                            modifier = Modifier.testTag(stringResource(Res.string.create_issues_item_test_tag))
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.label_new_pr)) },
-                            leadingIcon = { Icon(Icons.Default.CallMerge, null) },
-                            onClick = {
-                                isMenuExpanded = false
-                                /* TODO: handle */
-                            },
-                            modifier = Modifier.testTag(stringResource(Res.string.create_pr_item_test_tag))
-                        )
-                    }
-                }
-            }
-            Text(
-                text = repoName,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = spacingS)
-                    .testTag(stringResource(Res.string.repo_name_test_tag))
-            )
-
-            if (repoDesc.isNotEmpty()) {
-                Text(
-                    text = repoDesc,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(top = spacingML)
-                        .testTag(stringResource(Res.string.repo_desc_test_tag))
-                )
-            }
-
-            Row(
-                modifier = Modifier.padding(top = spacingL),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    painterResource(Res.drawable.github_icon),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(spacing18Dp)
-                        .testTag(stringResource(Res.string.forks_icon_test_tag))
-                )
-                Text(
-                    text = " " + stringResource(Res.string.label_forks, forksCount),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.testTag(stringResource(Res.string.forks_title_test_tag))
-                )
-                Spacer(modifier = Modifier.width(spacingL))
-                Box(
-                    modifier = Modifier.size(indicatorSize)
-                        .background(
-                            color = handleCorrectColor(language = programmingLanguage),
-                            shape = CircleShape
-                        )
-                )
-                Spacer(modifier = Modifier.width(spacingXS))
-                Text(
-                    text = programmingLanguage,
-                    modifier = Modifier.testTag(stringResource(Res.string.programming_language_test_tag))
-                )
-            }
-        }
-
-        HorizontalDivider(
-            thickness = tinyThicknessDivider,
-            color = MaterialTheme.colorScheme.outlineVariant
-        )
-
-        Column {
-            MenuRow(
-                icon = Icons.Default.Info,
-                label = stringResource(Res.string.label_issues),
-                value = issuesCount,
-                iconBgColor = Color(0xFF4CAF50),
-                iconTestTag = stringResource(Res.string.issues_icon_test_tag),
-                labelTestTag = stringResource(Res.string.issues_title_test_tag),
-                valueTestTag = stringResource(Res.string.issues_count_test_tag)
-            )
-            MenuRow(
-                icon = Icons.Default.FileOpen,
-                label = stringResource(Res.string.label_code),
-                value = "",
-                iconBgColor = Color.Black.copy(0.6f),
-                labelTestTag = stringResource(Res.string.repo_files_test_tag),
-                iconTestTag = "code_icon",
-                valueTestTag = ""
-            )
-        }
-        HorizontalDivider(
-            thickness = tinyThicknessDivider,
-            color = MaterialTheme.colorScheme.outlineVariant
-        )
-
-        Text(
-            text = stringResource(Res.string.label_readme),
+        Column(
             modifier = Modifier
-                .padding(top = spacingL, start = spacingL),
-            style = MaterialTheme.typography.bodyLarge
-        )
-        when (val state = readme) {
-            is ReadmeUiState.Success -> {
-                ReadmeContent(
-                    readmeUiState = state,
-                    owner = repoOwner,
-                    repo = repoName
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background).testTag("details_column")
+                .verticalScroll(rememberScrollState())
+        ) {
+            Column(modifier = Modifier.padding(spacingL)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Spacer(modifier = Modifier.width(spacingS))
+                    Text(
+                        text = repoOwner,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.outline,
+                        modifier = Modifier.testTag(stringResource(Res.string.repo_owner_test_tag))
+                    )
+                    IconButton(
+                        onClick = { /* toggle local favorite */ },
+                        modifier = Modifier.testTag(stringResource(Res.string.add_fav_button_test_tag))
+                    ) {
+                        Icon(Icons.Outlined.Favorite, contentDescription = null)
+                    }
+                    Box {
+                        IconButton(
+                            onClick = { isMenuExpanded = true },
+                            modifier = Modifier.testTag(stringResource(Res.string.add_button_test_tag))
+                        ) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = stringResource(Res.string.desc_add)
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = isMenuExpanded,
+                            onDismissRequest = { isMenuExpanded = false },
+                            modifier = Modifier.testTag(stringResource(Res.string.drop_down_menu_test_tag))
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(Res.string.label_new_issue)) },
+                                leadingIcon = { Icon(Icons.Default.BugReport, null) },
+                                onClick = {
+                                    isMenuExpanded = false
+                                    detailsActions.onCreateIssues()
+                                },
+                                modifier = Modifier.testTag(stringResource(Res.string.create_issues_item_test_tag))
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(Res.string.label_new_pr)) },
+                                leadingIcon = { Icon(Icons.Default.CallMerge, null) },
+                                onClick = {
+                                    isMenuExpanded = false
+                                    /* TODO: handle */
+                                },
+                                modifier = Modifier.testTag(stringResource(Res.string.create_pr_item_test_tag))
+                            )
+                        }
+                    }
+                }
+                Text(
+                    text = repoName,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = spacingS)
+                        .testTag(stringResource(Res.string.repo_name_test_tag))
                 )
+
+                if (repoDesc.isNotEmpty()) {
+                    Text(
+                        text = repoDesc,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(top = spacingML)
+                            .testTag(stringResource(Res.string.repo_desc_test_tag))
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.padding(top = spacingL),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painterResource(Res.drawable.github_icon),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(spacing18Dp)
+                            .testTag(stringResource(Res.string.forks_icon_test_tag))
+                    )
+                    Text(
+                        text = " " + stringResource(Res.string.label_forks, forksCount),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.testTag(stringResource(Res.string.forks_title_test_tag))
+                    )
+                    Spacer(modifier = Modifier.width(spacingL))
+                    Box(
+                        modifier = Modifier.size(indicatorSize)
+                            .background(
+                                color = handleCorrectColor(language = programmingLanguage),
+                                shape = CircleShape
+                            )
+                    )
+                    Spacer(modifier = Modifier.width(spacingXS))
+                    Text(
+                        text = programmingLanguage,
+                        modifier = Modifier.testTag(stringResource(Res.string.programming_language_test_tag))
+                    )
+                }
+            }
+
+            HorizontalDivider(
+                thickness = tinyThicknessDivider,
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
+
+            Column {
+                MenuRow(
+                    icon = Icons.Default.Info,
+                    label = stringResource(Res.string.label_issues),
+                    value = issuesCount,
+                    iconBgColor = Color(0xFF4CAF50),
+                    iconTestTag = stringResource(Res.string.issues_icon_test_tag),
+                    labelTestTag = stringResource(Res.string.issues_title_test_tag),
+                    valueTestTag = stringResource(Res.string.issues_count_test_tag)
+                )
+                MenuRow(
+                    icon = Icons.Default.FileOpen,
+                    label = stringResource(Res.string.label_code),
+                    value = "",
+                    iconBgColor = Color.Black.copy(0.6f),
+                    labelTestTag = stringResource(Res.string.repo_files_test_tag),
+                    iconTestTag = "code_icon",
+                    valueTestTag = ""
+                )
+            }
+            HorizontalDivider(
+                thickness = tinyThicknessDivider,
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
+
+            Text(
+                text = stringResource(Res.string.label_readme),
+                modifier = Modifier
+                    .padding(top = spacingL, start = spacingL),
+                style = MaterialTheme.typography.bodyLarge
+            )
+            when (val state = readme) {
+                is ReadmeUiState.Success -> {
+                    ReadmeContent(
+                        readmeUiState = state,
+                        owner = repoOwner,
+                        repo = repoName
+                    )
+                }
             }
         }
     }
-}
 
 @Composable
 fun ReadmeContent(readmeUiState: ReadmeUiState.Success, owner: String, repo: String) {
@@ -317,8 +319,18 @@ fun DetailsSuccessPreview() {
                     forksCount = "25",
                     issuesCount = "25",
                     programmingLanguage = "kotlin",
-                    readme = ReadmeUiState.Success("readme")
-                )
+                    readme = ReadmeUiState.Success("readme"),
+                ),
+                detailsActions = object : DetailsActions {
+                    override fun retry() = Unit
+
+                    override fun refresh() = Unit
+
+                    override fun onCode() = Unit
+
+                    override fun onCreateIssues() = Unit
+
+                }
             )
         }
     }

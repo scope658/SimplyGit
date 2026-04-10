@@ -69,11 +69,11 @@ class DetailsViewModel(
         )
     }
 
-    override fun onCode(repoOwner: String, repoName: String) {
+    override fun onCode() {
         emitEvent(event = DetailsEvent.OnCode(repoOwner, repoName))
     }
 
-    override fun onCreateIssues(repoOwner: String, repoName: String) {
+    override fun onCreateIssues() {
         emitEvent(event = DetailsEvent.OnCreateIssues(repoOwner, repoName))
     }
 
