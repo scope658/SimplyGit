@@ -94,9 +94,11 @@ class ProfileViewModel(
     }
 
     private fun updateScreenState(profileUiState: ProfileUiState) {
-        ProfileScreenState(
-            isRefreshing = false,
-            profileUiState = profileUiState,
-        )
+        _profileUiState.update {
+            ProfileScreenState(
+                isRefreshing = false,
+                profileUiState = profileUiState,
+            )
+        }
     }
 }
