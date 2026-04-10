@@ -47,4 +47,13 @@
     <string name="label_code">Код</string>
     <string name="label_readme">README</string>
     <string name="desc_add">Добавить</string>
+
+    <string name="create_issue_title">Создать задачу</string>
+    <string name="issue_title_label">Заголовок</string>
+    <string name="issue_description_label">Описание</string>
+    <string name="create_button">Создать</string>
+    <string name="cancel_button">Отмена</string>
+
+    <string name="error_body_too_long">Текст содержит %1$d символов, максимум 65536</string>
+    <string name="error_title_too_long">Заголовок содержит %1$d символов, максимум 256</string>
 </resources>

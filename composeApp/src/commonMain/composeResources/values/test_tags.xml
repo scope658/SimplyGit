@@ -60,4 +60,14 @@
     <string name="create_issues_item_test_tag">create_issues_item</string>
 
     <string name="add_fav_button_test_tag">add_fav_button</string>
+
+
+    <string name="issues_title_text_field_test_tag">issues_title_text_field</string>
+    <string name="issues_title_text_field_label_test_tag">issues_title_text_field_label</string>
+    <string name="issues_desc_text_field_test_tag">issues_desc_text_field</string>
+    <string name="issues_desc_text_field_label_test_tag">issues_desc_text_field_label</string>
+    <string name="create_issues_button_test_tag">create_issues_button</string>
+    <string name="issues_cancel_button_test_tag">issues_cancel_button</string>
+    <string name="issues_loading_test_tag">issues_loading</string>
+
 </resources>
