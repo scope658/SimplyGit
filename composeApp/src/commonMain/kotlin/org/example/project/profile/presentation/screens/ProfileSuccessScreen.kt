@@ -1,6 +1,5 @@
 package org.example.project.profile.presentation.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -63,7 +62,6 @@ fun ProfileSuccessScreen(profileUiState: ProfileUiState.Success, profileActions:
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
                 .padding(spacingL)
                 .verticalScroll(scrollState)
         ) {
@@ -98,7 +96,6 @@ fun ProfileSuccessScreen(profileUiState: ProfileUiState.Success, profileActions:
             Text(
                 text = bio,
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.Black,
                 lineHeight = smallLineHeight,
                 modifier = Modifier.testTag(stringResource(Res.string.user_bio_test_tag))
             )
