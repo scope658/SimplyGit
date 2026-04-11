@@ -151,7 +151,7 @@ fun CreateIssueUi(createIssueScreenState: IssueScreenState, createIssuesActions:
                     }
                 }
                 TextButton(
-                    onClick = {},
+                    onClick = { createIssuesActions.cancel() },
                     modifier = Modifier.fillMaxWidth()
                         .testTag(stringResource(Res.string.issues_cancel_button_test_tag))
                 ) {
@@ -176,7 +176,7 @@ private fun CreateIssuePreview() {
                     override fun onTitleChanged(title: String) = Unit
 
                     override fun onBodyChanged(body: String) = Unit
-
+                    override fun cancel() = Unit
                 }
             )
         }
@@ -189,6 +189,6 @@ private val createIssueScreenState = IssueScreenState(
     body = "fake body",
     bodySuppText = "fake body supp text",
     isCreateButtonActive = false,
-    isSuccess = false,
+    onBack = false,
     buttonState = ButtonState.Loading
 )

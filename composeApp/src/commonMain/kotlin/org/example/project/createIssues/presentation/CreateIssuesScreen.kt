@@ -12,7 +12,7 @@ fun CreateIssuesScreen(
 ) {
     val createIssuesScreenState by createIssuesViewModel.issuesScreenState.collectAsStateWithLifecycle()
 
-    if (createIssuesScreenState.isSuccess) {
+    if (createIssuesScreenState.onBack) {
         onSuccess()
     }
     CreateIssueUi(createIssuesScreenState, createIssuesViewModel)

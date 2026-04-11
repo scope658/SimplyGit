@@ -69,6 +69,10 @@ class IssuesViewModel(
         updateField { copy(body = body) }
     }
 
+    override fun cancel() {
+        updateField { copy(onBack = true) }
+    }
+
     private fun updateField(update: IssueScreenState.() -> IssueScreenState) {
         val updated = savedState.update()
         savedState = updated.copy(isCreateButtonActive = updated.isValid())

@@ -17,7 +17,7 @@ data class IssueScreenState(
     val body: String,
     val bodySuppText: String,
     val isCreateButtonActive: Boolean,
-    val isSuccess: Boolean,
+    val onBack: Boolean,
     val buttonState: ButtonState,
 ) {
     companion object {
@@ -27,7 +27,7 @@ data class IssueScreenState(
             isCreateButtonActive = false,
             titleSuppText = "",
             bodySuppText = "",
-            isSuccess = false,
+            onBack = false,
             buttonState = ButtonState.Init
         )
     }

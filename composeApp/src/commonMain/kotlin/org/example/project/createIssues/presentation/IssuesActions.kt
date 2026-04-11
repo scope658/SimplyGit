@@ -4,4 +4,5 @@ interface IssuesActions {
     fun create()
     fun onTitleChanged(title: String)
     fun onBodyChanged(body: String)
+    fun cancel()
 }

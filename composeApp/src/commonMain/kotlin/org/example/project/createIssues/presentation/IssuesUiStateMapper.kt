@@ -38,7 +38,7 @@ class IssuesUiStateMapper : IssueResult.Mapper<IssueScreenState> {
 
     override fun mapSuccess(current: IssueScreenState): IssueScreenState {
         return current.copy(
-            isSuccess = true,
+            onBack = true,
         )
     }
 
