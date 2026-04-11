@@ -7,8 +7,6 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.example.project.details.data.DetailsData
 import org.example.project.details.data.ReadmeData
 import org.example.project.details.domain.ReadmeNotFoundException
@@ -47,22 +45,4 @@ class DetailsGithubApiImpl(private val httpClient: HttpClient) : DetailsGithubAp
             readme = response.bodyAsText(),
         )
     }
-}
-
-@Serializable
-data class GithubRepoDto(
-    val name: String,
-    val description: String?,
-    @SerialName("forks_count")
-    val forksCount: Int,
-    val language: String?,
-
-    @SerialName("open_issues_count")
-    val openIssuesCount: Int,
-    val owner: OwnerDto
-) {
-    @Serializable
-    data class OwnerDto(
-        val login: String
-    )
 }
