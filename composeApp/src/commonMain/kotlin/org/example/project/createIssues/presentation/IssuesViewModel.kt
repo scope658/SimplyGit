@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import org.example.project.Routes
+import org.example.project.core.presentation.RouteArgs
 import org.example.project.core.presentation.RunAsync
 import org.example.project.createIssues.domain.CreateIssueUseCase
 import org.example.project.createIssues.domain.Issue
@@ -19,7 +20,8 @@ class IssuesViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val createIssueUseCase: CreateIssueUseCase,
     private val runAsync: RunAsync,
-    private val issuesUiStateMapper: IssueResult.Mapper<IssueScreenState>
+    private val issuesUiStateMapper: IssueResult.Mapper<IssueScreenState>,
+    private val issueArgs: RouteArgs,
 ) : ViewModel(), IssuesActions {
 
     private var savedState: IssueScreenState by savedStateHandle.saved(
@@ -29,9 +31,8 @@ class IssuesViewModel(
     private val _issueScreenState: MutableStateFlow<IssueScreenState> = MutableStateFlow(savedState)
     val issuesScreenState = _issueScreenState.asStateFlow()
 
-    private val route: Routes.CreateIssue =
-        savedStateHandle.toRoute()
-
+    private val repoOwner = issueArgs.repoOwner()
+    private val repoName = issueArgs.repoName()
 
     override fun create() {
         val currentState = savedState
@@ -48,8 +49,8 @@ class IssuesViewModel(
             viewModelScope,
             background = {
                 createIssueUseCase.createIssue(
-                    repoOwner = route.repoOwner,
-                    repoName = route.repoName,
+                    repoOwner = repoOwner,
+                    repoName = repoName,
                     issue = Issue(
                         title = title,
                         body = body,
@@ -64,14 +65,12 @@ class IssuesViewModel(
     }
 
     override fun onTitleChanged(title: String) {
-        if (savedState.buttonState == ButtonState.Loading) return
         val updated = savedState.copy(title = title)
         savedState = updated.copy(isCreateButtonActive = updated.isValid())
         _issueScreenState.value = savedState
     }
 
     override fun onBodyChanged(body: String) {
-        if (savedState.buttonState == ButtonState.Loading) return
         val updated = savedState.copy(body = body)
         savedState = updated.copy(isCreateButtonActive = updated.isValid())
         _issueScreenState.value = savedState
@@ -79,5 +78,16 @@ class IssuesViewModel(
 
     companion object {
         private const val ISSUES_UI_STATE_KEY = "ISSUES_UI_STATE_KEY"
+    }
+}
+
+class IssuesArgs(private val savedStateHandle: SavedStateHandle) : RouteArgs {
+    val issueRoute = savedStateHandle.toRoute<Routes.CreateIssue>()
+    override fun repoOwner(): String {
+        return issueRoute.repoOwner
+    }
+
+    override fun repoName(): String {
+        return issueRoute.repoName
     }
 }
