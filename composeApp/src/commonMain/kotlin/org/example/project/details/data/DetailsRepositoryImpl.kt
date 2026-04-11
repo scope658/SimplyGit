@@ -1,5 +1,6 @@
 package org.example.project.details.data
 
+import io.ktor.utils.io.CancellationException
 import org.example.project.core.data.HandleDomainError
 import org.example.project.details.data.cache.DetailsCacheDataSource
 import org.example.project.details.data.cloud.DetailsGithubApi
@@ -45,6 +46,8 @@ class DetailsRepositoryImpl(
             val readme = detailsGithubApi.readme(repoOwner, repoName)
             detailsCacheDataSource.saveReadme(readme)
             Result.success(readme.readme)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             if (detailsCacheDataSource.isReadmeContains(repoOwner, repoName)) {
                 val readme = detailsCacheDataSource.readme(repoOwner, repoName)
@@ -64,6 +67,8 @@ class DetailsRepositoryImpl(
             val details = detailsGithubApi.details(repoOwner, repoName)
             detailsCacheDataSource.saveDetails(details)
             Result.success(details.map(mapper = detailsDataToDomain))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             if (detailsCacheDataSource.isDetailsContains(repoOwner, repoName)) {
                 val details = detailsCacheDataSource.details(repoOwner, repoName)

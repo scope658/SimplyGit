@@ -409,7 +409,7 @@ class ScenarioTest : AbstractTest() {
         createIssuesPage.checkButtonIsEnabled()
 
         createIssuesPage.clickCreateButton()
-        createIssuesPage.checkErrorMessage(message = "Issue creation disabled")
+        createIssuesPage.checkErrorMessage(message = "Issue creation is disabled")
 
         fakeIssueGithubApi.isFailure(false)
         createIssuesPage.clickCreateButton()

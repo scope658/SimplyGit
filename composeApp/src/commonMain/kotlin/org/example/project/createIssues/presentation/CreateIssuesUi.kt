@@ -139,7 +139,7 @@ fun CreateIssueUi(createIssueScreenState: IssueScreenState, createIssuesActions:
                     when (val state = buttonState) {
                         is ButtonState.Failure -> Text(
                             state.message, style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onErrorContainer
+                            color = MaterialTheme.colorScheme.onError
                         )
 
                         is ButtonState.Init -> Text(stringResource(Res.string.create_button))
@@ -190,5 +190,5 @@ private val createIssueScreenState = IssueScreenState(
     bodySuppText = "fake body supp text",
     isCreateButtonActive = false,
     isSuccess = false,
-    buttonState = ButtonState.Failure(" no connection")
+    buttonState = ButtonState.Loading
 )
