@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import org.example.project.Routes
+import org.example.project.core.presentation.RouteArgs
 import org.example.project.core.presentation.RunAsync
 import org.example.project.details.domain.CombinedDetailsResult
 import org.example.project.details.domain.RepoDetailsUseCase
@@ -19,7 +20,7 @@ class DetailsViewModel(
     private val detailsUiMapper: CombinedDetailsResult.Mapper<DetailsUiState>,
     private val repoDetailsUseCase: RepoDetailsUseCase,
     private val runAsync: RunAsync,
-    private val savedStateHandle: SavedStateHandle,
+    private val detailsArgs: RouteArgs
 ) : ViewModel(), DetailsActions {
 
     private val _detailsScreenState: MutableStateFlow<DetailsScreenState> = MutableStateFlow(
@@ -30,12 +31,9 @@ class DetailsViewModel(
     )
     val detailsScreenState = _detailsScreenState.asStateFlow()
 
-    private val route: Routes.Details =
-        savedStateHandle.toRoute()
 
-    private val repoOwner = route.repoOwner
-    private val repoName = route.repoName
-
+    private val repoOwner = detailsArgs.repoOwner()
+    private val repoName = detailsArgs.repoName()
 
     private val _detailsEvent: MutableSharedFlow<DetailsEvent> = MutableSharedFlow()
     val detailsEvent: SharedFlow<DetailsEvent> = _detailsEvent.asSharedFlow()
@@ -102,5 +100,18 @@ class DetailsViewModel(
                 }
             }
         )
+    }
+}
+
+class DetailsArgs(private val savedStateHandle: SavedStateHandle) : RouteArgs {
+
+    private var detailsRoute = savedStateHandle.toRoute<Routes.Details>()
+
+    override fun repoOwner(): String {
+        return detailsRoute.repoOwner
+    }
+
+    override fun repoName(): String {
+        return detailsRoute.repoName
     }
 }

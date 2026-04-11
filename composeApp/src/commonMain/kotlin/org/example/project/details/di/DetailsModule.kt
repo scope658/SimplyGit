@@ -1,6 +1,7 @@
 package org.example.project.details.di
 
 import org.example.project.core.data.cache.db.AppDatabase
+import org.example.project.core.presentation.RouteArgs
 import org.example.project.details.data.DetailsData
 import org.example.project.details.data.DetailsDataToDomain
 import org.example.project.details.data.DetailsRepositoryImpl
@@ -22,6 +23,7 @@ import org.example.project.details.domain.HandleDetailsRequest
 import org.example.project.details.domain.RepoDetails
 import org.example.project.details.domain.RepoDetailsUseCase
 import org.example.project.details.domain.RepoDetailsUseCaseImpl
+import org.example.project.details.presentation.DetailsArgs
 import org.example.project.details.presentation.DetailsUiMapper
 import org.example.project.details.presentation.DetailsUiState
 import org.example.project.details.presentation.DetailsViewModel
@@ -69,12 +71,14 @@ val detailsModule = module {
 
     factory<CombinedDetailsResult.Mapper<DetailsUiState>> { DetailsUiMapper() }
 
+
+    factory<RouteArgs> { DetailsArgs(savedStateHandle = get()) }
     viewModel {
         DetailsViewModel(
-            savedStateHandle = get(),
             runAsync = get(),
             detailsUiMapper = get(),
             repoDetailsUseCase = get(),
+            detailsArgs = get()
         )
     }
 }
