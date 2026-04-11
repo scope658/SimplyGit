@@ -1,7 +1,5 @@
 package org.example.project.details
 
-import androidx.lifecycle.SavedStateHandle
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -9,6 +7,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.example.project.core.ControlledFakeRunAsync
 import org.example.project.core.domain.FakeManageResource
+import org.example.project.core.presentation.RouteArgs
 import org.example.project.details.domain.CombinedDetailsResult
 import org.example.project.details.domain.RepoDetails
 import org.example.project.details.domain.RepoDetailsUseCase
@@ -29,14 +28,15 @@ class DetailsViewModelTest {
     private lateinit var runAsync: ControlledFakeRunAsync
     private lateinit var detailsUiMapper: CombinedDetailsResult.Mapper<DetailsUiState>
     private lateinit var manageResource: FakeManageResource
+    private lateinit var detailsArgs: RouteArgs
 
     @BeforeTest
     fun setUp() {
+        detailsArgs = FakeDetailsArgs()
         manageResource = FakeManageResource()
         detailsUiMapper = DetailsUiMapper()
         fakeRepoDetailsUseCase = FakeRepoDetailsUseCase()
         runAsync = ControlledFakeRunAsync()
-
     }
 
     @Test //code will be in init block
@@ -48,7 +48,7 @@ class DetailsViewModelTest {
             detailsUiMapper = DetailsUiMapper(),
             repoDetailsUseCase = fakeRepoDetailsUseCase,
             runAsync = runAsync,
-            savedStateHandle = SavedStateHandle()
+            detailsArgs = detailsArgs,
         )
         val detailsScreenState: StateFlow<DetailsScreenState> = viewModel.detailsScreenState
 
@@ -56,6 +56,7 @@ class DetailsViewModelTest {
 
         runAsync.invokeUi()
 
+        fakeRepoDetailsUseCase.checkRepoDetailsIsCalled("fake repo owner", "fake repo name")
         assertEquals(
             successDetailsScreenState,
             detailsScreenState.value
@@ -71,10 +72,12 @@ class DetailsViewModelTest {
             detailsUiMapper = DetailsUiMapper(),
             repoDetailsUseCase = fakeRepoDetailsUseCase,
             runAsync = runAsync,
-            savedStateHandle = SavedStateHandle()
+            detailsArgs = detailsArgs,
         )
 
         runAsync.invokeUi()
+
+        fakeRepoDetailsUseCase.checkRepoDetailsIsCalled("fake repo owner", "fake repo name")
         assertEquals(
             successDetailsScreenState.copy(
                 detailsUiState = successDetailsUiState.copy(
@@ -93,10 +96,11 @@ class DetailsViewModelTest {
             detailsUiMapper = DetailsUiMapper(),
             repoDetailsUseCase = fakeRepoDetailsUseCase,
             runAsync = runAsync,
-            savedStateHandle = SavedStateHandle()
+            detailsArgs = detailsArgs,
         )
 
         val uiState: StateFlow<DetailsScreenState> = viewModel.detailsScreenState
+
         runAsync.invokeUi()
         assertEquals(
             DetailsScreenState(
@@ -122,7 +126,7 @@ class DetailsViewModelTest {
 
         runAsync.invokeUi()
 
-
+        fakeRepoDetailsUseCase.checkRepoDetailsIsCalled("fake repo owner", "fake repo name")
         assertEquals(
             successDetailsScreenState.copy(
                 detailsUiState = successDetailsUiState.copy(
@@ -142,8 +146,7 @@ class DetailsViewModelTest {
             detailsUiMapper = DetailsUiMapper(),
             repoDetailsUseCase = fakeRepoDetailsUseCase,
             runAsync = runAsync,
-
-            savedStateHandle = SavedStateHandle()
+            detailsArgs = detailsArgs,
         )
         runAsync.invokeUi()
 
@@ -152,7 +155,7 @@ class DetailsViewModelTest {
 
         viewModel.refresh()
 
-        fakeRepoDetailsUseCase.checkRefreshIsCalled(1)
+        fakeRepoDetailsUseCase.checkRefreshIsCalled(1, "fake repo owner", "fake repo name")
 
         assertEquals(successDetailsScreenState.copy(isRefreshing = true), uiState.value)
 
@@ -168,10 +171,10 @@ class DetailsViewModelTest {
             detailsUiMapper = DetailsUiMapper(),
             repoDetailsUseCase = fakeRepoDetailsUseCase,
             runAsync = runAsync,
-            savedStateHandle = SavedStateHandle()
+            detailsArgs = detailsArgs,
         )
         val detailsEventFlow: SharedFlow<DetailsEvent> = viewModel.detailsEvent
-        val job: Job = launch(Dispatchers.Unconfined) {
+        val job: Job = launch {
 
             detailsEventFlow.collect {
                 println(it.toString() + "EMITED")
@@ -179,7 +182,7 @@ class DetailsViewModelTest {
             }
         }
 
-        viewModel.onCreateIssues(repoOwner = "scope", repoName = "repo name")
+        viewModel.onCreateIssues()
 
         runAsync.invokeUi()
 
@@ -188,7 +191,7 @@ class DetailsViewModelTest {
         assertEquals(1, emitedEvents.size)
         assertEquals(
             emitedEvents[0],
-            DetailsEvent.OnCreateIssues(repoOwner = "scope", repoName = "repo name")
+            DetailsEvent.OnCreateIssues(repoOwner = "fake repo owner", repoName = "fake repo name")
         )
         Unit
     }
@@ -200,8 +203,7 @@ class DetailsViewModelTest {
             detailsUiMapper = DetailsUiMapper(),
             repoDetailsUseCase = fakeRepoDetailsUseCase,
             runAsync = runAsync,
-
-            savedStateHandle = SavedStateHandle()
+            detailsArgs = detailsArgs,
         )
         val detailEventFlow: SharedFlow<DetailsEvent> = viewModel.detailsEvent
         val job: Job? = launch {
@@ -210,14 +212,14 @@ class DetailsViewModelTest {
             }
         }
 
-        viewModel.onCode(repoOwner = "scope", repoName = "repo name")
+        viewModel.onCode()
 
         runAsync.invokeUi()
 
         assertEquals(emitedEvents.size, 1)
         assertEquals(
             emitedEvents[0],
-            DetailsEvent.OnCode(repoOwner = "scope", repoName = "repo name")
+            DetailsEvent.OnCode(repoOwner = "fake repo owner", repoName = "fake repo name")
         )
 
         job?.cancel()
@@ -268,6 +270,9 @@ private class FakeRepoDetailsUseCase : RepoDetailsUseCase {
 
     private var refreshCalledTimes = 0
 
+    private lateinit var repoOwnerArg: String
+    private lateinit var repoNameArg: String
+
     fun isRepoDetailsFailure(flag: Boolean) {
         isDetailsFailure = flag
     }
@@ -276,11 +281,25 @@ private class FakeRepoDetailsUseCase : RepoDetailsUseCase {
         this.isReadmeFailure = flag
     }
 
-    fun checkRefreshIsCalled(expectedTimes: Int) {
+    fun checkRefreshIsCalled(
+        expectedTimes: Int,
+        expectedRepoOwner: String,
+        expectedRepoName: String
+    ) {
+        assertEquals(expectedRepoOwner, repoOwnerArg)
+        assertEquals(expectedRepoName, repoNameArg)
         assertEquals(expectedTimes, refreshCalledTimes)
+
+    }
+
+    fun checkRepoDetailsIsCalled(expectedRepoOwner: String, expectedRepoName: String) {
+        assertEquals(expectedRepoOwner, repoOwnerArg)
+        assertEquals(expectedRepoName, repoNameArg)
     }
 
     override suspend fun repoDetails(repoOwner: String, repoName: String): CombinedDetailsResult {
+        repoOwnerArg = repoOwner
+        repoNameArg = repoName
 
         if (isDetailsFailure) {
             return CombinedDetailsResult.Failure("service unavailable")
@@ -304,6 +323,9 @@ private class FakeRepoDetailsUseCase : RepoDetailsUseCase {
         repoName: String
     ): CombinedDetailsResult {
         refreshCalledTimes++
+        repoOwnerArg = repoOwner
+        repoNameArg = repoName
+
         if (isDetailsFailure) {
             return CombinedDetailsResult.Failure("service unavailable")
         } else {
@@ -319,5 +341,15 @@ private class FakeRepoDetailsUseCase : RepoDetailsUseCase {
                 readme = if (isReadmeFailure) "readme not found" else "success refresh readme",
             )
         }
+    }
+}
+
+private class FakeDetailsArgs : RouteArgs {
+    override fun repoOwner(): String {
+        return "fake repo owner"
+    }
+
+    override fun repoName(): String {
+        return "fake repo name"
     }
 }
