@@ -33,7 +33,7 @@ data class IssueScreenState(
     }
 
     fun isValid(): Boolean {
-        if (buttonState is ButtonState.Loading) false
+        if (buttonState is ButtonState.Loading) return false
         return title.isNotBlank() && body.isNotBlank()
     }
 }//65536 body max // title max is 256

@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import org.example.project.Routes
 import org.example.project.core.presentation.RouteArgs
 import org.example.project.core.presentation.RunAsync
@@ -42,9 +41,7 @@ class IssuesViewModel(
             buttonState = ButtonState.Loading,
             isCreateButtonActive = false,
         )
-        _issueScreenState.update {
-            savedState
-        }
+        _issueScreenState.value = savedState
         runAsync.runAsync(
             viewModelScope,
             background = {
@@ -65,13 +62,15 @@ class IssuesViewModel(
     }
 
     override fun onTitleChanged(title: String) {
-        val updated = savedState.copy(title = title)
-        savedState = updated.copy(isCreateButtonActive = updated.isValid())
-        _issueScreenState.value = savedState
+        updateField { copy(title = title) }
     }
 
     override fun onBodyChanged(body: String) {
-        val updated = savedState.copy(body = body)
+        updateField { copy(body = body) }
+    }
+
+    private fun updateField(update: IssueScreenState.() -> IssueScreenState) {
+        val updated = savedState.update()
         savedState = updated.copy(isCreateButtonActive = updated.isValid())
         _issueScreenState.value = savedState
     }
@@ -79,10 +78,12 @@ class IssuesViewModel(
     companion object {
         private const val ISSUES_UI_STATE_KEY = "ISSUES_UI_STATE_KEY"
     }
+
+
 }
 
 class IssuesArgs(private val savedStateHandle: SavedStateHandle) : RouteArgs {
-    val issueRoute = savedStateHandle.toRoute<Routes.CreateIssue>()
+    private val issueRoute = savedStateHandle.toRoute<Routes.CreateIssue>()
     override fun repoOwner(): String {
         return issueRoute.repoOwner
     }
