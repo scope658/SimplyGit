@@ -11,13 +11,14 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun DetailsScreen(
     detailsViewModel: DetailsViewModel = koinViewModel(),
-    onCreateIssues: (repoOwner: String, repoName: String) -> Unit
+    onCreateIssues: (repoOwner: String, repoName: String) -> Unit,
+    onCode: (repoOwner: String, repoName: String) -> Unit,
 ) {
     val detailsScreenState by detailsViewModel.detailsScreenState.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
         detailsViewModel.detailsEvent.collectLatest {
             when (it) {
-                is DetailsEvent.OnCode -> Unit
+                is DetailsEvent.OnCode -> onCode(it.repoOwner, it.repoName)
                 is DetailsEvent.OnCreateIssues -> onCreateIssues(it.repoOwner, it.repoName)
             }
         }

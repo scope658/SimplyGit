@@ -1,6 +1,7 @@
 package org.example.project.details.presentation.Screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.CallMerge
+import androidx.compose.material.icons.filled.CallSplit
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.Favorite
@@ -52,7 +54,6 @@ import ktshwnumbertwo.composeapp.generated.resources.desc_add
 import ktshwnumbertwo.composeapp.generated.resources.drop_down_menu_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.forks_icon_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.forks_title_test_tag
-import ktshwnumbertwo.composeapp.generated.resources.github_icon
 import ktshwnumbertwo.composeapp.generated.resources.issues_count_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.issues_icon_test_tag
 import ktshwnumbertwo.composeapp.generated.resources.issues_title_test_tag
@@ -72,7 +73,6 @@ import org.example.project.details.presentation.DetailsActions
 import org.example.project.details.presentation.DetailsUiState
 import org.example.project.details.presentation.ReadmeUiState
 import org.example.project.main.presentation.components.handleCorrectColor
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import theme.indicatorSize
 import theme.spacing18Dp
@@ -169,7 +169,7 @@ fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success, detailsActions:
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        painterResource(Res.drawable.github_icon),
+                        imageVector = Icons.Filled.CallSplit,
                         contentDescription = null,
                         modifier = Modifier
                             .size(spacing18Dp)
@@ -209,7 +209,8 @@ fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success, detailsActions:
                     iconBgColor = Color(0xFF4CAF50),
                     iconTestTag = stringResource(Res.string.issues_icon_test_tag),
                     labelTestTag = stringResource(Res.string.issues_title_test_tag),
-                    valueTestTag = stringResource(Res.string.issues_count_test_tag)
+                    valueTestTag = stringResource(Res.string.issues_count_test_tag),
+                    onClick = {}
                 )
                 MenuRow(
                     icon = Icons.Default.FileOpen,
@@ -218,7 +219,8 @@ fun DetailsSuccessScreen(detailsUiState: DetailsUiState.Success, detailsActions:
                     iconBgColor = Color.Black.copy(0.6f),
                     labelTestTag = stringResource(Res.string.repo_files_test_tag),
                     iconTestTag = "code_icon",
-                    valueTestTag = ""
+                    valueTestTag = "",
+                    onClick = { detailsActions.onCode() }
                 )
             }
             HorizontalDivider(
@@ -264,11 +266,13 @@ private fun MenuRow(
     iconTestTag: String,
     labelTestTag: String,
     valueTestTag: String,
+    onClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(spacingL),
+            .padding(spacingL)
+            .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(

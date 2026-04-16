@@ -13,6 +13,7 @@ import org.example.project.login.di.loginModule
 import org.example.project.main.di.mainModule
 import org.example.project.onboarding.di.onboardingModule
 import org.example.project.profile.di.profileModule
+import org.example.project.repoFiles.di.repoFilesModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 
@@ -39,6 +40,7 @@ class MyApp : Application() {
                 coreModule,
                 detailsModule,
                 createIssuesModule,
+                repoFilesModule,
             )
         }
     }
