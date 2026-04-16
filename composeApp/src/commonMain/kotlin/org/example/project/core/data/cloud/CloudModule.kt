@@ -1,9 +1,13 @@
 package org.example.project.core.data.cloud
 
+import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.plugin
 import io.ktor.client.request.header
 import io.ktor.serialization.kotlinx.json.json
@@ -24,8 +28,15 @@ val cloudModule = module {
             install(ContentNegotiation) {
                 json(Json {
                     ignoreUnknownKeys = true
-
                 })
+            }
+            install(Logging) {
+                level = LogLevel.ALL
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        Napier.d(message, tag = "HTTP_DEBUG")
+                    }
+                }
             }
         }
         customHttClient.plugin(HttpSend).intercept { request ->
@@ -37,6 +48,7 @@ val cloudModule = module {
             }
             execute(request)
         }
+
         customHttClient
     }
 }

@@ -13,6 +13,7 @@ import org.example.project.createIssues.presentation.CreateIssuesScreen
 import org.example.project.details.presentation.DetailsScreen
 import org.example.project.login.presentation.LoginScreen
 import org.example.project.onboarding.presentation.OnboardingScreen
+import org.example.project.repoFiles.presentation.RepoFilesScreen
 import theme.CatAppTheme
 
 sealed interface Routes {
@@ -38,6 +39,11 @@ sealed interface Routes {
 
     @Serializable
     data class CreateIssue(val repoOwner: String, val repoName: String) : Routes
+
+
+    @Serializable
+    data class RepoFiles(val repoOwner: String, val repoName: String, val path: String = "") :
+        Routes
 
 }
 
@@ -94,10 +100,20 @@ fun App() {
                                     repoName = repoName
                                 )
                             )
+                        },
+                        onCode = { repoOwner, repoName ->
+                            navController.navigate(Routes.RepoFiles(repoOwner, repoName))
                         }
                     )
                 }
                 composable<Routes.CreateIssue> { CreateIssuesScreen(onSuccess = { navController.popBackStack() }) }
+                composable<Routes.RepoFiles> {
+                    RepoFilesScreen(
+                        onNextFiles = { repoOwner, repoName, path ->
+                            navController.navigate(Routes.RepoFiles(repoOwner, repoName, path))
+                        }
+                    )
+                }
             }
         }
     }
