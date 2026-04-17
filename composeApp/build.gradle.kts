@@ -10,6 +10,9 @@ plugins {
     kotlin("plugin.parcelize")
     alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.room)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.crashlytics)
+    alias(libs.plugins.detekt)
 }
 
 kotlin {
@@ -22,7 +25,7 @@ kotlin {
             )
         }
     }
-    
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -32,7 +35,7 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
@@ -80,6 +83,12 @@ kotlin {
 
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
+
+            implementation(project.dependencies.platform(libs.firebase.bom))
+            implementation(libs.firebase.crashlytics)
+            implementation(libs.firebase.analytics)
+
+            implementation(libs.leakcanary.android)
         }
         iosMain.dependencies {
             implementation(libs.coil.network.ktor)
@@ -143,11 +152,28 @@ android {
             )
         }
     }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
 
+    lint {
+        warningsAsErrors = false
+        abortOnError = false
+        htmlReport = true
+        htmlOutput = file("build/reports/lint-report.html")
+    }
 }
 room {
     schemaDirectory("$projectDir/schemas")
@@ -158,3 +184,12 @@ dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
 }
 
+detekt {
+    toolVersion = libs.versions.detekt.get()
+    source.setFrom(files("src/commonMain/kotlin", "src/androidMain/kotlin"))
+    buildUponDefaultConfig = true
+    allRules = false
+    reports {
+        html.required.set(true)
+    }
+}

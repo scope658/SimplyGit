@@ -18,7 +18,11 @@ class MyApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        Napier.base(DebugAntilog())
+        if (BuildConfig.DEBUG) {
+            Napier.base(DebugAntilog())
+        } else {
+            Napier.base(CrashReportingAntilog())
+        }
         startKoin {
             androidContext(this@MyApp)
             modules(
@@ -35,3 +39,4 @@ class MyApp : Application() {
         }
     }
 }
+
